@@ -930,3 +930,47 @@ def mongodb_delete_collection(db: Database, collection_name: str) -> None:
         db.drop_collection(collection_name)
     except Exception as e:
         raise RuntimeError(f"Failed to delete collection: {e}")
+
+## Async functions to load and delete data from MongoDB
+
+async def mongodb_async_bulk_load_objects(collection: Collection, objects: List[dict]) -> None:
+    """
+    Asynchronously bulk loads objects into a collection.
+
+    Args:
+        collection (Collection): The collection to load objects into.
+        objects (List[dict]): A list of dictionaries representing the objects to be loaded.
+
+    Raises:
+        ValueError: If objects is not a list of dictionaries.
+    """
+    if not all(isinstance(item, dict) for item in objects):
+        raise ValueError("Objects must be a list of dictionaries")
+
+    try:
+        # Motor uses the same syntax as PyMongo for bulk operations
+        await collection.insert_many(objects)
+    except Exception as e:
+        raise RuntimeError(f"Failed to bulk load objects asynchronously: {e}")
+
+async def mongodb_async_destroy_objects(collection: Collection, ids: Optional[List[str]] = None) -> None:
+    """
+    Asynchronously destroys objects in a collection based on an array of IDs.
+
+    Args:
+        collection (Collection): The collection from which to remove objects.
+        ids (Optional[List[str]], optional): List of IDs to remove. If None, removes all objects.
+
+    Raises:
+        ValueError: If ids is not a list of strings.
+    """
+    try:
+        if ids is None:
+            await collection.delete_many({})
+        else:
+            if not all(isinstance(id_, str) for id_ in ids):
+                raise ValueError("IDs must be a list of strings")
+            await collection.delete_many({"_id": {"$in": ids}})
+    except Exception as e:
+        raise RuntimeError(f"Failed to destroy objects asynchronously: {e}")
+    

@@ -24,7 +24,6 @@ def s3_connect():
         s3_client = None
     return s3_client
 
-
 #####################
 ####    MinIO    ####
 #####################
