@@ -8,6 +8,7 @@ Flask-RESTful==0.3.10
 Flask-SQLAlchemy==3.1.1
 lxml==4.9.3
 minio==7.2.0
+pandas==1.4.1
 plotly==5.18.0
 PyMuPDF==1.22.5
 pytest==7.4.0
