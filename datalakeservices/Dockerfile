@@ -14,13 +14,11 @@ WORKDIR /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 RUN python3 -m spacy download en_core_web_lg
-RUN python3 -m pip3 install --upgrade pymupdf
+RUN python3 -m pip install --upgrade pymupdf
 
 # Define environment variable
 ENV FLASK_APP=datalakeservices/app/myapp.py
 ENV FLASK_RUN_HOST=0.0.0.0
-
-
 
 
 
