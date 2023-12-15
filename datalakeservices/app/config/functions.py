@@ -815,4 +815,118 @@ except ValueError as e:
 """
 
 
+#################################
+####    MongoDB Functions    ####
+#################################
 
+def mongodb_connect_to_database(db_name: str = 'gis') -> Database:
+    """
+    Connect to or create a MongoDB database.
+
+    Args:
+        db_name (str, optional): Name of the database to connect to or create. Defaults to 'gis'.
+
+    Returns:
+        Database: MongoDB Database object.
+    """
+    assert isinstance(db_name, str), "Database name must be a string"
+
+    try:
+        client = MongoClient('mongodb://localhost:27017/')
+        return client[db_name]
+    except Exception as e:
+        raise ConnectionError(f"Failed to connect to the database: {e}")
+
+def mongodb_create_collection(db: Database, collection_name: str = 'base') -> Collection:
+    """
+    Create a collection in the given database if it doesn't exist.
+
+    Args:
+        db (Database): The database in which to create the collection.
+        collection_name (str, optional): The name of the collection. Defaults to 'base'.
+
+    Returns:
+        Collection: MongoDB Collection object.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+
+    try:
+        return db[collection_name]
+    except Exception as e:
+        raise RuntimeError(f"Failed to create collection: {e}")
+
+def mongodb_bulk_load_objects(collection: Collection, objects: List[dict]) -> None:
+    """
+    Bulk loads objects into a collection.
+
+    Args:
+        collection (Collection): The collection to load objects into.
+        objects (List[dict]): A list of dictionaries representing the objects to be loaded.
+
+    Raises:
+        ValueError: If objects is not a list of dictionaries.
+    """
+    if not all(isinstance(item, dict) for item in objects):
+        raise ValueError("Objects must be a list of dictionaries")
+
+    try:
+        collection.insert_many(objects)
+    except Exception as e:
+        raise RuntimeError(f"Failed to bulk load objects: {e}")
+
+def mongodb_search_by_guid(collection: Collection, guid: str) -> Optional[dict]:
+    """
+    Searches the collection for a specific GUID.
+
+    Args:
+        collection (Collection): The collection to search.
+        guid (str): The GUID to search for.
+
+    Returns:
+        Optional[dict]: The found document or None.
+    """
+    assert isinstance(guid, str), "GUID must be a string"
+
+    try:
+        return collection.find_one({"guid": guid})
+    except Exception as e:
+        raise RuntimeError(f"Failed to search for GUID: {e}")
+
+def mongodb_destroy_objects(collection: Collection, ids: Optional[List[str]] = None) -> None:
+    """
+    Destroys objects in a collection based on an array of IDs.
+
+    Args:
+        collection (Collection): The collection from which to remove objects.
+        ids (Optional[List[str]], optional): List of IDs to remove. If None, removes all objects.
+
+    Raises:
+        ValueError: If ids is not a list of strings.
+    """
+    try:
+        if ids is None:
+            collection.delete_many({})
+        else:
+            if not all(isinstance(id_, str) for id_ in ids):
+                raise ValueError("IDs must be a list of strings")
+            collection.delete_many({"_id": {"$in": ids}})
+    except Exception as e:
+        raise RuntimeError(f"Failed to destroy objects: {e}")
+
+def mongodb_delete_collection(db: Database, collection_name: str) -> None:
+    """
+    Deletes a MongoDB collection.
+
+    Args:
+        db (Database): The database containing the collection.
+        collection_name (str): The name of the collection to delete.
+
+    Raises:
+        ValueError: If collection_name is not a string.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+
+    try:
+        db.drop_collection(collection_name)
+    except Exception as e:
+        raise RuntimeError(f"Failed to delete collection: {e}")

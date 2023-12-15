@@ -9,6 +9,10 @@ import pandas as pd
 from pandas.api import types
 from datetime import datetime, timedelta
 
+# Ashnchronous packages
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+
 # Multiprcessing
 import ray
 
@@ -33,6 +37,7 @@ from botocore.exceptions import ClientError
 # Mongo
 from pymongo import MongoClient
 from pymongo.database import Database
+from pymongo.collection import Collection
 from pymongo.errors import ConnectionFailure, PyMongoError
 
 # LXML

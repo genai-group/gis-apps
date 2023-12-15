@@ -8,8 +8,7 @@ from config.modules import *
 ####    Ray - multi-processing    ####
 ######################################
 
-ray.init()
-
+ray.init(dashboard_host="0.0.0.0",dashboard_port=6379)
 
 ######################
 ####    AWS S3    ####
@@ -97,6 +96,7 @@ def initialize_connection_pool():
                                                             dbname=db_name,
                                                             user=db_user,
                                                             password=db_password)
+        print("Connection pool created successfully!")
     except psycopg2.Error as e:
         print(f"Error initializing connection pool: {e}")
 
@@ -209,8 +209,8 @@ def connect_to_mongodb(host: str = 'localhost',
     PyMongoError: For other PyMongo related errors.
 
     Example:
-    >>> db = connect_to_mongodb('localhost', 27017, 'user', 'pass', 'mydb')
-    >>> print(db.name)
+    >>> mongodb_client = connect_to_mongodb('localhost', 27017, 'user', 'pass', 'mydb')
+    >>> print(mongodb_client.name)
     mydb
     """
 
@@ -221,7 +221,8 @@ def connect_to_mongodb(host: str = 'localhost',
 
     try:
         # Create a MongoDB client instance
-        client = MongoClient(host, port, username=username, password=password)
+        # client = MongoClient(host, port, username=username, password=password)
+        client = MongoClient('mongodb://localhost:27017/')
 
         # Access the specified database
         db = client[db_name]
@@ -236,4 +237,5 @@ def connect_to_mongodb(host: str = 'localhost',
         raise PyMongoError(f"An error occurred with PyMongo: {e}")
 
 # Example usage
-# db = connect_to_mongodb('localhost', 27017, 'myuser', 'mypassword', 'mydatabase')
+mongo_client = connect_to_mongodb()
+
