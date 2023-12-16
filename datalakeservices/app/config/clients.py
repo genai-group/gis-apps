@@ -8,7 +8,7 @@ from config.modules import *
 ####    Ray - multi-processing    ####
 ######################################
 
-ray.init(dashboard_host="0.0.0.0",dashboard_port=6379)
+# ray.init(dashboard_host="0.0.0.0",dashboard_port=6379)
 
 ######################
 ####    AWS S3    ####
@@ -84,9 +84,12 @@ def initialize_connection_pool():
         # Get database connection details from environment variables
         db_host = os.environ.get('POSTGRES_DB_HOST', 'localhost')
         db_port = os.environ.get('POSTGRES_DB_PORT', '5432')
-        db_name = os.environ.get('POSTGRES_DB_NAME')
-        db_user = os.environ.get('POSTGRES_DB_USER')
-        db_password = os.environ.get('POSTGRES_DB_PASSWORD')
+        # db_name = os.environ.get('POSTGRES_DB_NAME')
+        db_name = 'postggres'
+        # db_user = os.environ.get('POSTGRES_DB_USER')
+        db_user = 'postgres'
+        # db_password = os.environ.get('POSTGRES_DB_PASSWORD')
+        db_password = '12345asdf'
 
         # Initialize the connection pool => auto scale threads when needed
         connection_pool = psycopg2.pool.ThreadedConnectionPool(1, 10,
