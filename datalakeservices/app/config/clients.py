@@ -85,7 +85,7 @@ def initialize_connection_pool():
         db_host = os.environ.get('POSTGRES_DB_HOST', 'localhost')
         db_port = os.environ.get('POSTGRES_DB_PORT', '5432')
         # db_name = os.environ.get('POSTGRES_DB_NAME')
-        db_name = 'postggres'
+        db_name = 'postgres'
         # db_user = os.environ.get('POSTGRES_DB_USER')
         db_user = 'postgres'
         # db_password = os.environ.get('POSTGRES_DB_PASSWORD')
