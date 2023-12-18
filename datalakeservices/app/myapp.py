@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
+#%%
 from config.init import *
-
 
 from flask import Flask, jsonify, request
 
+#%%
 app = Flask(__name__)
 
 @app.route('/api/item', methods=['POST'])

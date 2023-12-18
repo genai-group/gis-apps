@@ -8,3 +8,12 @@ MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'minio')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'minio123')
 
 # %%
+KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
+KAFKA_GROUP_ID = os.environ.get('KAFKA_GROUP_ID', 'my-group')
+KAFKA_TOPIC = os.environ.get('KAFKA_TOPIC', 'my-topic')
+
+# Neo4j Credentials
+NEO4J_URI = os.environ.get('NEO4J_URI', 'bolt://localhost:7687')
+NEO4J_USER = os.environ.get('NEO4J_USER', 'neo4j')
+NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD', 'password')
+

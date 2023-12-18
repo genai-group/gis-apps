@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
+# Neo4j
+from neo4j import GraphDatabase
+
 # Multiprcessing
 import ray
 
@@ -30,7 +33,9 @@ from typing import List, Dict, Tuple, Union, Any, Optional, Coroutine, Callable,
 import psycopg2
 from psycopg2 import pool, sql
 
-
+# Kafka & Zookeeper
+from confluent_kafka import Producer, Consumer, KafkaException
+from confluent_kafka.admin import AdminClient, NewTopic
 
 # AWS
 import boto3

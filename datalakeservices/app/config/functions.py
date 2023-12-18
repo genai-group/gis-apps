@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 #%%
+from config.variables import *
 from config.modules import *
 from config.clients import *
 
@@ -418,48 +419,48 @@ def minio_download_file(bucket_name: str, object_name: str, endpoint_url: str, a
 
 # Postgres Functions
 
-def create_table_from_json(conn, json_data, parent_table=None, parent_key=None):
-    """
-    Recursively creates tables from a JSON object.
+# def create_table_from_json(conn, json_data, parent_table=None, parent_key=None):
+#     """
+#     Recursively creates tables from a JSON object.
 
-    Args:
-    conn (psycopg2.connection): PostgreSQL database connection.
-    json_data (dict): A JSON object.
-    parent_table (str, optional): Name of the parent table for nested objects.
-    parent_key (str, optional): Primary key of the parent table for linking.
-    """
-    if isinstance(json_data, dict):
-        # Determine table name
-        table_name = parent_table + "_child" if parent_table else "root_table"
-        columns = []
-        foreign_key = None
-        if parent_table and parent_key:
-            foreign_key = parent_key + "_id"
-            columns.append(foreign_key + " INTEGER REFERENCES " + parent_table + "(" + parent_key + ")")
+#     Args:
+#     conn (psycopg2.connection): PostgreSQL database connection.
+#     json_data (dict): A JSON object.
+#     parent_table (str, optional): Name of the parent table for nested objects.
+#     parent_key (str, optional): Primary key of the parent table for linking.
+#     """
+#     if isinstance(json_data, dict):
+#         # Determine table name
+#         table_name = parent_table + "_child" if parent_table else "root_table"
+#         columns = []
+#         foreign_key = None
+#         if parent_table and parent_key:
+#             foreign_key = parent_key + "_id"
+#             columns.append(foreign_key + " INTEGER REFERENCES " + parent_table + "(" + parent_key + ")")
 
-        # Process each key in the JSON object
-        for key, value in json_data.items():
-            if isinstance(value, dict):
-                # Recursive call for nested objects
-                create_table_from_json(conn, value, table_name, key)
-            elif isinstance(value, list):
-                # Handle lists (arrays)
-                for item in value:
-                    if isinstance(item, dict):
-                        create_table_from_json(conn, item, table_name, key)
-            else:
-                # Simple data types
-                columns.append(key + " " + get_sql_data_type(value))
+#         # Process each key in the JSON object
+#         for key, value in json_data.items():
+#             if isinstance(value, dict):
+#                 # Recursive call for nested objects
+#                 create_table_from_json(conn, value, table_name, key)
+#             elif isinstance(value, list):
+#                 # Handle lists (arrays)
+#                 for item in value:
+#                     if isinstance(item, dict):
+#                         create_table_from_json(conn, item, table_name, key)
+#             else:
+#                 # Simple data types
+#                 columns.append(key + " " + get_sql_data_type(value))
 
-        # Create table
-        create_table_query = "CREATE TABLE IF NOT EXISTS " + table_name + " (" + ", ".join(columns) + ")"
-        execute_sql(conn, create_table_query)
+#         # Create table
+#         create_table_query = "CREATE TABLE IF NOT EXISTS " + table_name + " (" + ", ".join(columns) + ")"
+#         execute_sql(conn, create_table_query)
 
-    elif isinstance(json_data, list):
-        # Handle JSON arrays
-        for item in json_data:
-            if isinstance(item, dict):
-                create_table_from_json(conn, item, parent_table, parent_key)
+#     elif isinstance(json_data, list):
+#         # Handle JSON arrays
+#         for item in json_data:
+#             if isinstance(item, dict):
+#                 create_table_from_json(conn, item, parent_table, parent_key)
 
 def get_sql_data_type(value):
     """
@@ -974,3 +975,95 @@ async def mongodb_async_destroy_objects(collection: Collection, ids: Optional[Li
     except Exception as e:
         raise RuntimeError(f"Failed to destroy objects asynchronously: {e}")
     
+
+###############################
+####    Kafka Functions    ####
+###############################
+
+def kafka_create_topic(topic_name: str, num_partitions: int = 1, replication_factor: int = 1, kafka_client: AdminClient = kafka_client) -> None:
+    """
+    Create a new topic in Kafka.
+
+    Parameters:
+    kafka_client (AdminClient): The Kafka AdminClient instance.
+    topic_name (str): Name of the topic to be created.
+    num_partitions (int): Number of partitions for the topic (default: 1).
+    replication_factor (int): Replication factor for the topic (default: 1).
+
+    Raises:
+    AssertionError: If any of the input parameters are not in expected format.
+    KafkaException: If there is an error in creating the topic.
+    """
+    assert isinstance(topic_name, str), "Topic name must be a string"
+    assert isinstance(num_partitions, int), "Number of partitions must be an integer"
+    assert isinstance(replication_factor, int), "Replication factor must be an integer"
+
+    new_topic = NewTopic(topic_name, num_partitions=num_partitions, replication_factor=replication_factor)
+    try:
+        kafka_client.create_topics([new_topic])
+    except KafkaException as e:
+        raise KafkaException(f"Error in creating topic {topic_name}: {e}")
+
+def kafka_delete_topic(topic_name: str, kafka_client: AdminClient = kafka_client) -> None:
+    """
+    Delete a topic in Kafka.
+
+    Parameters:
+    kafka_client (AdminClient): The Kafka AdminClient instance.
+    topic_name (str): Name of the topic to be deleted.
+
+    Raises:
+    AssertionError: If topic_name is not a string.
+    KafkaException: If there is an error in deleting the topic.
+    """
+    assert isinstance(topic_name, str), "Topic name must be a string"
+
+    try:
+        kafka_client.delete_topics([topic_name])
+    except KafkaException as e:
+        raise KafkaException(f"Error in deleting topic {topic_name}: {e}")
+
+def kafka_list_topics(kafka_client: AdminClient = kafka_client):
+    """
+    List all topics in the Kafka cluster.
+
+    Parameters:
+    kafka_client (AdminClient): The Kafka AdminClient instance.
+
+    Returns:
+    dict: A dictionary of topics and their metadata.
+
+    Raises:
+    KafkaException: If there is an error in listing the topics.
+    """
+    try:
+        return kafka_client.list_topics().topics
+    except KafkaException as e:
+        raise KafkaException(f"Error in listing topics: {e}")
+
+def kafka_consume_message(bootstrap_servers: str, group_id: str, topic_name: str):
+    """
+    Consume a message from a Kafka topic.
+
+    Parameters:
+    bootstrap_servers (str): Comma-separated list of broker addresses.
+    group_id (str): The consumer group to which the consumer belongs.
+    topic_name (str): The topic to consume messages from.
+
+    Returns:
+    str or None: The consumed message or None if no message is received.
+
+    Raises:
+    Exception: If there is an error in consuming the message.
+    """
+    consumer = Consumer({"bootstrap.servers": bootstrap_servers, "group.id": group_id})
+    consumer.subscribe([topic_name])
+    try:
+        message = consumer.poll(1.0)
+        consumer.close()
+        if message is None:
+            print("No message received")
+        else:
+            return message
+    except Exception as e:
+        raise Exception(f"Error in consuming message: {e}")

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 #%%
+from config.variables import *
 from config.modules import *
-
 
 ######################################
 ####    Ray - multi-processing    ####
@@ -232,6 +232,8 @@ def connect_to_mongodb(host: str = 'localhost',
         # Attempt a simple operation to verify the connection
         db.command('ping')
 
+        print(f"Connected to MongoDB: {db_name}")
+
         return db
     except ConnectionFailure as e:
         raise ConnectionFailure(f"Failed to connect to MongoDB: {e}")
@@ -241,3 +243,63 @@ def connect_to_mongodb(host: str = 'localhost',
 # Example usage
 mongo_client = connect_to_mongodb()
 
+
+#################################
+####    Kafka & Zookeeper    ####
+#################################
+
+
+def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
+                              client_id: Optional[str] = None) -> AdminClient:
+    """
+    Create a Kafka AdminClient with specified parameters.
+
+    Parameters:
+    bootstrap_servers (str): Comma-separated list of broker addresses (default: "localhost:9092").
+    client_id (Optional[str]): An optional identifier for the client.
+
+    Returns:
+    AdminClient: A Kafka AdminClient instance.
+
+    Raises:
+    AssertionError: If any of the input parameters are not in expected format.
+    Exception: If there is an error in creating the Kafka AdminClient.
+    """
+
+    # Validate input parameters
+    assert isinstance(bootstrap_servers, str), "bootstrap_servers must be a string"
+    if client_id is not None:
+        assert isinstance(client_id, str), "client_id must be a string"
+
+    # Prepare configuration
+    config = {"bootstrap.servers": bootstrap_servers}
+    if client_id is not None:
+        config["client.id"] = client_id
+
+    # Attempt to create a Kafka AdminClient
+    try:
+        return AdminClient(config)
+    except Exception as e:
+        raise Exception(f"Error in creating Kafka AdminClient: {e}")
+
+# Creating the kafa admin client
+kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
+
+
+####    Neo4j Client    ####
+
+def connect_to_neo4j():
+    try:
+        client = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI"),
+            auth=(os.environ.get("NEO4J_USER"), os.environ.get("NEO4J_PASSWORD")),
+            max_connection_lifetime=3600*24*30,
+            keep_alive=True
+        )
+        print(f"Connected to Neo4j: {client}")
+        return client
+    except Exception as e:
+        print(f"Errors loading Neo4j Client: {e}")
+        return None
+    
+neo4j_client = connect_to_neo4j()

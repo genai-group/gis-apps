@@ -1,6 +1,7 @@
 # Required Python Packages
 
 boto3==1.21.25
+confluent-kafka==2.3.0
 Flask==2.2.5
 Flask-Cors==3.0.10
 Flask-HTTPAuth==4.8.0
