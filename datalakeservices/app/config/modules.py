@@ -4,6 +4,7 @@
 import os
 import re
 import json
+import unicodedata
 import numpy as np
 import pandas as pd
 from pandas.api import types
