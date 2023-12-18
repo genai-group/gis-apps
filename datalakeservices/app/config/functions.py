@@ -496,7 +496,7 @@ def execute_sql(conn, query):
 # Example usage
 conn = connect_to_postgres()
 json_data = '{"name": "John", "age": 30, "address": {"street": "123 Main St", "city": "Anytown"}, "hobbies": ["reading", "hiking"]}'
-create_table_from_json(conn, json.loads(json_data))
+# create_table_from_json(conn, json.loads(json_data))
 
 def normalize_name(name: str) -> Optional[str]:
     """
