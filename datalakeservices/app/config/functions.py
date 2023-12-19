@@ -108,28 +108,40 @@ def generate_key():
     key = Fernet.generate_key()
     print(f"Generated Key: {key.decode()}")
 
-def encrypt_data(data: Dict[str, Any]) -> Optional[bytes]:
+def serialize_data(data: Any) -> bytes:
     """
-    Encrypt a dictionary using the Fernet symmetric encryption.
+    Serialize different data types into bytes.
 
     Parameters:
-    - data (Dict[str, Any]): The dictionary to be encrypted.
+    - data (Any): The data to be serialized.
+
+    Returns:
+    - bytes: The serialized data.
+    """
+    if isinstance(data, (dict, list, str, int, float)):
+        # Directly serializable to JSON
+        return json.dumps(data).encode('utf-8')
+    else:
+        # For other data types like numpy arrays, pandas dataframes, images, etc.
+        return pickle.dumps(data)
+
+def encrypt_data(data: Any) -> Optional[bytes]:
+    """
+    Encrypt any data type using the Fernet symmetric encryption.
+
+    Parameters:
+    - data (Any): The data to be encrypted.
 
     Returns:
     - Optional[bytes]: The encrypted data, or None if an error occurs.
-
-    Raises:
-    - ValueError: If the SECRET_KEY_ENV_VAR is not set.
     """
-
     try:
         key = os.environ.get("SECRET_KEY_ENV_VAR")
-        
         if not key:
-            raise ValueError(f"crypto environment variable must be set.")    
+            raise ValueError("crypto environment variable must be set.")
     
         cipher = Fernet(key)
-        serialized_data = json.dumps(data).encode('utf-8')
+        serialized_data = serialize_data(data)
         encrypted_data = cipher.encrypt(serialized_data)
         return encrypted_data
     
@@ -137,7 +149,22 @@ def encrypt_data(data: Dict[str, Any]) -> Optional[bytes]:
         print(f"Encryption failed: {e}")
         return None
 
-def decrypt_data(encrypted_data: bytes) -> Optional[Dict[str, Any]]:
+def deserialize_data(serialized_data: bytes) -> Any:
+    """
+    Deserialize bytes into the original data type.
+
+    Parameters:
+    - serialized_data (bytes): The serialized data.
+
+    Returns:
+    - Any: The deserialized data.
+    """
+    try:
+        return json.loads(serialized_data)
+    except json.JSONDecodeError:
+        return pickle.loads(serialized_data)
+
+def decrypt_data(encrypted_data: bytes) -> Optional[Any]:
     """
     Decrypt data previously encrypted with the `encrypt_data` function.
 
@@ -145,24 +172,22 @@ def decrypt_data(encrypted_data: bytes) -> Optional[Dict[str, Any]]:
     - encrypted_data (bytes): The encrypted data.
 
     Returns:
-    - Optional[Dict[str, Any]]: The decrypted dictionary or None if decryption fails.
-
-    Raises:
-    - ValueError: If the SECRET_KEY_ENV_VAR is not set.
+    - Optional[Any]: The decrypted data or None if decryption fails.
     """
-
     try:
         key = os.environ.get("SECRET_KEY_ENV_VAR")
-        
         if not key:
             raise ValueError(f"{os.environ.get('SECRET_KEY_ENV_VAR')} environment variable must be set.")
         
         cipher = Fernet(key)
         decrypted_data = cipher.decrypt(encrypted_data)
-        return json.loads(decrypted_data.decode('utf-8'))
+        return deserialize_data(decrypted_data)
 
     except InvalidToken:
         print("Decryption failed due to an invalid token. Key mismatch or corrupted data.")
+        return None
+    except Exception as e:
+        print(f"Decryption failed: {e}")
         return None
 
 def hashify(input_data, hash_length: int = 20) -> str:
