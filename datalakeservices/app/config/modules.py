@@ -39,6 +39,9 @@ from minio.error import S3Error
 # Pytest
 import pytest
 
+# Redis
+import redis
+
 # Typing
 from typing import List, Dict, Tuple, Union, Any, Optional, Coroutine, Callable, Awaitable, Iterable, AsyncIterable, TypeVar, Generic, Iterator
 
