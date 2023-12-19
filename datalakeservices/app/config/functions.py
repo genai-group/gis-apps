@@ -1067,3 +1067,204 @@ def kafka_consume_message(bootstrap_servers: str, group_id: str, topic_name: str
             return message
     except Exception as e:
         raise Exception(f"Error in consuming message: {e}")
+    
+################################
+####    Milvus Functions    ####
+################################
+
+def milvus_create_collection(collection_name: str, description: str) -> None:
+    """
+    Create a new collection in the Milvus database with the given schema.
+
+    Parameters:
+    collection_name (str): Name of the collection to be created.
+    description (str): Description of the collection.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while creating the collection.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+    assert isinstance(description, str), "Description must be a string"
+
+    # Create FieldSchema objects from field_definitions
+    fields = []
+    fields.append(MilvusFieldSchema(name="gluid", dtype=MilvusDataType.VARCHAR, is_primary=True, max_length=100))
+    fields.append(MilvusFieldSchema(name="namespace", dtype=MilvusDataType.VARCHAR, is_primary=False, max_length=100))
+    fields.append(MilvusFieldSchema(name="vector", dtype=MilvusDataType.FLOAT_VECTOR, dim=300))
+    fields.append(MilvusFieldSchema(name="created_at", dtype=MilvusDataType.INT64))
+
+    # Create a CollectionSchema
+    schema = MilvusCollectionSchema(fields, description)
+
+    # Create a Collection
+    try:
+        milvus_collection = MilvusCollection(name=collection_name, schema=schema)
+        return milvus_collection
+    except Exception as e:
+        raise Exception(f"Error in creating collection {collection_name}: {e}")
+
+# Creating the Milvus Collection
+milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
+
+# Milvus Delete Collection
+def milvus_delete_collection(collection_name: str) -> None:
+    """
+    Delete a collection from the Milvus database.
+
+    Parameters:
+    collection_name (str): Name of the collection to be deleted.
+
+    Raises:
+    AssertionError: If collection_name is not a string.
+    Exception: For issues encountered while deleting the collection.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+
+    try:
+        milvus_utility.drop_collection(collection_name)
+        print(f"Successfully deleted collection: {collection_name}")
+    except Exception as e:
+        raise Exception(f"Error in deleting collection {collection_name}: {e}")
+
+# List Collections
+def milvus_list_collections() -> List[str]:
+    """
+    List all collections in the Milvus database.
+
+    Raises:
+    Exception: For issues encountered while listing the collections.
+    """
+    try:
+        collections = milvus_utility.list_collections()
+        return collections
+    except Exception as e:
+        raise Exception(f"Error in listing collections: {e}")
+
+def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gluid', vector_len: int = 300) -> None:
+    """
+    Create an index for a specified field in a Milvus collection.
+
+    Parameters:
+    collection_name (str): Name of the collection on which the index is to be created.
+    field_name (str): Name of the field in the collection to be indexed.
+    index_params (Dict): Parameters of the index including index type, metric type, and other configurations.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while creating the index.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+    assert isinstance(field_name, str), "Field name must be a string"
+
+    index_params = {
+        "index_type": "IVF_FLAT",
+        "metric_type": "L2",
+        "params": {"nlist": vector_len},
+    }
+
+    try:
+        collection = MilvusCollection(name=collection_name)
+        collection.create_index(field_name, index_params)
+    except Exception as e:
+        raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
+
+# Creating a Milvus Index
+milvus_create_index("gis_main", "vector")
+
+# Milvus Delete Index
+def milvus_delete_index(field_name: str, collection_name: str = 'gis_main') -> None:
+    """
+    Delete an index from a specified field in a Milvus collection.
+
+    Parameters:
+    collection_name (str): Name of the collection from which the index is to be deleted.
+    field_name (str): Name of the field in the collection from which the index is to be deleted.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while deleting the index.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+    assert isinstance(field_name, str), "Field name must be a string"
+
+    try:
+        milvus_collection = MilvusCollection(name=collection_name)
+        milvus_collection.drop_index(name=field_name)
+    except Exception as e:
+        raise Exception(f"Error in deleting index on {field_name} in collection {collection_name}: {e}")
+
+# Load vectors into Milvus
+def milvus_load_vectors(vectors: List[List[float]], gluids: List[str], namespace: List[str], created_at: List[float], collection: str = 'gis_main') -> None:
+    """
+    Load vectors into a Milvus collection.
+
+    Parameters:
+    collection (str): Name of the collection to load vectors into.
+    vectors (List[List[float]]): A list of vectors to be loaded.
+    gluids (List[str]): A list of globally unique IDs for the vectors.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while loading the vectors.
+    """
+    assert isinstance(collection, str), "Collection name must be a string"
+    assert isinstance(vectors, list), "Vectors must be a list"
+    assert isinstance(gluids, list), "IDs must be a list"
+    assert isinstance(namespace, list), "Namespace must be a list"
+    assert isinstance(created_at, list), "Created_at must be a list"
+    assert len(vectors) == len(gluids), "Vectors and IDs must have the same length"
+    assert len(vectors) == len(namespace), "Vectors and Namespace must have the same length"
+    assert len(vectors) == len(created_at), "Vectors and Created_at must have the same length"
+
+    try:
+        data = [
+            gluids,
+            namespace,
+            vectors,
+            created_at
+        ]    
+        milvus_collection = MilvusCollection(collection)
+        milvus_collection.insert(data)
+    except Exception as e:
+        raise Exception(f"Error in loading vectors into collection {collection}: {e}")
+
+# Fake data to load into Milvus
+vectors = [[random.random() for _ in range(300)] for _ in range(100)]
+gluids = [str(uuid.uuid4()) for _ in range(100)]
+namespace = ["person" for _ in range(100)]
+created_at = [to_unix(datetime.now()) for _ in range(100)]
+
+# Load vectors into Milvus
+milvus_load_vectors(vectors, gluids, namespace, created_at, collection="gis_main")
+
+# Delete vectors from Milvus
+def milvus_delete_vectors(guilds: List[str], collection: str = 'gis_main') -> None:
+    """
+    Delete vectors from a Milvus collection.
+
+    Parameters:
+    collection (str): Name of the collection to delete vectors from.
+    guilds (List[str]): A list of globally unique IDs for the vectors.
+    
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while deleting the vectors.
+    """
+    assert isinstance(collection, str), "Collection name must be a string"
+    assert isinstance(guilds, list), "IDs must be a list"
+
+    try:
+        # Set up Milvus collection
+        milvus_collection = MilvusCollection(collection)
+        
+        # Delete vectors
+        expr = f"gluid in {guilds}"
+        milvus_collection.delete(expr)
+        print(f"Successfully deleted vectors from collection {collection}")
+    except Exception as e:
+        raise Exception(f"Error in deleting vectors from collection {collection}: {e}")
+    
+
+
+# 

@@ -303,3 +303,75 @@ def connect_to_neo4j():
         return None
     
 neo4j_client = connect_to_neo4j()
+
+
+############################
+####    Redis Client    ####
+############################
+
+def connect_to_redis():
+    try:
+        client = redis.Redis(host=os.environ.get('REDIS_HOST'), port=int(os.environ.get('REDIS_PORT')))
+        print(f"Connected to Redis: {client}")
+        return client
+    except Exception as e:
+        print(f"Errors loading Redis Client: {e}")
+        return None
+    
+redis_client = connect_to_redis()    
+
+
+#############################
+####    Milvus Client    ####
+#############################
+
+# Instructions to start Milvus
+# cd ~/git/gis-apps
+# docker-compose -f docker-compose-milvus.yml up 
+
+def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
+    """
+    Connect to a Milvus server.
+
+    Args:
+        host (str, optional): Hostname or IP address of the Milvus server. Defaults to 'localhost'.
+        port (str, optional): Port number of the Milvus server. Defaults to '19530'.
+
+    Returns:
+        Milvus: Milvus server instance.
+    """
+    assert isinstance(host, str), "Host must be a string"
+    assert isinstance(port, str), "Port must be a string"
+
+    try:
+        return milvus_connections.connect("default", host="localhost", port="19530")
+    except Exception as e:
+        raise ConnectionError(f"Failed to connect to Milvus server: {e}")
+
+######################################
+####    Making Connections    ########
+######################################
+
+#%%
+
+# S3
+s3_connect()
+
+# PostgreSQL
+postgres_client = connect_to_postgres()
+
+# MongoDB
+mongodb_client = connect_to_mongodb()
+
+# Kafka
+kafka_client = create_kafka_admin_client()
+
+# Neo4j
+neo4j_client = connect_to_neo4j()
+
+# Redis
+redis_client = connect_to_redis()
+
+# Milvus
+milvus_connect_to_server()
+
