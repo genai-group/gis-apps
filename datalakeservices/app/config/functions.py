@@ -105,8 +105,12 @@ def generate_key():
     Generate a Fernet encryption key and print it.
     It's recommended to store this key securely (e.g., environment variables, secrets manager, etc.)
     """
-    key = Fernet.generate_key()
-    print(f"Generated Key: {key.decode()}")
+    try:
+        key = Fernet.generate_key()
+        return key.decode()
+    except Exception as e:
+        logging.error(f"An error occurred in generate_key: {e}", exc_info=True)
+        return None
 
 def serialize_data(data: Any) -> bytes:
     """
