@@ -220,7 +220,7 @@ def generate_near_truly_random_arrays(n, low=1, high=1000000):
     
     return arrays
 
-def hashify(input_data, namespace: str = '', hash_length: int = 20) -> str:
+def hashify(data, namespace: str = '', hash_length: int = 20) -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
@@ -235,19 +235,37 @@ def hashify(input_data, namespace: str = '', hash_length: int = 20) -> str:
     """
 
     try:
-        # Convert JSON-like objects to string
-        if not isinstance(input_data, str):
-            input_str = json.dumps(input_data, sort_keys=True)
-        else:
-            input_str = input_data
+        if not isinstance(data, list):
+            data = [data]
+        hash_list = []
+        for obj in data:
+            original_obj = copy.deepcopy(obj)
+            temp_obj = {}
+            # Convert JSON-like objects to string
+            if isinstance(obj, dict):
+                input_str = json.dumps(obj, sort_keys=True)
+            else:
+                input_str = obj
 
-        # Ensure that the input is now a string
-        assert isinstance(input_str, str), "Input must be a string or JSON-like object"
+            # Ensure that the input is now a string
+            assert isinstance(input_str, str), "Input must be a string or JSON-like object"
 
-        hash_object = hashlib.sha256(input_str.encode())  # Calculate the SHA-256 hash of the string
-        short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
-        return short_hash
-    
+            hash_object = hashlib.sha256(input_str.encode())  # Calculate the SHA-256 hash of the string
+            short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
+            temp_obj['_hash'] = short_hash
+            if len(namespace) > 0:
+                namespace_short_hash = namespace.lower().replace(' ','_') + '__' + short_hash
+                temp_obj['_guid'] = namespace_short_hash
+            hash_list.append(short_hash)
+
+        if len(hash_list) == 1:
+            if isinstance(original_obj, str):
+                return hash_list[0]['_hash']
+            else:
+                return hash_list[0]
+        else:                
+            return short_hash[0]
+        
     except Exception as e:
         # Log the error using the logging module
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
