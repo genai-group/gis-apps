@@ -41,7 +41,6 @@ assert to_unix("2023-08-09 12:00:00") == 1691582400
 assert from_unix(1691582400) == datetime(2023, 8, 9, 12, 0, tzinfo=timezone.utc)
 """
 
-
 def to_unix(date_str: str, tz_str: Optional[str] = None) -> int:
     """
     Convert a date string to a timezone aware UNIX timestamp using dateutil parsing.
@@ -98,6 +97,106 @@ def from_unix(unix_timestamp: int, tz_str: Optional[str] = None) -> datetime:
     except Exception as e:
         raise ValueError(f"Failed to convert UNIX timestamp '{unix_timestamp}' to datetime. Error: {e}")
         return None
+
+## Cryptography
+
+def generate_key():
+    """
+    Generate a Fernet encryption key and print it.
+    It's recommended to store this key securely (e.g., environment variables, secrets manager, etc.)
+    """
+    key = Fernet.generate_key()
+    print(f"Generated Key: {key.decode()}")
+
+def encrypt_data(data: Dict[str, Any]) -> Optional[bytes]:
+    """
+    Encrypt a dictionary using the Fernet symmetric encryption.
+
+    Parameters:
+    - data (Dict[str, Any]): The dictionary to be encrypted.
+
+    Returns:
+    - Optional[bytes]: The encrypted data, or None if an error occurs.
+
+    Raises:
+    - ValueError: If the SECRET_KEY_ENV_VAR is not set.
+    """
+
+    try:
+        key = os.environ.get("SECRET_KEY_ENV_VAR")
+        
+        if not key:
+            raise ValueError(f"crypto environment variable must be set.")    
+    
+        cipher = Fernet(key)
+        serialized_data = json.dumps(data).encode('utf-8')
+        encrypted_data = cipher.encrypt(serialized_data)
+        return encrypted_data
+    
+    except Exception as e:
+        print(f"Encryption failed: {e}")
+        return None
+
+def decrypt_data(encrypted_data: bytes) -> Optional[Dict[str, Any]]:
+    """
+    Decrypt data previously encrypted with the `encrypt_data` function.
+
+    Parameters:
+    - encrypted_data (bytes): The encrypted data.
+
+    Returns:
+    - Optional[Dict[str, Any]]: The decrypted dictionary or None if decryption fails.
+
+    Raises:
+    - ValueError: If the SECRET_KEY_ENV_VAR is not set.
+    """
+
+    try:
+        key = os.environ.get("SECRET_KEY_ENV_VAR")
+        
+        if not key:
+            raise ValueError(f"{os.environ.get('SECRET_KEY_ENV_VAR')} environment variable must be set.")
+        
+        cipher = Fernet(key)
+        decrypted_data = cipher.decrypt(encrypted_data)
+        return json.loads(decrypted_data.decode('utf-8'))
+
+    except InvalidToken:
+        print("Decryption failed due to an invalid token. Key mismatch or corrupted data.")
+        return None
+
+def hashify(input_data, hash_length: int = 20) -> str:
+    """
+    Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
+
+    Parameters:
+        input_data (str or JSON-like object): The string or JSON object to be hashed.
+
+    Returns:
+        str: A short unique hash representing the input.
+
+    Raises:
+        ValueError: If an error occurs during hashing.
+    """
+
+    try:
+        # Convert JSON-like objects to string
+        if not isinstance(input_data, str):
+            input_str = json.dumps(input_data, sort_keys=True)
+        else:
+            input_str = input_data
+
+        # Ensure that the input is now a string
+        assert isinstance(input_str, str), "Input must be a string or JSON-like object"
+
+        hash_object = hashlib.sha256(input_str.encode())  # Calculate the SHA-256 hash of the string
+        short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
+        return short_hash
+    
+    except Exception as e:
+        # Log the error using the logging module
+        logging.error(f"An error occurred in hashify: {e}", exc_info=True)
+        raise ValueError(f"Input error: {e}")
 
 
 ############################
@@ -1270,3 +1369,125 @@ def milvus_search(vectors: List[List[float]], namespace: str = '', top_k: int = 
 
     except Exception as e:
         raise Exception(f"Error in searching for vectors in collection {collection}: {e}")
+
+###############################
+####    Redis Functions    ####
+###############################
+
+def redis_load_objects(objects: List[Dict[str, Union[any, any]]]) -> bool:
+    """
+    Load a list of dictionary objects into Redis.
+
+    Parameters:
+    objects (List[Dict[str, Union[str, int]]]): A list of objects to be loaded, each containing a 'gluid' key.
+
+    Returns:
+    bool: True if objects loaded successfully, False otherwise.
+
+    Raises:
+    AssertionError: If the input is not a list, is empty, or objects lack 'gluid'.
+    """
+
+    assert isinstance(objects, List) and objects, "Input must be a non-empty list"
+
+    try:
+        with redis_client.pipeline() as pipe:
+            for obj in objects:
+                assert "gluid" in obj, "Each object must contain a 'gluid' key"
+                gluid = obj["gluid"]
+                serialized_obj = json.dumps(obj)
+                pipe.set(gluid, serialized_obj)
+            pipe.execute()
+        return True
+
+    except redis.RedisError as e:
+        print(f"Redis error loading objects: {e}")
+        return False
+    
+def redis_retrieve_objects(gluids: List[str]) -> List[Dict[str, Union[str, int]]]:
+    """
+    Retrieve a list of objects from Redis based on their gluid values.
+
+    Parameters:
+    gluids (List[str]): A list of gluid values to fetch the corresponding objects.
+
+    Returns:
+    List[Dict[str, Union[str, int]]]: A list of retrieved objects.
+
+    Raises:
+    AssertionError: If the input is not a list or is empty.
+    """
+
+    assert isinstance(gluids, List) and gluids, "Input must be a non-empty list"
+
+    try:
+        retrieved_objects = []
+        for gluid in gluids:
+            obj_str = redis_client.get(gluid)
+            if obj_str:
+                retrieved_objects.append(json.loads(obj_str))
+        return retrieved_objects
+
+    except redis.RedisError as e:
+        print(f"Redis error retrieving objects: {e}")
+        return []   
+
+def redis_delete_objects(gluids: List[str]) -> bool:
+    """
+    Remove a list of objects from Redis based on their gluid values.
+
+    Parameters:
+    gluids (List[str]): A list of gluid values of objects to be removed.
+
+    Returns:
+    bool: True if objects removed successfully, False otherwise.
+
+    Raises:
+    AssertionError: If the input is not a list or is empty.
+    """
+
+    assert isinstance(gluids, List) and gluids, "Input must be a non-empty list"
+
+    try:
+        redis_client.delete(*gluids)
+        return True
+
+    except redis.RedisError as e:
+        print(f"Redis error removing objects: {e}")
+        return False     
+
+def redis_delete_all() -> bool:
+    """
+    Remove all values from Redis.
+
+    Returns:
+    bool: True if all values removed successfully, False otherwise.
+    """
+
+    try:
+        redis_client.flushall()
+        return True
+
+    except redis.RedisError as e:
+        print(f"Redis error flushing all values: {e}")
+        return False
+    
+# Test Redis Functions with Fake Data
+"""
+
+objects = [
+    {"gluid": "1", "name": "John", "age": 30},
+    {"gluid": "2", "name": "Jane", "age": 25},
+    {"gluid": "3", "name": "Bob", "age": 40}
+]   
+redis_load_objects(objects)
+redis_retrieve_objects(["1", "2", "3"])
+redis_delete_objects(["1", "2", "3"])
+redis_delete_all()
+
+"""
+
+###############################
+####    Neo4j Functions    ####
+###############################
+
