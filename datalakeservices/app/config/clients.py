@@ -385,6 +385,9 @@ def milvus_create_collection(collection_name: str, description: str) -> None:
     except Exception as e:
         raise Exception(f"Error in creating collection {collection_name}: {e}")
 
+# Create Milvus Collection
+milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
+
 def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gluid', vector_len: int = 300) -> None:
     """
     Create an index for a specified field in a Milvus collection.
@@ -413,6 +416,9 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gl
     except Exception as e:
         raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
 
+# Create Milvus Index
+milvus_create_index("gis_main", "vector")
+
 ######################################
 ####    Making Connections    ########
 ######################################
@@ -437,7 +443,5 @@ neo4j_client = connect_to_neo4j()
 # Redis
 redis_client = connect_to_redis()
 
-# Milvus
-milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
-milvus_create_index("gis_main", "vector")
+# Load Milvus
 milvus_collection.load()
