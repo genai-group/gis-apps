@@ -369,7 +369,7 @@ def milvus_create_collection(collection_name: str, description: str) -> None:
 
     # Create FieldSchema objects from field_definitions
     fields = []
-    fields.append(MilvusFieldSchema(name="gluid", dtype=MilvusDataType.VARCHAR, is_primary=True, max_length=100))
+    fields.append(MilvusFieldSchema(name="_guid", dtype=MilvusDataType.VARCHAR, is_primary=True, max_length=100))
     fields.append(MilvusFieldSchema(name="namespace", dtype=MilvusDataType.VARCHAR, is_primary=False, max_length=100))
     fields.append(MilvusFieldSchema(name="vector", dtype=MilvusDataType.FLOAT_VECTOR, dim=300))
     fields.append(MilvusFieldSchema(name="created_at", dtype=MilvusDataType.INT64))
@@ -387,7 +387,7 @@ def milvus_create_collection(collection_name: str, description: str) -> None:
 
 # Create Milvus Collection
 
-def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gluid', vector_len: int = 300) -> None:
+def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_guid', vector_len: int = 300) -> None:
     """
     Create an index for a specified field in a Milvus collection.
 

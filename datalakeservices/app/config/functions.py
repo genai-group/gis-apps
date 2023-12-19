@@ -194,7 +194,33 @@ def decrypt_data(encrypted_data: bytes) -> Optional[Any]:
         print(f"Decryption failed: {e}")
         return None
 
-def hashify(input_data, hash_length: int = 20) -> str:
+####################################################################################################################################
+#####    GIS Lock & Unlock Functions (Truly Random Number Generation based on hardware-based random number generators (RNGs)    ####
+####################################################################################################################################
+
+def generate_near_truly_random_arrays(n, low=1, high=1000000):
+    """
+    Generates a set of n 2D numpy arrays with n rows and n columns, filled with truly random integers.
+
+    Parameters:
+    - n (int): The number of arrays and the size of each array.
+    - low (int): The lowest integer to be included.
+    - high (int): One above the highest integer to be included.
+
+    Returns:
+    - List[np.ndarray]: A list containing n numpy arrays with integer values.
+    """
+    arrays = []
+    for _ in range(n):
+        # Generate truly random bytes and convert them to integers
+        random_bytes = os.urandom(n * n * 4)  # 4 bytes for each integer
+        random_integers = np.frombuffer(random_bytes, dtype=np.uint32) % (high - low) + low
+        array = random_integers.reshape((n, n))
+        arrays.append(array)
+    
+    return arrays
+
+def hashify(input_data, namespace: str = '', hash_length: int = 20) -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
@@ -1258,14 +1284,14 @@ def milvus_delete_index(field_name: str, collection_name: str = 'gis_main') -> N
         raise Exception(f"Error in deleting index on {field_name} in collection {collection_name}: {e}")
 
 # Load vectors into Milvus
-def milvus_load_vectors(vectors: List[List[float]], gluids: List[str], namespace: List[str], created_at: List[float], collection: str = 'gis_main') -> None:
+def milvus_load_vectors(vectors: List[List[float]], _guids: List[str], namespace: List[str], created_at: List[float], collection: str = 'gis_main') -> None:
     """
     Load vectors into a Milvus collection.
 
     Parameters:
     collection (str): Name of the collection to load vectors into.
     vectors (List[List[float]]): A list of vectors to be loaded.
-    gluids (List[str]): A list of globally unique IDs for the vectors.
+    _guids (List[str]): A list of globally unique IDs for the vectors.
 
     Raises:
     AssertionError: If inputs are not in expected format.
@@ -1273,16 +1299,16 @@ def milvus_load_vectors(vectors: List[List[float]], gluids: List[str], namespace
     """
     assert isinstance(collection, str), "Collection name must be a string"
     assert isinstance(vectors, list), "Vectors must be a list"
-    assert isinstance(gluids, list), "IDs must be a list"
+    assert isinstance(_guids, list), "IDs must be a list"
     assert isinstance(namespace, list), "Namespace must be a list"
     assert isinstance(created_at, list), "Created_at must be a list"
-    assert len(vectors) == len(gluids), "Vectors and IDs must have the same length"
+    assert len(vectors) == len(_guids), "Vectors and IDs must have the same length"
     assert len(vectors) == len(namespace), "Vectors and Namespace must have the same length"
     assert len(vectors) == len(created_at), "Vectors and Created_at must have the same length"
 
     try:
         data = [
-            gluids,
+            _guids,
             namespace,
             vectors,
             created_at
@@ -1297,12 +1323,12 @@ def milvus_load_vectors(vectors: List[List[float]], gluids: List[str], namespace
 
 # Fake data to load into Milvus
 vectors = [[random.random() for _ in range(300)] for _ in range(100)]
-gluids = [str(uuid.uuid4()) for _ in range(100)]
+_guids = [str(uuid.uuid4()) for _ in range(100)]
 namespace = ["person" for _ in range(100)]
 created_at = [to_unix(datetime.now()) for _ in range(100)]
 
 # Load vectors into Milvus
-milvus_load_vectors(vectors, gluids, namespace, created_at, collection="gis_main")
+milvus_load_vectors(vectors, _guids, namespace, created_at, collection="gis_main")
 
 """
 
@@ -1328,7 +1354,7 @@ def milvus_delete_vectors(guilds: List[str], collection: str = 'gis_main') -> No
         milvus_collection = MilvusCollection(collection)
         
         # Delete vectors
-        expr = f"gluid in {guilds}"
+        expr = f"_guid in {guilds}"
         milvus_collection.delete(expr)
         milvus_collection.flush()
         print(f"Successfully deleted vectors from collection {collection}")
@@ -1337,7 +1363,7 @@ def milvus_delete_vectors(guilds: List[str], collection: str = 'gis_main') -> No
 
 """
 
-milvus_delete_vectors(gluids, collection="gis_main")
+milvus_delete_vectors(_guids, collection="gis_main")
 
 """
 
@@ -1408,13 +1434,13 @@ def redis_load_objects(objects: List[Dict[str, Union[any, any]]]) -> bool:
     Load a list of dictionary objects into Redis.
 
     Parameters:
-    objects (List[Dict[str, Union[str, int]]]): A list of objects to be loaded, each containing a 'gluid' key.
+    objects (List[Dict[str, Union[str, int]]]): A list of objects to be loaded, each containing a '_guid' key.
 
     Returns:
     bool: True if objects loaded successfully, False otherwise.
 
     Raises:
-    AssertionError: If the input is not a list, is empty, or objects lack 'gluid'.
+    AssertionError: If the input is not a list, is empty, or objects lack '_guid'.
     """
 
     assert isinstance(objects, List) and objects, "Input must be a non-empty list"
@@ -1422,10 +1448,10 @@ def redis_load_objects(objects: List[Dict[str, Union[any, any]]]) -> bool:
     try:
         with redis_client.pipeline() as pipe:
             for obj in objects:
-                assert "gluid" in obj, "Each object must contain a 'gluid' key"
-                gluid = obj["gluid"]
+                assert "_guid" in obj, "Each object must contain a '_guid' key"
+                _guid = obj["_guid"]
                 serialized_obj = json.dumps(obj)
-                pipe.set(gluid, serialized_obj)
+                pipe.set(_guid, serialized_obj)
             pipe.execute()
         return True
 
@@ -1433,12 +1459,12 @@ def redis_load_objects(objects: List[Dict[str, Union[any, any]]]) -> bool:
         print(f"Redis error loading objects: {e}")
         return False
     
-def redis_retrieve_objects(gluids: List[str]) -> List[Dict[str, Union[str, int]]]:
+def redis_retrieve_objects(_guids: List[str]) -> List[Dict[str, Union[str, int]]]:
     """
-    Retrieve a list of objects from Redis based on their gluid values.
+    Retrieve a list of objects from Redis based on their _guid values.
 
     Parameters:
-    gluids (List[str]): A list of gluid values to fetch the corresponding objects.
+    _guids (List[str]): A list of _guid values to fetch the corresponding objects.
 
     Returns:
     List[Dict[str, Union[str, int]]]: A list of retrieved objects.
@@ -1447,12 +1473,12 @@ def redis_retrieve_objects(gluids: List[str]) -> List[Dict[str, Union[str, int]]
     AssertionError: If the input is not a list or is empty.
     """
 
-    assert isinstance(gluids, List) and gluids, "Input must be a non-empty list"
+    assert isinstance(_guids, List) and _guids, "Input must be a non-empty list"
 
     try:
         retrieved_objects = []
-        for gluid in gluids:
-            obj_str = redis_client.get(gluid)
+        for _guid in _guids:
+            obj_str = redis_client.get(_guid)
             if obj_str:
                 retrieved_objects.append(json.loads(obj_str))
         return retrieved_objects
@@ -1461,12 +1487,12 @@ def redis_retrieve_objects(gluids: List[str]) -> List[Dict[str, Union[str, int]]
         print(f"Redis error retrieving objects: {e}")
         return []   
 
-def redis_delete_objects(gluids: List[str]) -> bool:
+def redis_delete_objects(_guids: List[str]) -> bool:
     """
-    Remove a list of objects from Redis based on their gluid values.
+    Remove a list of objects from Redis based on their _guid values.
 
     Parameters:
-    gluids (List[str]): A list of gluid values of objects to be removed.
+    _guids (List[str]): A list of _guid values of objects to be removed.
 
     Returns:
     bool: True if objects removed successfully, False otherwise.
@@ -1475,10 +1501,10 @@ def redis_delete_objects(gluids: List[str]) -> bool:
     AssertionError: If the input is not a list or is empty.
     """
 
-    assert isinstance(gluids, List) and gluids, "Input must be a non-empty list"
+    assert isinstance(_guids, List) and _guids, "Input must be a non-empty list"
 
     try:
-        redis_client.delete(*gluids)
+        redis_client.delete(*_guids)
         return True
 
     except redis.RedisError as e:
@@ -1505,9 +1531,9 @@ def redis_delete_all() -> bool:
 """
 
 objects = [
-    {"gluid": "1", "name": "John", "age": 30},
-    {"gluid": "2", "name": "Jane", "age": 25},
-    {"gluid": "3", "name": "Bob", "age": 40}
+    {"_guid": "1", "name": "John", "age": 30},
+    {"_guid": "2", "name": "Jane", "age": 25},
+    {"_guid": "3", "name": "Bob", "age": 40}
 ]   
 redis_load_objects(objects)
 redis_retrieve_objects(["1", "2", "3"])
