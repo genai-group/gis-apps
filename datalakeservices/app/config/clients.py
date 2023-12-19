@@ -411,7 +411,7 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_g
 
     try:
         milvus_collection = MilvusCollection(name=collection_name)
-        collection.create_index(field_name, index_params)
+        milvus_collection.create_index(field_name, index_params)
     except Exception as e:
         raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
 
