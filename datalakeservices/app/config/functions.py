@@ -41,6 +41,7 @@ assert to_unix("2023-08-09 12:00:00") == 1691582400
 assert from_unix(1691582400) == datetime(2023, 8, 9, 12, 0, tzinfo=timezone.utc)
 """
 
+
 def to_unix(date_str: str, tz_str: Optional[str] = None) -> int:
     """
     Convert a date string to a timezone aware UNIX timestamp using dateutil parsing.
@@ -1226,8 +1227,11 @@ def milvus_load_vectors(vectors: List[List[float]], gluids: List[str], namespace
         ]    
         milvus_collection = MilvusCollection(collection)
         milvus_collection.insert(data)
+        milvus_collection.flush()
     except Exception as e:
         raise Exception(f"Error in loading vectors into collection {collection}: {e}")
+
+"""
 
 # Fake data to load into Milvus
 vectors = [[random.random() for _ in range(300)] for _ in range(100)]
@@ -1238,7 +1242,10 @@ created_at = [to_unix(datetime.now()) for _ in range(100)]
 # Load vectors into Milvus
 milvus_load_vectors(vectors, gluids, namespace, created_at, collection="gis_main")
 
+"""
+
 # Delete vectors from Milvus
+
 def milvus_delete_vectors(guilds: List[str], collection: str = 'gis_main') -> None:
     """
     Delete vectors from a Milvus collection.
@@ -1261,10 +1268,61 @@ def milvus_delete_vectors(guilds: List[str], collection: str = 'gis_main') -> No
         # Delete vectors
         expr = f"gluid in {guilds}"
         milvus_collection.delete(expr)
+        milvus_collection.flush()
         print(f"Successfully deleted vectors from collection {collection}")
     except Exception as e:
         raise Exception(f"Error in deleting vectors from collection {collection}: {e}")
-    
 
+"""
 
-# 
+milvus_delete_vectors(gluids, collection="gis_main")
+
+"""
+
+# Search vectors in Milvus
+def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, collection: str = 'gis_main') -> List[List[int]]:
+    """
+    Search for vectors in a Milvus collection.
+
+    Parameters:
+    collection (str): Name of the collection to search.
+    vectors (List[List[float]]): A list of vectors to search for.
+    namespace (str): Namespace of the vectors to search for.
+    top_k (int): Number of results to return (default: 10).
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while searching for the vectors.
+    """
+    assert isinstance(collection, str), "Collection name must be a string"
+    assert isinstance(vectors, list), "Vectors must be a list"
+    assert isinstance(top_k, int), "Top_k must be an integer"
+
+    try:
+        # Search Parameters
+        search_params = {
+            "metric_type": "L2", 
+            "offset": 0, 
+            "ignore_growing": False, 
+            "params": {"nprobe": 10}
+        }
+
+        milvus_collection = MilvusCollection(collection)
+
+        # Returning similar vectors
+        if len(namespace) > 0:
+            results = milvus_collection.search(data=vectors, 
+                                               ans_field='vector', 
+                                               expr = f"namespace == '{namespace}'",
+                                               limit = top_k, 
+                                               param = search_params)
+        else:
+            results = milvus_collection.search(data=vectors, 
+                                               ans_field='vector', 
+                                               limit = top_k, 
+                                               param = search_params)
+            
+        return results
+
+    except Exception as e:
+        raise Exception(f"Error in searching for vectors in collection {collection}: {e}")

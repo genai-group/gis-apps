@@ -9,6 +9,7 @@ import unicodedata
 import numpy as np
 import pandas as pd
 from pandas.api import types
+from dateutil.parser import parse
 from datetime import datetime, timedelta, timezone
 
 # Ashnchronous packages
