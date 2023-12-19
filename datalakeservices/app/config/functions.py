@@ -1280,7 +1280,7 @@ milvus_delete_vectors(gluids, collection="gis_main")
 """
 
 # Search vectors in Milvus
-def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, collection: str = 'gis_main') -> List[List[int]]:
+def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, collection: str = 'gis_main', offset: int = 0) -> List[List[int]]:
     """
     Search for vectors in a Milvus collection.
 
@@ -1302,9 +1302,9 @@ def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, c
         # Search Parameters
         search_params = {
             "metric_type": "L2", 
-            "offset": 0, 
+            "offset": offset, 
             "ignore_growing": False, 
-            "params": {"nprobe": 10}
+            "params": {"nprobe": top_k}
         }
 
         milvus_collection = MilvusCollection(collection)
