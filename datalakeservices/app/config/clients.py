@@ -348,6 +348,71 @@ def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> No
     except Exception as e:
         raise ConnectionError(f"Failed to connect to Milvus server: {e}")
 
+#############################
+####    Milvus Client    ####
+#############################
+
+def milvus_create_collection(collection_name: str, description: str) -> None:
+    """
+    Create a new collection in the Milvus database with the given schema.
+
+    Parameters:
+    collection_name (str): Name of the collection to be created.
+    description (str): Description of the collection.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while creating the collection.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+    assert isinstance(description, str), "Description must be a string"
+
+    # Create FieldSchema objects from field_definitions
+    fields = []
+    fields.append(MilvusFieldSchema(name="gluid", dtype=MilvusDataType.VARCHAR, is_primary=True, max_length=100))
+    fields.append(MilvusFieldSchema(name="namespace", dtype=MilvusDataType.VARCHAR, is_primary=False, max_length=100))
+    fields.append(MilvusFieldSchema(name="vector", dtype=MilvusDataType.FLOAT_VECTOR, dim=300))
+    fields.append(MilvusFieldSchema(name="created_at", dtype=MilvusDataType.INT64))
+
+    # Create a CollectionSchema
+    schema = MilvusCollectionSchema(fields, description)
+
+    # Create a Collection
+    try:
+        milvus_collection = MilvusCollection(name=collection_name, schema=schema)
+        print(f"Milvus Collection created: {milvus_collection}")
+        return milvus_collection
+    except Exception as e:
+        raise Exception(f"Error in creating collection {collection_name}: {e}")
+
+def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gluid', vector_len: int = 300) -> None:
+    """
+    Create an index for a specified field in a Milvus collection.
+
+    Parameters:
+    collection_name (str): Name of the collection on which the index is to be created.
+    field_name (str): Name of the field in the collection to be indexed.
+    index_params (Dict): Parameters of the index including index type, metric type, and other configurations.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while creating the index.
+    """
+    assert isinstance(collection_name, str), "Collection name must be a string"
+    assert isinstance(field_name, str), "Field name must be a string"
+
+    index_params = {
+        "index_type": "IVF_FLAT",
+        "metric_type": "L2",
+        "params": {"nlist": vector_len},
+    }
+
+    try:
+        collection = MilvusCollection(name=collection_name)
+        collection.create_index(field_name, index_params)
+    except Exception as e:
+        raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
+
 ######################################
 ####    Making Connections    ########
 ######################################
@@ -373,5 +438,6 @@ neo4j_client = connect_to_neo4j()
 redis_client = connect_to_redis()
 
 # Milvus
-milvus_connect_to_server()
-
+milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
+milvus_create_index("gis_main", "vector")
+milvus_collection.load()

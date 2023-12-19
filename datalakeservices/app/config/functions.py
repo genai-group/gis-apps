@@ -1073,41 +1073,6 @@ def kafka_consume_message(bootstrap_servers: str, group_id: str, topic_name: str
 ####    Milvus Functions    ####
 ################################
 
-def milvus_create_collection(collection_name: str, description: str) -> None:
-    """
-    Create a new collection in the Milvus database with the given schema.
-
-    Parameters:
-    collection_name (str): Name of the collection to be created.
-    description (str): Description of the collection.
-
-    Raises:
-    AssertionError: If inputs are not in expected format.
-    Exception: For issues encountered while creating the collection.
-    """
-    assert isinstance(collection_name, str), "Collection name must be a string"
-    assert isinstance(description, str), "Description must be a string"
-
-    # Create FieldSchema objects from field_definitions
-    fields = []
-    fields.append(MilvusFieldSchema(name="gluid", dtype=MilvusDataType.VARCHAR, is_primary=True, max_length=100))
-    fields.append(MilvusFieldSchema(name="namespace", dtype=MilvusDataType.VARCHAR, is_primary=False, max_length=100))
-    fields.append(MilvusFieldSchema(name="vector", dtype=MilvusDataType.FLOAT_VECTOR, dim=300))
-    fields.append(MilvusFieldSchema(name="created_at", dtype=MilvusDataType.INT64))
-
-    # Create a CollectionSchema
-    schema = MilvusCollectionSchema(fields, description)
-
-    # Create a Collection
-    try:
-        milvus_collection = MilvusCollection(name=collection_name, schema=schema)
-        return milvus_collection
-    except Exception as e:
-        raise Exception(f"Error in creating collection {collection_name}: {e}")
-
-# Creating the Milvus Collection
-milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
-
 # Milvus Delete Collection
 def milvus_delete_collection(collection_name: str) -> None:
     """
@@ -1141,37 +1106,6 @@ def milvus_list_collections() -> List[str]:
         return collections
     except Exception as e:
         raise Exception(f"Error in listing collections: {e}")
-
-def milvus_create_index(collection_name: str = 'gis_main', field_name: str = 'gluid', vector_len: int = 300) -> None:
-    """
-    Create an index for a specified field in a Milvus collection.
-
-    Parameters:
-    collection_name (str): Name of the collection on which the index is to be created.
-    field_name (str): Name of the field in the collection to be indexed.
-    index_params (Dict): Parameters of the index including index type, metric type, and other configurations.
-
-    Raises:
-    AssertionError: If inputs are not in expected format.
-    Exception: For issues encountered while creating the index.
-    """
-    assert isinstance(collection_name, str), "Collection name must be a string"
-    assert isinstance(field_name, str), "Field name must be a string"
-
-    index_params = {
-        "index_type": "IVF_FLAT",
-        "metric_type": "L2",
-        "params": {"nlist": vector_len},
-    }
-
-    try:
-        collection = MilvusCollection(name=collection_name)
-        collection.create_index(field_name, index_params)
-    except Exception as e:
-        raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
-
-# Creating a Milvus Index
-milvus_create_index("gis_main", "vector")
 
 # Milvus Delete Index
 def milvus_delete_index(field_name: str, collection_name: str = 'gis_main') -> None:
@@ -1279,8 +1213,15 @@ milvus_delete_vectors(gluids, collection="gis_main")
 
 """
 
+"""
+namespace = ""
+collection = 'gis_main'
+offset = 0
+opt_k = 10
+"""
+
 # Search vectors in Milvus
-def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, collection: str = 'gis_main', offset: int = 0) -> List[List[int]]:
+def milvus_search(vectors: List[List[float]], namespace: str = '', top_k: int = 10, collection: str = 'gis_main', offset: int = 0) -> List[List[int]]:
     """
     Search for vectors in a Milvus collection.
 
@@ -1309,16 +1250,19 @@ def milvus_search(vectors: List[List[float]], namespace: str, top_k: int = 10, c
 
         milvus_collection = MilvusCollection(collection)
 
+        # loading collection into memory
+        milvus_collection.load()
+
         # Returning similar vectors
         if len(namespace) > 0:
             results = milvus_collection.search(data=vectors, 
-                                               ans_field='vector', 
+                                               anns_field='vector', 
                                                expr = f"namespace == '{namespace}'",
                                                limit = top_k, 
                                                param = search_params)
         else:
             results = milvus_collection.search(data=vectors, 
-                                               ans_field='vector', 
+                                               anns_field='vector', 
                                                limit = top_k, 
                                                param = search_params)
             
