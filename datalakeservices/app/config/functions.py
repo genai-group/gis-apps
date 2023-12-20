@@ -1248,7 +1248,7 @@ def kafka_consume_message(bootstrap_servers: str, group_id: str, topic_name: str
             return message
     except Exception as e:
         raise Exception(f"Error in consuming message: {e}")
-    
+
 ################################
 ####    Milvus Functions    ####
 ################################
@@ -1484,7 +1484,7 @@ def redis_load_objects(objects: List[Dict[str, Union[any, any]]]) -> bool:
     except redis.RedisError as e:
         print(f"Redis error loading objects: {e}")
         return False
-    
+
 def redis_retrieve_objects(_guids: List[str]) -> List[Dict[str, Union[str, int]]]:
     """
     Retrieve a list of objects from Redis based on their _guid values.
@@ -1560,7 +1560,7 @@ objects = [
     {"_guid": "1", "name": "John", "age": 30},
     {"_guid": "2", "name": "Jane", "age": 25},
     {"_guid": "3", "name": "Bob", "age": 40}
-]   
+]
 redis_load_objects(objects)
 redis_retrieve_objects(["1", "2", "3"])
 redis_delete_objects(["1", "2", "3"])
