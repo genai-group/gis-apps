@@ -220,15 +220,18 @@ def generate_near_truly_random_arrays(n, low=1, high=1000000):
     
     return arrays
 
-def hashify(data, namespace: str = '', hash_length: int = 20) -> str:
+def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = '') -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
     Parameters:
         input_data (str or JSON-like object): The string or JSON object to be hashed.
-
+        hash_length (int, optional): The length of the hash to be returned. Defaults to 20.
+        created_at (str, optional): The name of the property to be removed prior to hashing. Defaults to ''.
+        
     Returns:
-        str: A short unique hash representing the input.
+        [Optional] str: The short hash of the input string or JSON object.
+        [Optional] dict: The input JSON object with the short hash added as a property.
 
     Raises:
         ValueError: If an error occurs during hashing.
@@ -243,6 +246,9 @@ def hashify(data, namespace: str = '', hash_length: int = 20) -> str:
             temp_obj = {}
             # Convert JSON-like objects to string
             if isinstance(obj, dict):
+                # removing the created_at property prior to hashing the object
+                if created_at in obj.keys():
+                    obj.pop(created_at)
                 input_str = json.dumps(obj, sort_keys=True)
             else:
                 input_str = obj
@@ -254,23 +260,25 @@ def hashify(data, namespace: str = '', hash_length: int = 20) -> str:
             short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
             temp_obj['_hash'] = short_hash
             if len(namespace) > 0:
-                namespace_short_hash = namespace.lower().replace(' ','_') + '__' + short_hash
+                namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
-            hash_list.append(short_hash)
+            hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
             if isinstance(original_obj, str):
-                return hash_list[0]['_hash']
+                if len(namespace) > 0:
+                    return hash_list[0]
+                else:
+                    return hash_list[0]['_hash']
             else:
                 return hash_list[0]
         else:                
-            return short_hash[0]
+            return hash_list
         
     except Exception as e:
         # Log the error using the logging module
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
         raise ValueError(f"Input error: {e}")
-
 
 ############################
 ####    S3 Functions    ####
@@ -1544,7 +1552,7 @@ def redis_delete_all() -> bool:
     except redis.RedisError as e:
         print(f"Redis error flushing all values: {e}")
         return False
-    
+
 # Test Redis Functions with Fake Data
 """
 
