@@ -242,8 +242,11 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             data = [data]
         hash_list = []
         for obj in data:
-            original_obj = copy.deepcopy(obj)
-            temp_obj = {}
+            if isinstance(obj, str):
+                temp_obj = {'_label': obj}
+            else:
+                original_obj = copy.deepcopy(obj)
+                temp_obj = copy.deepcopy(obj)
             # Convert JSON-like objects to string
             if isinstance(obj, dict):
                 # removing the created_at property prior to hashing the object
