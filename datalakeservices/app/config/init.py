@@ -13,7 +13,9 @@ from config.functions import *
 # Loading the Template Yaml File(s)
 # from config.templates.data_ingest import *
 
-# Loading data for the manifest files
+# Loading the YAML files from the config/templates directory
+template_dir = './config/templates'
+data_ingest = yaml.safe_load(open(f"{template_dir}/data_ingest.yml", "r").read())
 
 # airline_flight_manifest_0_hours
 try:
