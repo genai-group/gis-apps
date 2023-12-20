@@ -33,8 +33,19 @@ try:
     fake_passport_hour_0 = json.loads(open(f"{data_dir}/fake_passport_hour_0.json", "r").read())
     fake_passport_hour_24 = json.loads(open(f"{data_dir}/fake_passport_hour_24.json", "r").read())
     fake_passport_hour_72 = json.loads(open(f"{data_dir}/fake_passport_hour_72.json", "r").read())
+    print(f"Successfully loaded data for the fake_passport data files (0, 24 adn 72 hours).")
 except Exception as e:
     print(f"Error loading fake_passport: {e}")
+    raise
+
+# Reading in the fake_customs_report data at the 0, 24, and 72 hours
+try:
+    fake_customs_report_hour_0 = json.loads(open(f"{data_dir}/fake_customs_report_hour_0.json", "r").read())
+    fake_customs_report_hour_24 = json.loads(open(f"{data_dir}/fake_customs_report_hour_24.json", "r").read())
+    fake_customs_report_hour_72 = json.loads(open(f"{data_dir}/fake_customs_report_hour_72.json", "r").read())
+    print(f"Successfully loaded data for the fake_customs_report data files (0, 24 adn 72 hours).")
+except Exception as e:
+    print(f"Error loading fake_customs_report: {e}")
     raise
 
 # Reading ISO json object
