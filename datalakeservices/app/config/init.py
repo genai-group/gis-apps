@@ -40,8 +40,18 @@ except Exception as e:
 try:
     government_ids = pd.read_csv(f"{data_dir}/International Government IDs - Sheet1.csv")
     government_ids = government_ids.to_dict(orient='records')
-    government_ids = {obj['Country']:obj['Name'] for obj in government_ids}
+    government_ids = {obj['Country']:{'Name':obj['Name'], 'Description':obj['Description']} for obj in government_ids}
     print(f"Successfully loaded data for the International Government IDs.")
 except Exception as e:
     print(f"Error loading International Government IDs: {e}")
+    raise
+
+# Reading in the fake_passport data
+try:
+    fake_passport_0 = pd.read_csv(f"{data_dir}/fake_passport.csv")
+    fake_passport_24 = fake_passport.to_dict(orient='records')
+    fake_passport_72 = {obj['Country']:obj['Passport'] for obj in fake_passport}
+    print(f"Successfully loaded data for the fake_passport.")
+except Exception as e:
+    print(f"Error loading fake_passport: {e}")
     raise

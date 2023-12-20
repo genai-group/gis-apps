@@ -265,6 +265,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             if len(namespace) > 0:
                 namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
+                temp_obj['_namespace'] = namespace
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
