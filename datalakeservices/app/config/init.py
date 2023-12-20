@@ -28,6 +28,16 @@ except Exception as e:
     print(f"Error loading data: {e}")
     raise
 
+# Reading in the fake_passport data
+try:
+    fake_passport_0 = pd.read_csv(f"{data_dir}/fake_passport.csv")
+    fake_passport_24 = fake_passport.to_dict(orient='records')
+    fake_passport_72 = {obj['Country']:obj['Passport'] for obj in fake_passport}
+    print(f"Successfully loaded data for the fake_passport.")
+except Exception as e:
+    print(f"Error loading fake_passport: {e}")
+    raise
+
 # Reading ISO json object
 try:
     iso_data = json.loads(open(f"{data_dir}/iso.json", "r").read())
@@ -44,14 +54,4 @@ try:
     print(f"Successfully loaded data for the International Government IDs.")
 except Exception as e:
     print(f"Error loading International Government IDs: {e}")
-    raise
-
-# Reading in the fake_passport data
-try:
-    fake_passport_0 = pd.read_csv(f"{data_dir}/fake_passport.csv")
-    fake_passport_24 = fake_passport.to_dict(orient='records')
-    fake_passport_72 = {obj['Country']:obj['Passport'] for obj in fake_passport}
-    print(f"Successfully loaded data for the fake_passport.")
-except Exception as e:
-    print(f"Error loading fake_passport: {e}")
     raise
