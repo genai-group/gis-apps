@@ -415,7 +415,58 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_g
     except Exception as e:
         raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
 
-# Create Milvus Index
+############################
+####    Bloom Filter    ####
+############################
+
+class BloomFilter:
+    """
+    A simple Bloom filter implementation using Redis.
+    """
+    def __init__(self, redis_host: str, redis_port: int, redis_db: int = 0):
+        self.redis_client = redis.StrictRedis(host=os.environ.get("REDIS_HOST"), port=os.environ.get("REDIS_PORT"), db=redis_db)
+        self.num_hashes = 6  # Number of hash functions to use
+        self.bit_size = 10000000  # Size of the bitmap
+
+    def _hashes(self, key: str) -> List[int]:
+        """
+        Generates multiple hash values for a given key.
+        """
+        hashes = []
+        for i in range(self.num_hashes):
+            hash_val = int(hashlib.md5(f"{key}_{i}".encode()).hexdigest(), 16) % self.bit_size
+            hashes.append(hash_val)
+        return hashes
+
+    def add(self, key: str) -> None:
+        """
+        Adds a key to the Bloom filter.
+        """
+        hashes = self._hashes(key)
+        pipeline = self.redis_client.pipeline()
+        for hash_val in hashes:
+            pipeline.setbit("bloom_filter", hash_val, 1)
+        pipeline.execute()
+
+    def check(self, key: str) -> bool:
+        """
+        Checks if a key might be in the Bloom filter.
+        """
+        hashes = self._hashes(key)
+        for hash_val in hashes:
+            if not self.redis_client.getbit("bloom_filter", hash_val):
+                return False
+        return True
+
+def connect_to_bloomfilter():
+    try:
+        bloom_filter = BloomFilter(redis_host=os.environ.get("REDIS_HOST"), redis_port=os.environ.get("REDIS_PORT"), redis_db=0)
+        print(f"Connected to BloomFilter: {bloom_filter}")
+        return bloom_filter
+    except Exception as e:
+        print(f"Errors loading BloomFilter Client: {e}")
+        return None
+
 
 ######################################
 ####    Making Connections    ########
@@ -446,3 +497,6 @@ milvus_connect_to_server()
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")
 milvus_collection.load()
+
+# Bloom Filter
+bloom_filter = connect_to_bloomfilter()

@@ -284,6 +284,75 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
         raise ValueError(f"Input error: {e}")
 
+
+############################
+####    Bloom Filter    ####
+############################
+
+def bloom_filter_check_and_load(objects: List[Dict[str, Any]] = [], 
+                                key: str = '_id', 
+                                bloom: BloomFilter = bloom_filter) -> Any:    
+    """
+    Filters out items that are possibly in the Bloom filter.
+    Loads the new item keys into the Bloom filter and returns True when that is completed.
+    """
+    new_objects = []
+    
+    try:
+        for obj in objects:
+            assert key in obj, "Each object should have a 'key' property."
+            if not bloom.check(obj[key]):
+                new_objects.append(obj)
+                bloom.add(obj[key])
+
+        return new_objects
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
+
+"""
+
+NOTE: Example Bloom Filter Usage:
+google_form_output = bloom_filter_check_and_load(google_form_output, key='Job Posting URL', bloom=bloom_filter)
+
+"""
+
+def bloomfilter_remove(objects: List[Dict[str, Any]] = [], 
+                       bloom: BloomFilter = bloom_filter) -> Any:    
+    """
+    Filters out items that are possibly in the Bloom filter.
+    Loads the new item keys into the Bloom filter and returns True when that is completed.
+    """
+    new_objects = []
+    
+    try:
+        for obj in objects:
+            obj['uuid'] = hashify(str(obj))
+            if not bloom.check(obj['uuid']):
+                new_objects.append(obj)
+
+        return new_objects
+    
+    except Exception as e:
+        print(f"An error occurred when removing items with bloomfilter_remove: {e}")
+        return []
+
+def bloom_filter_clear(redis_client: Any = redis_client):
+    """
+    Clears the entire Bloom filter.
+    """
+
+    try:
+        redis_client.delete("bloom_filter")
+        print(f"Bloom filter cleared.")
+        return True
+    
+    except Exception as e:
+        print(f"An error occurred when clearing the bloom filter: {e}")
+        return False
+    
+
 ############################
 ####    S3 Functions    ####
 ############################
