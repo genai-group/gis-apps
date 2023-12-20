@@ -35,3 +35,13 @@ try:
 except Exception as e:
     print(f"Error loading ISO data: {e}")
     raise
+
+# Reading in the International Government IDs - Sheet1.csv
+try:
+    government_ids = pd.read_csv(f"{data_dir}/International Government IDs - Sheet1.csv")
+    government_ids = government_ids.to_dict(orient='records')
+    government_ids = {obj['Country']:obj['Name'] for obj in government_ids}
+    print(f"Successfully loaded data for the International Government IDs.")
+except Exception as e:
+    print(f"Error loading International Government IDs: {e}")
+    raise
