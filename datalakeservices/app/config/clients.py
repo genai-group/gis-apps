@@ -240,9 +240,6 @@ def connect_to_mongodb(host: str = 'localhost',
     except PyMongoError as e:
         raise PyMongoError(f"An error occurred with PyMongo: {e}")
 
-# Example usage
-mongo_client = connect_to_mongodb()
-
 
 #################################
 ####    Kafka & Zookeeper    ####
@@ -317,8 +314,6 @@ def connect_to_redis():
     except Exception as e:
         print(f"Errors loading Redis Client: {e}")
         return None
-    
-redis_client = connect_to_redis()    
 
 
 #############################
@@ -479,7 +474,48 @@ def create_database_if_not_exists(client, database_name):
     else:
         print(f"Database '{database_name}' already exists.")
 
+def connect_to_typedb(host: str = 'localhost', 
+                      port: int = 27017, 
+                      username: Optional[str] = None, 
+                      password: Optional[str] = None, 
+                      db_name: str = 'gis_main') -> Database:
+    """
+    Establishes a connection to a MongoDB database.
 
+    Parameters:
+    host (str): The hostname or IP address of the TypeDB server. Defaults to 'localhost'.
+    port (int): The port number on which TypeDB is running. Defaults to 1729.
+    username (Optional[str]): The username for TypeDB authentication. Defaults to None.
+    password (Optional[str]): The password for TypeDB authentication. Defaults to None.
+    db_name (str): The name of the database to connect to. Defaults to 'gis_main'.
+
+    Returns:
+    Database: A TypeDB database object.
+
+    Raises:
+    AssertionError: If the provided host, port, or db_name are not valid.
+
+    Example:
+    >>> typedb_client = connect_to_mongodb('localhost', 1729, 'user', 'pass', 'mydb')
+    >>> print(typedb_client.name)
+    
+    """
+
+    # Input validation
+    assert isinstance(host, str) and host, "Host must be a non-empty string."
+    assert isinstance(port, int) and port > 0, "Port must be a positive integer."
+    assert isinstance(db_name, str) and db_name, "Database name must be a non-empty string."
+
+    try:
+        # Create a TypeDB client instance
+        client = TypeDB.core_client(TYPEDB_URI)
+        print(f"Connected to TypeDB: {client}")
+
+        return client
+    
+    except Exception as e:
+        print(f"Error connecting to TypeDB: {e}")
+        return None
 
 ######################################
 ####    Making Connections    ########
@@ -513,3 +549,6 @@ milvus_collection.load()
 
 # Bloom Filter
 bloom_filter = connect_to_bloomfilter()
+
+# TypeDB
+typedb_client = connect_to_typedb()
