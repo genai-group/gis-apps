@@ -42,6 +42,9 @@ import ray
 # PyYaml
 import yaml
 
+# TypeDB
+from typedb.client import TypeDB, TypeDBOptions, SessionType, TransactionType
+
 # MinIO
 from minio import Minio
 from minio.error import S3Error
