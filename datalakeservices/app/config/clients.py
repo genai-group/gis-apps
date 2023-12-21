@@ -471,10 +471,13 @@ def connect_to_bloomfilter():
 ######################
 ####    TypeDB    ####
 ######################
-    
 
-
-
+def create_database_if_not_exists(client, database_name):
+    if not client.databases().contains(database_name):
+        client.databases().create(database_name)
+        print(f"Database '{database_name}' created.")
+    else:
+        print(f"Database '{database_name}' already exists.")
 
 
 

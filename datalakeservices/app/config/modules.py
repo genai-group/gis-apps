@@ -43,10 +43,10 @@ import ray
 import yaml
 
 # TypeDB
-from typedb.client import TypeDB, TypeDBOptions, SessionType, TransactionType
+# from typedb.client import TypeDB, TypeDBOptions, SessionType, TransactionType
 # from typedb.driver import *
 from typedb.driver import TypeDB, SessionType, TransactionType
-from typedb.common.exception import TypeDBClientException, TypeDBClientError
+# from typedb.common.exception import TypeDBClientException, TypeDBClientError
 
 # MinIO
 from minio import Minio
