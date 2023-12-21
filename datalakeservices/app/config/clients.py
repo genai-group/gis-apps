@@ -467,13 +467,6 @@ def connect_to_bloomfilter():
 ####    TypeDB    ####
 ######################
 
-def create_database_if_not_exists(client, database_name):
-    if not client.databases().contains(database_name):
-        client.databases().create(database_name)
-        print(f"Database '{database_name}' created.")
-    else:
-        print(f"Database '{database_name}' already exists.")
-
 def connect_to_typedb(host: str = 'localhost', 
                       port: int = 27017, 
                       username: Optional[str] = None, 
@@ -517,6 +510,33 @@ def connect_to_typedb(host: str = 'localhost',
         print(f"Error connecting to TypeDB: {e}")
         return None
 
+# Connect to TypeDB and create a database 'gis-main'
+    
+def create_typedb_database(typedb_client: type, database_name: str = 'gis_main') -> None:
+    """
+    Create a new database in the TypeDB server.
+
+    Parameters:
+    database_name (str): Name of the database to be created.
+
+    Raises:
+    AssertionError: If inputs are not in expected format.
+    Exception: For issues encountered while creating the database.
+    """
+    assert isinstance(database_name, str), "Database name must be a string"
+
+    try:
+        # Create a TypeDB client instance
+        client = TypeDB.core_client(TYPEDB_URI)
+
+        # Create a database
+        client.databases.create(database_name)
+        print(f"TypeDB Database created: {database_name}")
+    
+    except Exception as e:
+        print(f"Error creating TypeDB Database: {e}")
+        return None    
+
 ######################################
 ####    Making Connections    ########
 ######################################
@@ -552,3 +572,5 @@ bloom_filter = connect_to_bloomfilter()
 
 # TypeDB
 typedb_client = connect_to_typedb()
+
+create_typedb_database(typedb_client, 'gis_main')
