@@ -23,7 +23,7 @@ try:
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
     manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
     manifest_data_72 = json.loads(open(f"{data_dir}/fake_airline_manifest_72_hours.json", "r").read()) 
-    print(f"Successfully loaded data for the manifest data files (0, 24 adn 72 hours).")
+    print(f"Successfully loaded data for the fake_airline_manifest files (0, 24 adn 72 hours).")
 except Exception as e:
     print(f"Error loading data: {e}")
     raise
