@@ -501,7 +501,7 @@ def connect_to_typedb(host: str = 'localhost',
 
     try:
         # Create a TypeDB client instance
-        client = TypeDB.core_client(TYPEDB_URI)
+        client = TypeDB.core_driver(TYPEDB_URI)
         print(f"Connected to TypeDB: {client}")
 
         return client
@@ -527,7 +527,7 @@ def create_typedb_database(typedb_client: type, database_name: str = 'gis_main')
 
     try:
         # Create a TypeDB client instance
-        client = TypeDB.core_client(TYPEDB_URI)
+        client = TypeDB.core_driver(TYPEDB_URI)
 
         # Create a database
         client.databases.create(database_name)
