@@ -65,7 +65,6 @@ def define_schema(driver, database_name):
 #             # Assuming insert_data function is defined elsewhere
 #             insert_data(session, flight_info, passengers)
 
-
 def main():
     with TypeDB.core_driver(TYPEDB_URI) as client:
         # Database check and creation logic here...
