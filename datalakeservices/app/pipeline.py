@@ -13,7 +13,7 @@ hashify(passengers, namespace='passenger')
 
 data = manifest_data_0['passenger_info']
 
-
+"""
 {
     'full_name': 'Ryan Smith',
     'gender': 'Male',
@@ -23,7 +23,9 @@ data = manifest_data_0['passenger_info']
     'passport_information': '217-45-9511'
 }
 
-schema = '""full_name [name], country_of_citizenship [country], passport_information [passport_id]; passport_id -> full_name, country""'
+"""
+
+schema = '""full_name [name], country_of_citizenship [country], passport_information [passport_id]; passport_id -> name, country""'
 
 # Split into statements
 statements = schema.split(';')
@@ -48,4 +50,5 @@ for statement in statements:
             children = command.split('->')[1].strip()
             children = children.split(',')
             for child in children:
-                print(f"paernt: {parent}: child {child}")
+                define_relation = 'has_' + child.strip().lower().replace(' ','_')
+                print(f"parent: {parent} => {define_relation} => {child}")

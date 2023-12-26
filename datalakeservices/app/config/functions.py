@@ -284,6 +284,84 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
         raise ValueError(f"Input error: {e}")
 
+########################################
+####    Find Dates in the object    ####
+########################################
+    
+def is_datetime_string(s: str) -> bool:
+    """
+    Checks if the given string matches common datetime formats.
+
+    Args:
+    s (str): The string to check.
+
+    Returns:
+    bool: True if the string matches a datetime pattern, False otherwise.
+    """
+    datetime_patterns = [
+        r'\d{4}-\d{2}-\d{2}',  # YYYY-MM-DD
+        r'\d{2}/\d{2}/\d{4}',  # MM/DD/YYYY
+        r'\d{2}-\d{2}-\d{4}',  # DD-MM-YYYY
+        # Additional patterns can be added here
+    ]
+    return any(re.fullmatch(pattern, s) for pattern in datetime_patterns)
+
+def is_unix_timestamp(val: Any) -> bool:
+    """
+    Checks if the given value is a Unix timestamp.
+
+    Args:
+    val (Any): The value to check.
+
+    Returns:
+    bool: True if the value is a Unix timestamp, False otherwise.
+    """
+    try:
+        return isinstance(val, int) and 0 <= val <= 4102444800
+    except ValueError:
+        return False
+
+def find_datetime_values(obj: Union[Dict, List], path: str = "") -> None:
+    """
+    Recursively searches for datetime values in a nested dictionary or list.
+
+    Args:
+    obj (Union[Dict, List]): The object to search through.
+    path (str): The current path in the object.
+
+    Returns:
+    None: This function prints the paths and values of datetime-related data it finds.
+    """
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            current_path = f"{path}.{k}" if path else k
+            if isinstance(v, (dict, list)):
+                find_datetime_values(v, current_path)
+            else:
+                if isinstance(v, datetime):
+                    print(f"Found datetime object at {current_path}: {v}")
+                elif isinstance(v, str):
+                    if is_datetime_string(v):
+                        print(f"Found datetime string at {current_path}: {v}")
+                elif is_unix_timestamp(v):
+                    print(f"Found Unix timestamp at {current_path}: {v}")
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            current_path = f"{path}[{i}]"
+            find_datetime_values(item, current_path)
+
+# Example usage
+example_obj = {
+    "date_str": "2023-04-01",
+    "timestamp": 1672502400,
+    "nested": {
+        "another_date": datetime.now(),
+        "list_example": ["2023/12/31", 42, {"deep_nested_date": "01-01-2023"}]
+    }
+}
+
+find_datetime_values(example_obj)
+
 
 ############################
 ####    Bloom Filter    ####
