@@ -534,7 +534,7 @@ def create_typedb_database(typedb_client: type, database_name: str = 'gis_main')
         print(f"TypeDB Database created: {database_name}")
     
     except Exception as e:
-        print(f"Error creating TypeDB Database: {e}")
+        # print(f"Error creating TypeDB Database: {e}")
         return None    
 
 ######################################
