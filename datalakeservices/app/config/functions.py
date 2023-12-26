@@ -430,6 +430,39 @@ def bloom_filter_clear(redis_client: Any = redis_client):
         print(f"An error occurred when clearing the bloom filter: {e}")
         return False
     
+########################################
+####    Transformation Functions    ####
+########################################
+
+def phone_number(phone_number: str) -> str:
+    """
+    Standardizes an international phone number according to ISO guidelines (E.164 format)
+    and provides geographic information based on the country and area codes.
+
+    Parameters:
+    phone_number (str): The phone number to be standardized.
+
+    Returns:
+    str: A standardized phone number along with geographic information.
+
+    Raises:
+    ValueError: If the input is not a valid phone number.
+    """
+    # Validate input
+    assert isinstance(phone_number, str), "Input must be a string."
+
+    try:
+        # Parse and standardize the phone number
+        parsed_number = phonenumbers.parse(phone_number)
+        standardized_number = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
+        
+        # Extract geographic information
+        country_info = geocoder.description_for_number(parsed_number, 'en')
+
+        return f"Standardized Number: {standardized_number}, Country: {country_info}"
+
+    except phonenumbers.NumberParseException as e:
+        raise ValueError(f"Invalid phone number: {e}")
 
 ############################
 ####    S3 Functions    ####

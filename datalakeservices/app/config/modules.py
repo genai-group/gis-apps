@@ -52,6 +52,9 @@ from typedb.driver import TypeDB, SessionType, TransactionType
 from minio import Minio
 from minio.error import S3Error
 
+# Phone numbers
+
+
 # Pytest
 import pytest
 
