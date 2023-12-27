@@ -244,6 +244,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
         for obj in data:
             if isinstance(obj, str):
                 temp_obj = {'_label': obj}
+                original_obj = copy.deepcopy(obj)
             else:
                 original_obj = copy.deepcopy(obj)
                 temp_obj = copy.deepcopy(obj)

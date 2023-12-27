@@ -551,6 +551,10 @@ postgres_client = connect_to_postgres()
 
 # MongoDB
 mongodb_client = connect_to_mongodb()
+mongo_collection = mongodb_client['gis_main']
+
+if '_guid' not in list(mongo_collection.index_information()):
+    mongo_collection.create_index([("_guid", 1)], unique=True)
 
 # Kafka
 kafka_client = create_kafka_admin_client()
