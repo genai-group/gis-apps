@@ -5,8 +5,8 @@ template:
   primary_key: "passenger_info"
 
 rename_fields:
-  - from: "passenger_info"
-    to: "passenger_information"
+  - from: "passport_information"
+    to: "passport_id"
   - from: "full_name"
     to: "name"
   - from: "date_of_birth"

@@ -504,35 +504,37 @@ def standardize_name(name: str) -> str:
     except Exception as e:
         raise ValueError(f"Error processing the name: {e}")
 
-def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str]) -> List[Dict[str, Any]]:
     """
-    Recursively renames properties in a list of records based on a mapping.
+    Renames and processes properties in a list of records based on a mapping and drops specified fields.
 
     Args:
     records (List[Dict[str, Any]]): List of dictionaries representing records.
     rename_map (List[Dict[str, str]]): List of dictionaries mapping 'from' field names to 'to' field names.
+    drop_fields (List[str]): List of field names to be dropped from records.
 
     Returns:
-    List[Dict[str, Any]]: List of updated records with renamed properties.
+    List[Dict[str, Any]]: List of updated records with renamed and processed properties.
     """
     assert all('from' in mapping and 'to' in mapping for mapping in rename_map), "Each rename mapping must have 'from' and 'to' keys."
 
-    def rename_recursively(obj: Any, rename_map: List[Dict[str, str]]) -> Any:
+    def rename_and_drop_recursively(obj: Any, rename_map: List[Dict[str, str]], drop_fields: List[str]) -> Any:
         if isinstance(obj, dict):
             new_obj = {}
             for key, value in obj.items():
-                new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
-                new_obj[new_key] = rename_recursively(value, rename_map)
+                if key not in drop_fields:
+                    new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
+                    new_obj[new_key] = rename_and_drop_recursively(value, rename_map, drop_fields)
             return new_obj
         elif isinstance(obj, list):
-            return [rename_recursively(item, rename_map) for item in obj]
+            return [rename_and_drop_recursively(item, rename_map, drop_fields) for item in obj]
         else:
             return obj
 
     try:
-        return [rename_recursively(record, rename_map) for record in records]
+        return [rename_and_drop_recursively(record, rename_map, drop_fields) for record in records]
     except Exception as e:
-        raise ValueError(f"An error occurred while renaming properties: {e}")
+        raise ValueError(f"An error occurred while processing properties: {e}")
 
 
 
