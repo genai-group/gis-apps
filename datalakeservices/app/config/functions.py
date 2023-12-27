@@ -504,6 +504,36 @@ def standardize_name(name: str) -> str:
     except Exception as e:
         raise ValueError(f"Error processing the name: {e}")
 
+def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+    """
+    Recursively renames properties in a list of records based on a mapping.
+
+    Args:
+    records (List[Dict[str, Any]]): List of dictionaries representing records.
+    rename_map (List[Dict[str, str]]): List of dictionaries mapping 'from' field names to 'to' field names.
+
+    Returns:
+    List[Dict[str, Any]]: List of updated records with renamed properties.
+    """
+    assert all('from' in mapping and 'to' in mapping for mapping in rename_map), "Each rename mapping must have 'from' and 'to' keys."
+
+    def rename_recursively(obj: Any, rename_map: List[Dict[str, str]]) -> Any:
+        if isinstance(obj, dict):
+            new_obj = {}
+            for key, value in obj.items():
+                new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
+                new_obj[new_key] = rename_recursively(value, rename_map)
+            return new_obj
+        elif isinstance(obj, list):
+            return [rename_recursively(item, rename_map) for item in obj]
+        else:
+            return obj
+
+    try:
+        return [rename_recursively(record, rename_map) for record in records]
+    except Exception as e:
+        raise ValueError(f"An error occurred while renaming properties: {e}")
+
 
 
 ####################################
