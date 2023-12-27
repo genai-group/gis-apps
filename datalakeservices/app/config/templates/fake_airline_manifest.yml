@@ -2,12 +2,11 @@
 
 template:
   name: "fake_airline_manifest"
-  purpose: "Analysis of fake airline manifest data"
   primary_key: "passenger_info"
 
 rename_fields:
-  - from: "passport_id"
-    to: "passenger_info"
+  - from: "passenger_info"
+    to: "passenger_information"
   - from: "full_name"
     to: "name"
   - from: "date_of_birth"
@@ -22,6 +21,13 @@ standardize_fields:
     transform: "standardize_date"
   - field: "country"
     transform: "standardize_country"
+
+entities:
+  - name
+  - passport_id
+
+drop_fields:
+  - id_type
 
 relationships:
   - parents: ["passport_id"]
