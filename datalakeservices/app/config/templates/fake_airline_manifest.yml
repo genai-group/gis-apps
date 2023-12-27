@@ -2,36 +2,28 @@
 
 template:
   name: "fake_airline_manifest"
-  purpose: "To process and transform fake airline manifest data for analysis"
+  purpose: "Analysis of fake airline manifest data"
   primary_key: "passenger_info"
 
-data_fields:
-  - field_name: "full_name"
-    field_name_new: "name"
-    standardize: "standardize_name"
-    field_format: "string"
+rename_fields:
+  - from: "passport_id"
+    to: "passenger_info"
+  - from: "full_name"
+    to: "name"
+  - from: "date_of_birth"
+    to: "dob"
+  - from: "country_of_citizenship"
+    to: "country"
 
-  - field_name: "gender"    
-    field_format: "string"
-
-  - field_name: "date_of_birth"
-    field_name_new: "dob"
-    standardize: "standardize_date"
-    field_format: "unix_timestamp"
-
-  - field_name: "country_of_citizenship"  
-    field_name_new: "country"
-    field_format: "string"
-
-  - field_name: "government_id_type"
-    field_name_new: "id_type"
-    field_format: "string"
-
-  - field_name: "passport_information"
-    field_name_new: "id_number"
-    field_format: "string"
+standardize_fields:
+  - field: "name"
+    transform: "standardize_name"
+  - field: "dob"
+    transform: "standardize_date"
+  - field: "country"
+    transform: "standardize_country"
 
 relationships:
-  - parents: ['passenger_info']
-    children: ['passenger_info']
-    relationship_type: 'one_to_one'
+  - parents: ["passport_id"]
+    children: ["name", "dob", "country", "id_type"]
+    type: "one_to_one"

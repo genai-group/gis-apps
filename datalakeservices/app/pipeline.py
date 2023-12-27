@@ -6,7 +6,13 @@ from config.init import *
 # Reading in the template file
 #%%
 template_dir = './config/templates'
-airline_manifest_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest.yml", "r").read())
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest.yml", "r").read())
+
+#%%
+data = manifest_data_0[parse_config['template']['primary_key']]
+
+#%%
+
 
 #%%
 passengers = manifest_data_0['passenger_info']
