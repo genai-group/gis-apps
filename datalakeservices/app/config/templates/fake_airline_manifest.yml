@@ -8,7 +8,7 @@ template:
 data_fields:
   - field_name: "full_name"
     field_name_new: "name"
-    transformation: "transformation_name"
+    standardize: "standardize_name"
     field_format: "string"
 
   - field_name: "gender"    
@@ -16,7 +16,7 @@ data_fields:
 
   - field_name: "date_of_birth"
     field_name_new: "dob"
-    transformation: "transformation_date"
+    standardize: "standardize_date"
     field_format: "unix_timestamp"
 
   - field_name: "country_of_citizenship"  
@@ -30,3 +30,8 @@ data_fields:
   - field_name: "passport_information"
     field_name_new: "id_number"
     field_format: "string"
+
+relationships:
+  - parents: ['passenger_info']
+    children: ['passenger_info']
+    relationship_type: 'one_to_one'
