@@ -29,6 +29,9 @@ entities:
 embeddings:
   - name
 
+datetime_fields:
+  - dob
+
 drop_fields:
   - id_type
 
