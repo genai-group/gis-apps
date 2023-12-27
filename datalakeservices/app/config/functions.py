@@ -504,7 +504,7 @@ def standardize_name(name: str) -> str:
     except Exception as e:
         raise ValueError(f"Error processing the name: {e}")
 
-def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str]) -> List[Dict[str, Any]]:
+def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """
     Renames and processes properties in a list of records based on a mapping and drops specified fields.
 

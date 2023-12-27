@@ -22,6 +22,7 @@ if 'primary_key' in parse_config['template']:
 if 'rename_fields' in parse_config:
     data = rename_properties(data, parse_config['rename_fields'])
 
+#%%
 # Add hashes to each object
 data = hashify(data, namespace='passenger')
 
