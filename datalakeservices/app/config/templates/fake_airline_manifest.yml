@@ -26,6 +26,9 @@ entities:
   - name
   - passport_id
 
+embeddings:
+  - name
+
 drop_fields:
   - id_type
 
