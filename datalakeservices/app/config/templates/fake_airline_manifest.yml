@@ -1,0 +1,32 @@
+# Template for Processing Fake Airline Manifest Data
+
+template:
+  name: "fake_airline_manifest"
+  purpose: "To process and transform fake airline manifest data for analysis"
+  primary_key: "passenger_info"
+
+data_fields:
+  - field_name: "full_name"
+    field_name_new: "name"
+    transformation: "transformation_name"
+    field_format: "string"
+
+  - field_name: "gender"    
+    field_format: "string"
+
+  - field_name: "date_of_birth"
+    field_name_new: "dob"
+    transformation: "transformation_date"
+    field_format: "unix_timestamp"
+
+  - field_name: "country_of_citizenship"  
+    field_name_new: "country"
+    field_format: "string"
+
+  - field_name: "government_id_type"
+    field_name_new: "id_type"
+    field_format: "string"
+
+  - field_name: "passport_information"
+    field_name_new: "id_number"
+    field_format: "string"

@@ -434,7 +434,7 @@ def bloom_filter_clear(redis_client: Any = redis_client):
 ####    Transformation Functions    ####
 ########################################
 
-def phone_number(phone_number: str) -> str:
+def standardize_phone(phone_number: str) -> str:
     """
     Standardizes an international phone number according to ISO guidelines (E.164 format)
     and provides geographic information based on the country and area codes.
@@ -463,6 +463,99 @@ def phone_number(phone_number: str) -> str:
 
     except phonenumbers.NumberParseException as e:
         raise ValueError(f"Invalid phone number: {e}")
+
+def standardize_name(name: str) -> str:
+    """
+    Standardizes a person's name by converting to lowercase, replacing special 
+    punctuation with space, and removing accent marks from letters. Additionally, 
+    it trims leading and trailing whitespaces.
+
+    Parameters:
+    name (str): The name to be standardized.
+
+    Returns:
+    str: The standardized name.
+
+    Raises:
+    AssertionError: If the input is not a string.
+    """
+
+    # Ensure the input is a string
+    assert isinstance(name, str), "Input must be a string."
+
+    try:
+        # Convert to lowercase
+        name = name.lower()
+
+        # Normalize to decompose accent characters
+        name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('ascii')
+
+        # Replace special punctuation with space
+        name = re.sub(r"[^\w\s]", ' ', name)
+
+        # Collapse all spaces and tabs to a single space
+        name = re.sub(r"\s+", ' ', name)
+
+        # Trim leading and trailing whitespaces
+        name = name.strip()
+
+        return name
+
+    except Exception as e:
+        raise ValueError(f"Error processing the name: {e}")
+
+
+
+####################################
+####    Similarity Functions    ####
+####################################
+    
+def transliterate_and_standardize_name(name: str) -> str:
+    """Transliterate (if needed) and standardize the name."""
+    # Transliterate to Latin script
+    name = unidecode(name)
+    # Standardize
+    name = name.lower()
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('ascii')
+    name = re.sub(r"[^\w\s]", ' ', name)
+    name = re.sub(r"\s+", ' ', name)
+    return name.strip()
+
+def name_similarity(names: List[str], similarity_threshold: float = 0.8) -> bool:
+    """
+    Compares an array of names, possibly in different languages, to test if they could represent the same entity.
+
+    Parameters:
+    names (List[str]): An array of names to be compared.
+    similarity_threshold (float): The threshold for considering names as similar.
+
+    Returns:
+    bool: True if the names are likely to represent the same entity, False otherwise.
+    """
+
+    # Transliterate and standardize all names
+    standardized_names = [transliterate_and_standardize_name(name) for name in names]
+    print(f"standardized_names: {standardized_names}")
+
+    # Compare each name with every other name
+    for i in range(len(standardized_names)):
+        for j in range(i + 1, len(standardized_names)):
+            similarity = difflib.SequenceMatcher(None, standardized_names[i], standardized_names[j]).ratio()
+            print(f"similarity: {similarity} | Threshold: {similarity_threshold}")
+            if similarity < similarity_threshold:
+                return False
+
+    return True
+
+"""
+
+names_to_compare = ['Иван Петров', 'Ivanar Petrov']
+print(name_similarity(names_to_compare))
+
+"""
+
+
+
 
 ############################
 ####    S3 Functions    ####

@@ -53,7 +53,8 @@ from minio import Minio
 from minio.error import S3Error
 
 # Phone numbers
-
+import phonenumbers
+from phonenumbers import geocoder
 
 # Pytest
 import pytest
