@@ -23,12 +23,13 @@ if 'rename_fields' in parse_config:
     data = rename_properties(data, parse_config['rename_fields'])
 
 #%%
+# Add hashes to each object
+data = hashify(data, namespace='passenger')
+
+#%%
 # Standardize Fields
 standardize_objects(data, parse_config)
 
-#%%
-# Add hashes to each object
-data = hashify(data, namespace='passenger')
 
 #%%
 # Load data into MongoDB Collection

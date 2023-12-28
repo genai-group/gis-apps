@@ -324,7 +324,9 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
                 input_str = obj
 
             # Ensure that the input is now a string
-            assert isinstance(input_str, str), "Input must be a string or JSON-like object"
+            # UNCOMMENT THIS LINE
+            print(f"input_str: {input_str}")
+            # assert isinstance(input_str, str), "Input must be a string or JSON-like object"
 
             hash_object = hashlib.sha256(input_str.encode())  # Calculate the SHA-256 hash of the string
             short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
