@@ -677,8 +677,8 @@ def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
                         transform_func = globals()[transform]
                         transformed_value = transform_func(obj[field])
                         standardized_obj = {
-                            'namespace': field,
-                            'label': obj[field],
+                            '_namespace': field,
+                            '_label': obj[field],
                             '_guid': hashify(transformed_value, namespace=field)['_guid'],
                             '_source': obj['_guid'],
                             '_relationship': 'has_' + field

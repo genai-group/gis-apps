@@ -28,7 +28,7 @@ data = hashify(data, namespace='passenger')
 
 #%%
 # Standardize Fields
-standardize_objects(data, parse_config)
+graph_data = standardize_objects(data, parse_config)
 
 
 #%%
