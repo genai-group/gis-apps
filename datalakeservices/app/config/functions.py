@@ -544,11 +544,65 @@ def standardize_passport_id(passport_id: str, length: int = 12, separator: str =
         raise RuntimeError(f"Error in formatting: {e}")
 
 # Example usage
-print(standardize_passport_id("A1234567"))
+# print(standardize_passport_id("A1234567"))
 
 def standardized_functions():
     functions = filter_func(lambda x: 'standardize_' in x, globals().keys())
     return functions
+
+def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
+    """
+    Standardize objects based on the parse_config.
+
+    Args:
+        objects (List[Dict]): List of objects to standardize.
+        parse_config (Dict): The parse configuration specifying fields and transformations.
+        map_func (Callable): A mapping function to apply transformations to each object.
+
+    Returns:
+        List[Dict]: List of standardized objects.
+
+    Raises:
+        KeyError: If 'standardize_fields' is not in parse_config.
+        ValueError: If 'transform' function is not found in globals.
+        RuntimeError: If an error occurs during processing.
+    """
+    # Assertions
+    assert isinstance(objects, list), "objects must be a list"
+    assert isinstance(parse_config, dict), "parse_config must be a dictionary"
+    assert 'standardize_fields' in parse_config, "parse_config must contain 'standardize_fields'"
+
+    standardized_objects = []
+
+    try:
+        for obj in objects:
+            standardized_obj = {}
+            for standardize_field in parse_config['standardize_fields']:
+                field = standardize_field['field']
+                transform = standardize_field.get('transform')
+
+                if transform and transform in globals():
+                    transform_func = globals()[transform]
+                    transformed_value = transform_func(obj[field])
+                    standardized_obj = {
+                        'namespace': field,
+                        'label': obj[field],
+                        '_guid': hashify(transformed_value, namespace=field)['_guid'],
+                        '_source': obj['_guid'],
+                        '_relationship': 'has_' + field
+                    }
+                else:
+                    raise ValueError(f"Transform function '{transform}' not found in globals.")
+
+            standardized_objects.append(standardized_obj)
+
+        return standardized_objects
+
+    except KeyError as e:
+        raise RuntimeError(f"Key Error: {e}")
+    except Exception as e:
+        raise RuntimeError(f"Error during processing: {e}")
+
 
 def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """

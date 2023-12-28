@@ -48,10 +48,28 @@ except Exception as e:
     print(f"Error loading fake_customs_report: {e}")
     raise
 
+# Global Terrorism Index
+try:
+    gti = pd.read_csv(f"{data_dir}/global_terrorism_index.csv")
+    gti.set_index('country', inplace=True)
+    gti_dict = gti.to_dict('index')
+    print(f"Successfully loaded data for the Global Terrorism Index data file.")
+except Exception as e:
+    print(f"Errors loading the global terrorism index")
+    raise
+
 # Reading ISO json object
 try:
     iso_data = json.loads(open(f"{data_dir}/iso.json", "r").read())
-    iso_dict = {obj['name']:obj['alpha-2'] for obj in iso_data}
+    iso_data = pd.DataFrame(iso_data)
+    iso_data.set_index('name', inplace=True)
+    iso_dict = iso_data.to_dict('index')
+    # Add global terrorist index
+    for k,v in iso_dict.items():
+        try:
+            iso_dict[k]['terrorism_index'] = gti_dict[k]
+        except:
+            pass
     print(f"Successfully loaded data for the ISO data file.")
 except Exception as e:
     print(f"Error loading ISO data: {e}")

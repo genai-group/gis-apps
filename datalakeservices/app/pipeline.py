@@ -44,8 +44,20 @@ if 'entities' in parse_config.keys():
             'standardize_' in entity
 
 #%%
-def standardize_objects(objects, parse_config):
-    # Standardize fields
+def standardize_objects(objects List[Dict], parse_config: List[Dict]) -> List[Dict]:
+    """
+        Standardize objects based on the parse_config
+
+        Args:
+            objects (list): List of objects to standardize
+            parse_config (dict): The parse config file
+
+        Returns:
+            list: List of standardized objects
+
+    """
+    # Assertions
+
     if 'standardize_fields' in parse_config.keys():            
         for standardize_field in parse_config['standardize_fields']:
             if standardize_field['transform'] in globals().keys():
