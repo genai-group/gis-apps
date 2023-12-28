@@ -21,6 +21,8 @@ standardize_fields:
     transform: "standardize_date"
   - field: "country"
     transform: "standardize_country"
+  - field: "passport_id"
+    transform: "standardize_passport_id"
 
 entities:
   - name
