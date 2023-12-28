@@ -36,8 +36,9 @@ neo4j_objects = standardize_objects(data, parse_config)
 
 # Prepare the graph_data to be loaded into Neo4j
 
+#%%
 # Creating the Neo4j load statement
-load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys()])
+load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_source', '_relationship']])
 load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
 
 
