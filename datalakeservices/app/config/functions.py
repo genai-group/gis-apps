@@ -329,6 +329,8 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             # Calculate the hash
             hash_object = hashlib.sha256(str(input_str).encode())  # Calculate the SHA-256 hash of the string
             short_hash = hash_object.hexdigest()[:hash_length]  # Shorten the hash to the specified length
+            if not isinstance(temp_obj, dict):
+                temp_obj = {'_label': temp_obj}
             temp_obj['_hash'] = short_hash
             if len(namespace) > 0:
                 namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
