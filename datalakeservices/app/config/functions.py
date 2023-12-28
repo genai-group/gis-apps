@@ -680,6 +680,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
                             # '_namespace': field,
                             '_label': obj[field],
                             '_guid': hashify(transformed_value, namespace=field)['_guid'],
+                            '_hash': hashify(transformed_value, namespace=field)['_hash'],
                             '_source': obj['_guid'],
                             '_relationship': 'has_' + field
                         }
@@ -696,7 +697,6 @@ def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
         raise RuntimeError(f"Key Error: {e}")
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
-
 
 def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """

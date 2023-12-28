@@ -34,13 +34,17 @@ mongo_collection.insert_many(data)
 # Standardize Fields
 neo4j_objects = standardize_objects(data, parse_config)
 
-# Prepare the graph_data to be loaded into Neo4j
-
 #%%
 # Creating the Neo4j load statement
 load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_source', '_relationship']])
 load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
 
+#%%
+# Load objects given the schema
+with neo4j_client.session() as session:
+    session.run(load_statement, objects=neo4j_objects)
+    logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
+    print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
 
 
 
