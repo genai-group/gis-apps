@@ -41,62 +41,127 @@ assert to_unix("2023-08-09 12:00:00") == 1691582400
 assert from_unix(1691582400) == datetime(2023, 8, 9, 12, 0, tzinfo=timezone.utc)
 """
 
-def to_unix(date_str: str, tz_str: Optional[str] = None) -> int:
-    """
-    Convert a date string to a timezone aware UNIX timestamp using dateutil parsing.
+# def to_unix(date_str: str, tz_str: Optional[str] = None) -> int:
+#     """
+#     Convert a date string to a timezone aware UNIX timestamp using dateutil parsing.
 
-    :param date_str: String representation of the date.
-    :param tz_str: Timezone string. If None, it's treated as UTC.
-    :return: UNIX timestamp.
-    """
+#     :param date_str: String representation of the date.
+#     :param tz_str: Timezone string. If None, it's treated as UTC.
+#     :return: UNIX timestamp.
+#     """
 
-    try:
-        # Convert string to datetime object using dateutil parsing
-        if isinstance(date_str, str):
-            dt = parse(date_str)
-        else:
-            dt = date_str
+#     try:
+#         # Convert string to datetime object using dateutil parsing
+#         if isinstance(date_str, str):
+#             dt = parse(date_str)
+#         else:
+#             dt = date_str
 
-        # If the parsed datetime is naive, attach the appropriate timezone
-        if dt.tzinfo is None:
-            if tz_str:
-                import pytz
-                tz = pytz.timezone(tz_str)
-                dt = tz.localize(dt)
-            else:
-                dt = dt.replace(tzinfo=timezone.utc)
+#         # If the parsed datetime is naive, attach the appropriate timezone
+#         if dt.tzinfo is None:
+#             if tz_str:
+#                 import pytz
+#                 tz = pytz.timezone(tz_str)
+#                 dt = tz.localize(dt)
+#             else:
+#                 dt = dt.replace(tzinfo=timezone.utc)
         
-        # Convert datetime to UNIX timestamp
-        return int(dt.timestamp())
+#         # Convert datetime to UNIX timestamp
+#         return int(dt.timestamp())
     
-    except Exception as e:
-        raise ValueError(f"Failed to convert date string '{date_str}' to UNIX timestamp. Error: {e}")
-        return None
+#     except Exception as e:
+#         raise ValueError(f"Failed to convert date string '{date_str}' to UNIX timestamp. Error: {e}")
+#         return None
+
+def to_unix(date_input: Union[datetime, date, str]) -> int:
+    """
+    Convert a datetime object, a date object, or a string representation of a datetime 
+    to a Unix timestamp.
+
+    Args:
+    date_input (datetime | date | str): The datetime object, date object, 
+                                        or a string representation of a datetime.
+
+    Returns:
+    int: The Unix timestamp corresponding to the provided datetime.
+
+    Raises:
+    ValueError: If the date_input is neither a datetime object, a date object, nor a string.
+    """
+    # Check if the input is a datetime object, a date object, or a string
+    if not isinstance(date_input, (datetime, date, str)):
+        raise ValueError("date_input must be either a datetime object, a date object, or a string")
+
+    # If the input is a date object, convert it to a datetime object at midnight
+    if isinstance(date_input, date) and not isinstance(date_input, datetime):
+        date_input = datetime(date_input.year, date_input.month, date_input.day)
+
+    # If the input is a string, parse it to a datetime object
+    if isinstance(date_input, str):
+        date_input = parse(date_input)
+
+    # Check if the datetime object is timezone aware
+    if date_input.tzinfo is not None and date_input.tzinfo.utcoffset(date_input) is not None:
+        # Convert to UTC
+        date_input = date_input.astimezone(pytz.utc)
+
+    # Convert to Unix timestamp
+    timestamp = int(date_input.timestamp())
+    return timestamp
 
 def from_unix(unix_timestamp: int, tz_str: Optional[str] = None) -> datetime:
     """
     Convert a UNIX timestamp to a timezone aware datetime object.
 
-    :param unix_timestamp: UNIX timestamp to convert.
-    :param tz_str: Timezone string. If None, it's returned as UTC.
-    :return: Timezone aware datetime object.
-    """
+    Args:
+    unix_timestamp (int): UNIX timestamp to convert.
+    tz_str (Optional[str]): Timezone string. If None, it's returned as UTC.
 
+    Returns:
+    datetime: Timezone aware datetime object.
+
+    Raises:
+    ValueError: If conversion fails or invalid timezone is provided.
+    """
     try:
-        # Convert UNIX timestamp to datetime
+        # Convert UNIX timestamp to datetime in UTC
         dt = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
 
-        # If timezone is provided, adjust datetime
+        # If timezone is provided, adjust datetime to that timezone
         if tz_str:
-            import pytz
             tz = pytz.timezone(tz_str)
             dt = dt.astimezone(tz)
 
         return dt
-    
+
     except Exception as e:
         raise ValueError(f"Failed to convert UNIX timestamp '{unix_timestamp}' to datetime. Error: {e}")
-        return None
+
+
+# def from_unix(unix_timestamp: int, tz_str: Optional[str] = None) -> datetime:
+#     """
+#     Convert a UNIX timestamp to a timezone aware datetime object.
+
+#     :param unix_timestamp: UNIX timestamp to convert.
+#     :param tz_str: Timezone string. If None, it's returned as UTC.
+#     :return: Timezone aware datetime object.
+#     """
+
+#     try:
+#         # Convert UNIX timestamp to datetime
+#         dt = datetime.fromtimestamp(unix_timestamp, tz=timezone.utc)
+
+#         # If timezone is provided, adjust datetime
+#         if tz_str:
+#             import pytz
+#             tz = pytz.timezone(tz_str)
+#             dt = dt.astimezone(tz)
+
+#         return dt
+    
+#     except Exception as e:
+#         raise ValueError(f"Failed to convert UNIX timestamp '{unix_timestamp}' to datetime. Error: {e}")
+#         return None
 
 ## Cryptography
 
@@ -194,6 +259,7 @@ def decrypt_data(encrypted_data: bytes) -> Optional[Any]:
         print(f"Decryption failed: {e}")
         return None
 
+
 ####################################################################################################################################
 #####    GIS Lock & Unlock Functions (Truly Random Number Generation based on hardware-based random number generators (RNGs)    ####
 ####################################################################################################################################
@@ -284,6 +350,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
         # Log the error using the logging module
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
         raise ValueError(f"Input error: {e}")
+
 
 ########################################
 ####    Find Dates in the object    ####
@@ -435,6 +502,27 @@ def bloom_filter_clear(redis_client: Any = redis_client):
 ####    Transformation Functions    ####
 ########################################
 
+def standardize_date(date_input) -> int:
+    """
+    Standardizes a date, datetime, or timestamp to a Unix timestamp.
+
+    Parameters:
+    date_input: Some date, datetime, or timestamp.
+
+    Returns:
+    int: A unix timestamp.
+
+    Raises:
+    ValueError: If the input is not a date.
+    """
+
+    try:
+        date_value = to_unix(date_input)
+        return date_value
+    
+    except Exception as e:
+        logging.error(f"An error occurred in standardize_date: {e}", exc_info=True)
+
 def standardize_phone(phone_number: str) -> str:
     """
     Standardizes an international phone number according to ISO guidelines (E.164 format)
@@ -582,17 +670,20 @@ def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
                 transform = standardize_field.get('transform')
 
                 if transform and transform in globals():
-                    transform_func = globals()[transform]
-                    transformed_value = transform_func(obj[field])
-                    standardized_obj = {
-                        'namespace': field,
-                        'label': obj[field],
-                        '_guid': hashify(transformed_value, namespace=field)['_guid'],
-                        '_source': obj['_guid'],
-                        '_relationship': 'has_' + field
-                    }
+                    if transform in globals().keys():
+                        transform_func = globals()[transform]
+                        transformed_value = transform_func(obj[field])
+                        standardized_obj = {
+                            'namespace': field,
+                            'label': obj[field],
+                            '_guid': hashify(transformed_value, namespace=field)['_guid'],
+                            '_source': obj['_guid'],
+                            '_relationship': 'has_' + field
+                        }
                 else:
-                    raise ValueError(f"Transform function '{transform}' not found in globals.")
+                    logging.warning(f"Transform function '{transform}' not found in globals.")
+                    # raise ValueError(f"Transform function '{transform}' not found in globals.")
+                    pass
 
             standardized_objects.append(standardized_obj)
 

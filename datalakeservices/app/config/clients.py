@@ -283,7 +283,9 @@ def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
 kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
 
 
+############################
 ####    Neo4j Client    ####
+############################
 
 def connect_to_neo4j():
     try:
@@ -537,9 +539,10 @@ def create_typedb_database(typedb_client: type, database_name: str = 'gis_main')
         # print(f"Error creating TypeDB Database: {e}")
         return None    
 
-######################################
-####    Making Connections    ########
-######################################
+
+################################
+####    Creating Clients    ####
+################################
 
 #%%
 

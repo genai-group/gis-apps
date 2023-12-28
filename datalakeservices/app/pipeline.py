@@ -24,7 +24,7 @@ if 'rename_fields' in parse_config:
 
 #%%
 # Standardize Fields
-
+standardize_objects(data, parse_config)
 
 #%%
 # Add hashes to each object
