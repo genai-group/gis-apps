@@ -335,7 +335,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             if len(namespace) > 0:
                 namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
-                temp_obj['_namespace'] = namespace
+                # temp_obj['_namespace'] = namespace
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
@@ -348,7 +348,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
                 return hash_list[0]
         else:                
             return hash_list
-        
+
     except Exception as e:
         # Log the error using the logging module
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
@@ -439,7 +439,7 @@ find_datetime_values(example_obj)
 ############################
 
 def bloom_filter_check_and_load(objects: List[Dict[str, Any]] = [], 
-                                key: str = '_id', 
+                                key: str = '_guid', 
                                 bloom: BloomFilter = bloom_filter) -> Any:    
     """
     Filters out items that are possibly in the Bloom filter.
