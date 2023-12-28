@@ -505,6 +505,51 @@ def standardize_name(name: str) -> str:
     except Exception as e:
         raise ValueError(f"Error processing the name: {e}")
 
+def standardize_passport_id(passport_id: str, length: int = 12, separator: str = '') -> str:
+    """
+    Standardizes the given passport ID to a specified format.
+    
+    Args:
+    passport_id (str): The passport ID to be standardized.
+    length (int): The total length of the standardized ID (including separators).
+    separator (str): The separator character to be used in the standardized ID.
+
+    Returns:
+    str: The standardized passport ID.
+
+    Raises:
+    ValueError: If the passport ID contains non-alphanumeric characters or is too long to be formatted.
+    """
+    # Remove any non-alphanumeric characters
+    passport_id = re.sub(r"[^a-zA-Z0-9]", '', passport_id)
+
+    # Ensure passport ID is alphanumeric
+    if not passport_id.isalnum():
+        raise ValueError("Passport ID must be alphanumeric.")
+
+    # Remove existing non-alphanumeric characters
+    clean_id = ''.join(filter(str.isalnum, passport_id))
+
+    # Check if the clean ID can be formatted to the specified length
+    if len(clean_id) > length:
+        raise ValueError("Passport ID is too long to be standardized to the specified length.")
+
+    # Padding the ID with zeros if necessary
+    standardized_id = clean_id.ljust(length, '0')
+
+    # Inserting separators
+    try:
+        return separator.join(standardized_id[i:i + 4] for i in range(0, length, 4))
+    except Exception as e:
+        raise RuntimeError(f"Error in formatting: {e}")
+
+# Example usage
+print(standardize_passport_id("A123   r r r 4567"))
+
+def standardized_functions():
+    functions = filter_func(lambda x: 'standardize_' in x, globals().keys())
+    return functions
+
 def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """
     Renames and processes properties in a list of records based on a mapping and drops specified fields.
