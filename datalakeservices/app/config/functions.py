@@ -505,7 +505,7 @@ def standardize_name(name: str) -> str:
     except Exception as e:
         raise ValueError(f"Error processing the name: {e}")
 
-def standardize_passport_id(passport_id: str, length: int = 12, separator: str = '') -> str:
+def standardize_passport_id(passport_id: str, length: int = 12, separator: str = '-') -> str:
     """
     Standardizes the given passport ID to a specified format.
     
@@ -544,7 +544,7 @@ def standardize_passport_id(passport_id: str, length: int = 12, separator: str =
         raise RuntimeError(f"Error in formatting: {e}")
 
 # Example usage
-print(standardize_passport_id("A123   r r r 4567"))
+print(standardize_passport_id("A1234567"))
 
 def standardized_functions():
     functions = filter_func(lambda x: 'standardize_' in x, globals().keys())

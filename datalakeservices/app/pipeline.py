@@ -23,6 +23,10 @@ if 'rename_fields' in parse_config:
     data = rename_properties(data, parse_config['rename_fields'])
 
 #%%
+# Standardize Fields
+
+
+#%%
 # Add hashes to each object
 data = hashify(data, namespace='passenger')
 
@@ -40,11 +44,12 @@ if 'entities' in parse_config.keys():
             'standardize_' in entity
 
 #%%
-# Standardize fields
-if 'standardize_fields' in parse_config.keys():            
-    for standardize_field in parse_config['standardize_fields']:
-        if standardize_field['transform'] in globals().keys():
-            print(map_func(lambda x: {'namespace':standardize_field['field'], 'label': x[standardize_field['field']], '_guid': hashify(globals()[(standardize_field['transform'])](x[standardize_field['field']]), namespace=standardize_field['field'])['_guid'], '_source':x['_guid'], '_relationship':'has_' + standardize_field['field']}, data))
+def standardize_objects(objects, parse_config):
+    # Standardize fields
+    if 'standardize_fields' in parse_config.keys():            
+        for standardize_field in parse_config['standardize_fields']:
+            if standardize_field['transform'] in globals().keys():
+                print(map_func(lambda x: {'namespace':standardize_field['field'], 'label': x[standardize_field['field']], '_guid': hashify(globals()[(standardize_field['transform'])](x[standardize_field['field']]), namespace=standardize_field['field'])['_guid'], '_source':x['_guid'], '_relationship':'has_' + standardize_field['field']}, data))
 
 #%%
 

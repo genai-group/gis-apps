@@ -1,0 +1,164 @@
+rank,country,score,category,change
+1,Afghanistan,9.109,Very High Impact,Steady
+2,Iraq,8.511,Very High Impact,Steady
+3,Somalia,8.398,Very High Impact,Steady
+4,Pakistan,8.27,Very High Impact,Positive decrease 2
+5,Syria,8.25,Very High Impact,Steady
+6,Nigeria,8.233,Very High Impact,Negative increase 2
+7,Mali,8.152,Very High Impact,Steady
+8,Niger,7.856,High Impact,Positive decrease 4
+9,Myanmar,7.83,High Impact,Positive decrease 15
+10,Burkina Faso,7.825,High Impact,Negative increase 2
+11,Cameroon,7.432,High Impact,Steady
+12,India,7.432,High Impact,Negative increase 2
+13,Mozambique,7.432,High Impact,Negative increase 4
+14,Colombia,7.068,High Impact,Steady
+15,Egypt,6.932,High Impact,Positive decrease 1
+16,Philippines,6.79,High Impact,Negative increase 1
+17,Democratic Republic of the Congo,6.733,High Impact,Positive decrease 5
+18,Chile,6.496,High Impact,Positive decrease 5
+19,Chad,6.379,High Impact,Negative increase 3
+20,Kenya,6.166,High Impact,Negative increase 2
+21,Yemen,5.87,Medium Impact,Negative increase 1
+22,Thailand,5.723,Medium Impact,Negative increase 3
+23,Turkey,5.651,Medium Impact,Negative increase 6
+24,Indonesia,5.5,Medium Impact,Positive decrease 4
+25,Sri Lanka,5.445,Medium Impact,Negative increase 4
+26,Libya,5.1,Medium Impact,Negative increase 1
+27,Iran,5.015,Medium Impact,Steady
+28,United States,4.961,Medium Impact,Negative increase 2
+29,Greece,4.849,Medium Impact,Positive decrease 10
+30,Israel,4.778,Medium Impact,Positive decrease 4
+31,United Kingdom,4.77,Medium Impact,Steady
+32,Palestine,4.736,Medium Impact,Positive decrease 1
+33,Germany,4.729,Medium Impact,Negative increase 1
+34,Nepal,4.693,Medium Impact,Negative increase 4
+35,France,4.562,Medium Impact,Negative increase 6
+36,Tanzania,4.53,Medium Impact,Steady
+37,Peru,4.471,Medium Impact,Positive decrease 18
+38,Tunisia,4.447,Medium Impact,Negative increase 1
+39,Algeria,4.432,Medium Impact,Positive decrease 4
+40,Bangladesh,4.411,Medium Impact,Positive decrease 1
+41,New Zealand,4.376,Medium Impact,Negative increase 6
+42,Ivory Coast,4.31,Medium Impact,Positive decrease 2
+43,Burundi,4.271,Medium Impact,Positive decrease 13
+44,Russia,4.219,Medium Impact,Negative increase 6
+45,Uganda,4.106,Medium Impact,Positive decrease 59
+46,Venezuela,4.005,Medium Impact,Steady
+47,Tajikistan,3.988,Low Impact,Negative increase 7
+48,Canada,3.882,Low Impact,Steady
+49,Ethiopia,3.759,Low Impact,Negative increase 7
+50,Italy,3.687,Low Impact,Negative increase 3
+51,Lebanon,3.566,Low Impact,Negative increase 6
+52,Austria,3.261,Low Impact,Negative increase 2
+53,Benin,3.164,Low Impact,Positive decrease 19
+54,Saudi Arabia,3.11,Low Impact,Negative increase 5
+55,Spain,2.861,Low Impact,Negative increase 3
+56,Ecuador,2.766,Low Impact,Negative increase 2
+57,Argentina,2.657,Low Impact,Positive decrease 9
+58,Jordan,2.594,Low Impact,Negative increase 5
+59,Switzerland,2.522,Low Impact,Positive decrease 3
+60,Australia,2.438,Low Impact,Negative increase 2
+61,Mexico,2.428,Low Impact,Negative increase 4
+62,Ukraine,2.304,Low Impact,Negative increase 3
+63,Malaysia,2.247,Low Impact,Negative increase 2
+64,Paraguay,2.194,Low Impact,Negative increase 4
+65,Bahrain,2.145,Low Impact,Negative increase 2
+66,Netherlands,2.077,Low Impact,Positive decrease 7
+67,China,1.863,Very Low Impact,Negative increase 3
+68,Belgium,1.745,Very Low Impact,Negative increase 17
+69,Sweden,1.66,Very Low Impact,Negative increase 2
+70,Senegal,1.58,Very Low Impact,Negative increase 2
+71,Japan,1.46,Very Low Impact,Negative increase 1
+72,Uruguay,1.322,Very Low Impact,Positive decrease 1
+73,Rwanda,1.243,Very Low Impact,Positive decrease 3
+74,South Africa,1.243,Very Low Impact,Positive decrease 3
+75,Togo,1.243,Very Low Impact,Positive decrease 31
+76,Morocco,1.156,Very Low Impact,Positive decrease 2
+77,Norway,1.109,Very Low Impact,Positive decrease 2
+78,Ireland,1.06,Very Low Impact,Positive decrease 2
+79,Romania,1.06,Very Low Impact,Positive decrease 3
+80,Finland,1.007,Very Low Impact,Positive decrease 2
+81,Brazil,0.951,Very Low Impact,Positive decrease 2
+82,Cyprus,0.922,Very Low Impact,Positive decrease 2
+83,Lithuania,0.827,Very Low Impact,Positive decrease 2
+84,Mauritania,0.509,Very Low Impact,Positive decrease 3
+85,Vietnam,0.407,Very Low Impact,Positive decrease 3
+86,Angola,0.291,Very Low Impact,Positive decrease 3
+87,Czech Republic,0.291,Very Low Impact,Positive decrease 3
+88,Denmark,0.291,Very Low Impact,Positive decrease 3
+89,Gabon,0.291,Very Low Impact,Positive decrease 3
+90,Kosovo,0.291,Very Low Impact,Steady
+91,Sudan,0.291,Very Low Impact,Positive decrease 3
+92,Taiwan,0.227,Very Low Impact,Positive decrease 4
+93=,Albania,0,No Impact,Steady
+93=,Armenia,0,No Impact,Positive decrease 6
+93=,Azerbaijan,0,No Impact,Positive decrease 6
+93=,Belarus,0,No Impact,Steady
+93=,Bhutan,0,No Impact,Steady
+93=,Bolivia,0,No Impact,Steady
+93=,Bosnia and Herzegovina,0,No Impact,Steady
+93=,Botswana,0,No Impact,Steady
+93=,Bulgaria,0,No Impact,Steady
+93=,Cambodia,0,No Impact,Steady
+93=,Central African Republic,0,No Impact,Positive decrease 28
+93=,Costa Rica,0,No Impact,Steady
+93=,Croatia,0,No Impact,Steady
+93=,Cuba,0,No Impact,Steady
+93=,Djibouti,0,No Impact,Steady
+93=,Dominican Republic,0,No Impact,Steady
+93=,El Salvador,0,No Impact,Steady
+93=,Equatorial Guinea,0,No Impact,Steady
+93=,Eritrea,0,No Impact,Steady
+93=,Estonia,0,No Impact,Steady
+93=,Georgia,0,No Impact,Positive decrease 1
+93=,Ghana,0,No Impact,Steady
+93=,Guatemala,0,No Impact,Steady
+93=,Guinea,0,No Impact,Steady
+93=,Guinea-Bissau,0,No Impact,Steady
+93=,Guyana,0,No Impact,Steady
+93=,Haiti,0,No Impact,Steady
+93=,Honduras,0,No Impact,Steady
+93=,Hungary,0,No Impact,Positive decrease 4
+93=,Iceland,0,No Impact,Steady
+93=,Jamaica,0,No Impact,Steady
+93=,Kazakhstan,0,No Impact,Positive decrease 18
+93=,Kuwait,0,No Impact,Positive decrease 6
+93=,Kyrgyzstan,0,No Impact,Positive decrease 1
+93=,Laos,0,No Impact,Positive decrease 22
+93=,Latvia,0,No Impact,Steady
+93=,Lesotho,0,No Impact,Steady
+93=,Liberia,0,No Impact,Steady
+93=,North Macedonia,0,No Impact,Steady
+93=,Madagascar,0,No Impact,Positive decrease 24
+93=,Malawi,0,No Impact,Steady
+93=,Mauritius,0,No Impact,Positive decrease 6
+93=,Moldova,0,No Impact,Positive decrease 6
+93=,Mongolia,0,No Impact,Steady
+93=,Montenegro,0,No Impact,Steady
+93=,Namibia,0,No Impact,Steady
+93=,Nicaragua,0,No Impact,Steady
+93=,North Korea,0,No Impact,Steady
+93=,Oman,0,No Impact,Steady
+93=,Panama,0,No Impact,Steady
+93=,Papua New Guinea,0,No Impact,Steady
+93=,Poland,0,No Impact,Positive decrease 5
+93=,Portugal,0,No Impact,Steady
+93=,Qatar,0,No Impact,Steady
+93=,Republic of the Congo,0,No Impact,Steady
+93=,Serbia,0,No Impact,Steady
+93=,Sierra Leone,0,No Impact,Steady
+93=,Singapore,0,No Impact,Steady
+93=,Slovakia,0,No Impact,Steady
+93=,Slovenia,0,No Impact,Steady
+93=,South Korea,0,No Impact,Steady
+93=,South Sudan,0,No Impact,Steady
+93=,Eswatini,0,No Impact,Steady
+93=,Gambia,0,No Impact,Steady
+93=,Timor-Leste,0,No Impact,Steady
+93=,Trinidad and Tobago,0,No Impact,Steady
+93=,Turkmenistan,0,No Impact,Steady
+93=,United Arab Emirates,0,No Impact,Steady
+93=,Uzbekistan,0,No Impact,Steady
+93=,Zambia,0,No Impact,Steady
+93=,Zimbabwe,0,No Impact,Steady

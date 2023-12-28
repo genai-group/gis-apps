@@ -51,6 +51,7 @@ except Exception as e:
 # Reading ISO json object
 try:
     iso_data = json.loads(open(f"{data_dir}/iso.json", "r").read())
+    iso_dict = {obj['name']:obj['alpha-2'] for obj in iso_data}
     print(f"Successfully loaded data for the ISO data file.")
 except Exception as e:
     print(f"Error loading ISO data: {e}")
