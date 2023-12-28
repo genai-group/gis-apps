@@ -314,6 +314,9 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             else:
                 original_obj = copy.deepcopy(obj)
                 temp_obj = copy.deepcopy(obj)
+            # This is the line that might need adjusting.
+            if isinstance(temp_obj, str):
+                temp_obj = {'value': temp_obj}
             # Convert JSON-like objects to string
             if isinstance(obj, dict):
                 # removing the created_at property prior to hashing the object
