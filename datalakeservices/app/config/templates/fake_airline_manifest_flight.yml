@@ -58,4 +58,5 @@ drop_fields:
 relationships:
   - parents: ["passport_id"]
     children: ["name", "dob", "country", "id_type"]
+    direction: 
     type: "one_to_one"

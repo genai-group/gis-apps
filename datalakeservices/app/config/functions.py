@@ -526,6 +526,22 @@ def standardize_date(date_input) -> int:
     except Exception as e:
         logging.error(f"An error occurred in standardize_date: {e}", exc_info=True)
 
+def standardize_geography(input_data: str) -> Dict[str, Any]:
+    """
+    Standizes a location name to a standardized location object.
+
+    Parameters:
+    input_data (str): The location name to be standardized.
+
+    Returns:
+    Dict[str, Any]: A standardized location object.
+    """
+    try:
+        return(input_data)
+    except Exception as e:
+        logging.error(f"An error occurred in standardize_geography: {e}", exc_info=True)
+        return None
+
 def standardize_phone(phone_number: str) -> str:
     """
     Standardizes an international phone number according to ISO guidelines (E.164 format)
