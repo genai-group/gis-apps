@@ -91,3 +91,9 @@ try:
     airport_codes = airport_codes.to_dict('records')
 except Exception as e:
     print(f"Errors reading in IATA international airport codes.")    
+
+# World Cities
+try:
+    world_cities = pd.read_csv(f"{data_dir}/worldcities.csv")   
+except Exception as e:
+    print(f"Errors reading in world cities.")
