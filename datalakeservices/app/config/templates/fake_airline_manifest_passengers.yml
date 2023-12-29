@@ -42,3 +42,6 @@ edges:
   - parents: ["passport_id"]
     children: ["name", "dob", "country", "id_type"]
     type: "one_to_one"
+
+edge_properties:
+  - time_to_departure
