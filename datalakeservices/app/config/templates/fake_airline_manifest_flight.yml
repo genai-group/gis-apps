@@ -21,6 +21,8 @@ rename_fields:
     to: "flight_arrival_gate"
   - from: "arrival_time"
     to: "flight_arrival_time"
+  - from: "airline_name"
+    to: "airline"
 
 standardize_fields:
   - field: "flight_departure_time"
@@ -43,7 +45,7 @@ entities:
   - flight_departure_airport
   - flight_arrival_city
   - flight_arrival_airport
-  - airline_name
+  - airline
 
 embeddings:
   - none
@@ -58,7 +60,7 @@ drop_fields:
   - time_to_departure
 
 edges:
-  - parents: ["airline_name"]
+  - parents: ["airline"]
     children: ["flight_number"]
     direction: ["out"]
     type: "one_to_one"
@@ -66,7 +68,7 @@ edges:
     children: ["flight_manifest_id"]
     direction: ["out"]
     type: "one_to_one"
-  - parents: ["airline_name", "flight_number", "flight_manifest_id"]
+  - parents: ["airline", "flight_number", "flight_manifest_id"]
     children: ["flight_departure_city", "flight_departure_airport", "flight_arrival_city", "flight_arrival_airport"]
     direction: ["out", "out", "out", "out"]
     type: "one_to_one"
