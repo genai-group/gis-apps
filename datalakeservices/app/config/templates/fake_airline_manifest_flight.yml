@@ -1,20 +1,5 @@
 # Template for Processing Fake Airline Manifest Data
 
-{
-    "flight_manifest_id":"71bc51ce-a67f-11ee-93b6-8a96d59b1324",
-    "city_of_departure": "New York, USA",
-    "departure_airport_name": "John F. Kennedy International Airport (JFK)",
-    "departure_gate": "A7",
-    "departure_time": "2023-12-01T07:00:00",
-    "city_of_arrival": "London, UK",
-    "arrival_airport_name": "Heathrow Airport (LHR)",
-    "arrival_gate": "C14",
-    "arrival_time": "2023-12-01T19:30:00",
-    "airline_name": "British Airways",
-    "flight_number": "BA123",
-    "time_to_departure": "00:00:00"
-},
-
 template:
   name: "fake_airline_manifest_flight"
   primary_key: "flight_information"
