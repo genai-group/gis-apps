@@ -703,7 +703,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def prepare_objects(objects, _created_at: int, _namespace: str = '',) -> List[Dict]:
+def prepare_objects(objects, _created_at: int, _namespace: str, parse_config: Dict[Any]) -> List[Dict]:
     """
     Prepare objects for hashing and loading into the database.
 
@@ -736,28 +736,12 @@ def prepare_objects(objects, _created_at: int, _namespace: str = '',) -> List[Di
             else: 
                 prepared_obj['_created_at'] = to_unix(datetime.now())
 
-    except Exception as e:
-        logging.warning(f"Preparing object had errors: {e}.")
-        pass
+            prepared_objects.append(prepared_obj)    
 
-if len(standardized_obj) > 0:
-    standardized_objects.append(standardized_obj)
-
-
-
-
-
-
-            # Adding the _created_at property
-            if _created_at:
-                obj[_created_at] = int(datetime.now().timestamp())
-            prepared_objects.append(obj)
-        
-        return prepared_objects
+        return prepared_objects  
 
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
-
 
 def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """
