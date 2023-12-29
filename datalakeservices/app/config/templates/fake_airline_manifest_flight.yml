@@ -24,6 +24,16 @@ rename_fields:
   - from: "airline_name"
     to: "airline"
 
+field_aliases:
+  - field: "flight_departure_city"
+  - alias: "city"
+  - field: "flight_departure_airport"
+  - alias: "airport"
+  - field: "flight_arrival_city"
+  - alias: "city"
+  - field: "flight_arrival_airport"
+  - alias: "airport"
+
 standardize_fields:
   - field: "flight_departure_time"
     transform: "standardize_date"

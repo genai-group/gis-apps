@@ -69,6 +69,7 @@ mongo_collection.insert_many(data)
 if 'entities' in parse_config.keys():
     entities = parse_config['entities']
 
+#%%
 if len(entities) > 0:
     for entity in entities:
         # Loading an array of entities into Neo4j
