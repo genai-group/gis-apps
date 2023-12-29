@@ -683,10 +683,8 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
 
     try:
         for obj in objects:
-            standardized_obj = {}
             for standardize_field in parse_config['standardize_fields']:
                 field = standardize_field['field']
-                # Only processing if the field is in the object
                 # Only processing if the field is in the object
                 if field in obj.keys():
                     transform = standardize_field.get('transform')
@@ -695,35 +693,71 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
                         if transform in globals().keys():
                             transform_func = globals()[transform]
                             transformed_value = transform_func(obj[field])
-                            standardized_obj = {
-                                '_namespace': field,
-                                '_label': obj[field],
-                                '_guid': hashify(transformed_value, namespace=field)['_guid'],
-                                '_hash': hashify(transformed_value, namespace=field)['_hash'],
-                                '_source': obj['_guid'],
-                                '_edge': 'has_' + field
-                            }
-                            if len(_created_at) > 0:
-                                if _created_at in obj.keys():
-                                    standardized_obj['_created_at'] = obj[_created_at]
-                                else: 
-                                    standardized_obj['_created_at'] = to_unix(datetime.now())
-                            else: 
-                                standardized_obj['_created_at'] = to_unix(datetime.now())
-
-                    else:
-                        logging.warning(f"Transform function '{transform}' not found in globals.")
-                        # raise ValueError(f"Transform function '{transform}' not found in globals.")
-                        pass
-                if len(standardized_obj) > 0:
-                    standardized_objects.append(standardized_obj)
-
+                            obj[field] = transformed_value
+            standardized_objects.append(obj)
+        
         return standardized_objects
 
     except KeyError as e:
         raise RuntimeError(f"Key Error: {e}")
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
+
+def prepare_objects(objects, _created_at: int, _namespace: str = '',) -> List[Dict]:
+    """
+    Prepare objects for hashing and loading into the database.
+
+    Args:
+        objects (List[Dict]): List of objects to prepare.
+        _created_at (int): A property name representing _created_at unix timestamp.
+
+    Returns:
+        List[Dict]: List of prepared objects.
+    """
+    prepared_objects = []
+
+    try:
+        for obj in objects:
+            hashed_object = hashify(obj[_namespace], namespace=_namespace)
+            prepared_obj = {
+                '_namespace': _namespace,
+                '_label': obj[_namespace],
+                '_guid': hashed_object['_guid'],
+                '_hash': hashed_object['_hash'],
+                '_source': obj['_guid'],
+                '_edge': 'has_' + _namespace
+            }
+            # Adding the _created_at property
+            if len(_created_at) > 0:
+                if _created_at in obj.keys():
+                    prepared_obj['_created_at'] = obj[_created_at]
+                else: 
+                    prepared_obj['_created_at'] = to_unix(datetime.now())
+            else: 
+                prepared_obj['_created_at'] = to_unix(datetime.now())
+
+    except Exception as e:
+        logging.warning(f"Preparing object had errors: {e}.")
+        pass
+
+if len(standardized_obj) > 0:
+    standardized_objects.append(standardized_obj)
+
+
+
+
+
+
+            # Adding the _created_at property
+            if _created_at:
+                obj[_created_at] = int(datetime.now().timestamp())
+            prepared_objects.append(obj)
+        
+        return prepared_objects
+
+    except Exception as e:
+        raise RuntimeError(f"Error during processing: {e}")
+
 
 def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
     """
