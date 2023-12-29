@@ -715,8 +715,8 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
                         logging.warning(f"Transform function '{transform}' not found in globals.")
                         # raise ValueError(f"Transform function '{transform}' not found in globals.")
                         pass
-
-                standardized_objects.append(standardized_obj)
+                if len(standardized_obj) > 0:
+                    standardized_objects.append(standardized_obj)
 
         return standardized_objects
 
