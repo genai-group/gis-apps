@@ -55,7 +55,7 @@ datetime_fields:
     is_created_at: false
 
 drop_fields:
-  - id_type
+  - time_to_departure
 
 edges:
   - parents: ["airline_name"]
