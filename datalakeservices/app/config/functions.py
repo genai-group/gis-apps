@@ -686,34 +686,37 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
             standardized_obj = {}
             for standardize_field in parse_config['standardize_fields']:
                 field = standardize_field['field']
-                transform = standardize_field.get('transform')
+                # Only processing if the field is in the object
+                # Only processing if the field is in the object
+                if field in obj.keys():
+                    transform = standardize_field.get('transform')
 
-                if transform and transform in globals():
-                    if transform in globals().keys():
-                        transform_func = globals()[transform]
-                        transformed_value = transform_func(obj[field])
-                        standardized_obj = {
-                            '_namespace': field,
-                            '_label': obj[field],
-                            '_guid': hashify(transformed_value, namespace=field)['_guid'],
-                            '_hash': hashify(transformed_value, namespace=field)['_hash'],
-                            '_source': obj['_guid'],
-                            '_relationship': 'has_' + field
-                        }
-                        if len(_created_at) > 0:
-                            if _created_at in obj.keys():
-                                standardized_obj['_created_at'] = obj[_created_at]
+                    if transform and transform in globals():
+                        if transform in globals().keys():
+                            transform_func = globals()[transform]
+                            transformed_value = transform_func(obj[field])
+                            standardized_obj = {
+                                '_namespace': field,
+                                '_label': obj[field],
+                                '_guid': hashify(transformed_value, namespace=field)['_guid'],
+                                '_hash': hashify(transformed_value, namespace=field)['_hash'],
+                                '_source': obj['_guid'],
+                                '_edge': 'has_' + field
+                            }
+                            if len(_created_at) > 0:
+                                if _created_at in obj.keys():
+                                    standardized_obj['_created_at'] = obj[_created_at]
+                                else: 
+                                    standardized_obj['_created_at'] = to_unix(datetime.now())
                             else: 
                                 standardized_obj['_created_at'] = to_unix(datetime.now())
-                        else: 
-                            standardized_obj['_created_at'] = to_unix(datetime.now())
 
-                else:
-                    logging.warning(f"Transform function '{transform}' not found in globals.")
-                    # raise ValueError(f"Transform function '{transform}' not found in globals.")
-                    pass
+                    else:
+                        logging.warning(f"Transform function '{transform}' not found in globals.")
+                        # raise ValueError(f"Transform function '{transform}' not found in globals.")
+                        pass
 
-            standardized_objects.append(standardized_obj)
+                standardized_objects.append(standardized_obj)
 
         return standardized_objects
 
