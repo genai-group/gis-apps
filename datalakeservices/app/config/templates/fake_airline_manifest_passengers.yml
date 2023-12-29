@@ -38,7 +38,7 @@ datetime_fields:
 drop_fields:
   - id_type
 
-relationships:
+edges:
   - parents: ["passport_id"]
     children: ["name", "dob", "country", "id_type"]
     type: "one_to_one"

@@ -20,7 +20,6 @@ parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight
 if 'primary_key' in parse_config['template']:
     data = manifest_data_0[parse_config['template']['primary_key']]
 
-
 #%%
 # Passengers
 parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_passengers.yml", "r").read())

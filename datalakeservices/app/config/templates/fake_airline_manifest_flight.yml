@@ -37,6 +37,8 @@ standardize_fields:
     transform: "standardize_geography"
 
 entities:
+  - flight_number
+  - flight_manifest_id
   - flight_departure_city
   - flight_departure_airport
   - flight_arrival_city
@@ -55,8 +57,19 @@ datetime_fields:
 drop_fields:
   - id_type
 
-relationships:
-  - parents: ["passport_id"]
-    children: ["name", "dob", "country", "id_type"]
-    direction: 
+edges:
+  - parents: ["airline_name"]
+    children: ["flight_number"]
+    direction: ["out"]
     type: "one_to_one"
+  - parents: ["flight_number"]
+    children: ["flight_manifest_id"]
+    direction: ["out"]
+    type: "one_to_one"
+  - parents: ["airline_name", "flight_number", "flight_manifest_id"]
+    children: ["flight_departure_city", "flight_departure_airport", "flight_arrival_city", "flight_arrival_airport"]
+    direction: ["out", "out", "out", "out"]
+    type: "one_to_one"
+
+edge_properties:
+  - none

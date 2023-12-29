@@ -84,3 +84,10 @@ try:
 except Exception as e:
     print(f"Error loading International Government IDs: {e}")
     raise
+
+# IATA International Airport Codes
+try:
+    airport_codes = pd.read_csv(f"{data_dir}/international_airport_codes.csv")
+    airport_codes = airport_codes.to_dict('records')
+except Exception as e:
+    print(f"Errors reading in IATA international airport codes.")    
