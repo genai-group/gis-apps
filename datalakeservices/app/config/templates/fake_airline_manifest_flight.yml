@@ -1,0 +1,76 @@
+# Template for Processing Fake Airline Manifest Data
+
+{
+    "flight_manifest_id":"71bc51ce-a67f-11ee-93b6-8a96d59b1324",
+    "city_of_departure": "New York, USA",
+    "departure_airport_name": "John F. Kennedy International Airport (JFK)",
+    "departure_gate": "A7",
+    "departure_time": "2023-12-01T07:00:00",
+    "city_of_arrival": "London, UK",
+    "arrival_airport_name": "Heathrow Airport (LHR)",
+    "arrival_gate": "C14",
+    "arrival_time": "2023-12-01T19:30:00",
+    "airline_name": "British Airways",
+    "flight_number": "BA123",
+    "time_to_departure": "00:00:00"
+},
+
+template:
+  name: "fake_airline_manifest_flight"
+  primary_key: "flight_information"
+
+rename_fields:
+  - from: "city_of_departure"
+    to: "flight_departure_city"
+  - from: "departure_airport_name"
+    to: "flight_departure_airport"
+  - from: "departure_gate"
+    to: "flight_departure_gate"
+  - from: "departure_time"
+    to: "flight_departure_time"
+  - from: "city_of_arrival"
+    to: "flight_arrival_city"
+  - from: "arrival_airport_name"
+    to: "flight_arrival_airport"
+  - from: "arrival_gate"
+    to: "flight_arrival_gate"
+  - from: "arrival_time"
+    to: "flight_arrival_time"
+
+standardize_fields:
+  - field: "flight_departure_time"
+    transform: "standardize_date"
+  - field: "flight_arrival_time"
+    transform: "standardize_date"
+  - field: "flight_departure_airport"
+    transform: "standardize_name"
+  - field: "flight_arrival_airport"
+    transform: "standardize_name"
+  - field: "flight_departure_city"
+    transform: "standardize_geography"
+  - field: "flight_arrival_city"
+    transform: "standardize_geography"
+
+entities:
+  - flight_departure_city
+  - flight_departure_airport
+  - flight_arrival_city
+  - flight_arrival_airport
+  - airline_name
+
+embeddings:
+  - none
+
+datetime_fields:
+  - field: "flight_departure_time"
+    is_created_at: false
+  - field: "flight_arrival_time"
+    is_created_at: false
+
+drop_fields:
+  - id_type
+
+relationships:
+  - parents: ["passport_id"]
+    children: ["name", "dob", "country", "id_type"]
+    type: "one_to_one"

@@ -1,7 +1,7 @@
 # Template for Processing Fake Airline Manifest Data
 
 template:
-  name: "fake_airline_manifest"
+  name: "fake_airline_manifest_passengers"
   primary_key: "passenger_info"
 
 rename_fields:
@@ -32,7 +32,8 @@ embeddings:
   - name
 
 datetime_fields:
-  - dob
+  - field: "dob"
+    is_created_at: false
 
 drop_fields:
   - id_type

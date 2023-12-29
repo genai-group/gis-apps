@@ -10,7 +10,12 @@ data = manifest_data_0
 #%%
 # Reading in the template file
 template_dir = './config/templates'
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest.yml", "r").read())
+
+# Flight
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
+
+# Passengers
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_passengers.yml", "r").read())
 
 #%%
 # Filter data file
@@ -26,17 +31,10 @@ if 'rename_fields' in parse_config:
 # Add hashes to each object
 data = hashify(data, namespace='passenger')
 
-#%%
-# Load data into MongoDB Collection
-mongo_collection.insert_many(data)
+# Load Passengers into Neo4j
+neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','name']}, data)
 
-#%%
-# Standardize Fields
-neo4j_objects = standardize_objects(data, parse_config)
-
-#%%
-# Creating the Neo4j load statement
-load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_source', '_relationship']])
+load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_relationship']])
 load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
 
 #%%
@@ -47,6 +45,42 @@ with neo4j_client.session() as session:
     print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
 
 
+#%%
+# Load data into MongoDB Collection
+mongo_collection.insert_many(data)
+
+#%%
+# Standardize Fields
+neo4j_objects = standardize_objects(data, parse_config)
+
+#%%
+# Load Neo4j Nodes
+load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_relationship']])
+load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
+
+#%%
+# Load objects given the schema
+with neo4j_client.session() as session:
+    session.run(load_statement, objects=neo4j_objects)
+    logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
+    print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
+
+#%%
+# Load Neo4j Relationships
+neo4j_relationships = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_relationship']}, neo4j_objects)
+
+# Load Neo4j Relationships
+#%%
+load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys()])
+load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:HAS{' + str(load_statement) + '}]-(obj2) RETURN *'
+
+with neo4j_client.session() as session:
+    session.run(load_statement, objects=neo4j_relationships)
+    logging.info(f'Loaded Objects into Neo4j: {neo4j_relationships}')
+
+
+
+# Load objects given the schema
 
 #%%
 # Get entities

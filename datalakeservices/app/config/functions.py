@@ -335,7 +335,7 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             if len(namespace) > 0:
                 namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
-                # temp_obj['_namespace'] = namespace
+                temp_obj['_namespace'] = namespace
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
@@ -641,14 +641,14 @@ def standardized_functions():
     functions = filter_func(lambda x: 'standardize_' in x, globals().keys())
     return functions
 
-def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
+def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: str = '') -> List[Dict]:
     """
     Standardize objects based on the parse_config.
 
     Args:
         objects (List[Dict]): List of objects to standardize.
         parse_config (Dict): The parse configuration specifying fields and transformations.
-        map_func (Callable): A mapping function to apply transformations to each object.
+        _created_at (str): A property name representing _created_at unix timestamp.
 
     Returns:
         List[Dict]: List of standardized objects.
@@ -677,13 +677,21 @@ def standardize_objects(objects: List[Dict], parse_config: Dict) -> List[Dict]:
                         transform_func = globals()[transform]
                         transformed_value = transform_func(obj[field])
                         standardized_obj = {
-                            # '_namespace': field,
+                            '_namespace': field,
                             '_label': obj[field],
                             '_guid': hashify(transformed_value, namespace=field)['_guid'],
                             '_hash': hashify(transformed_value, namespace=field)['_hash'],
                             '_source': obj['_guid'],
                             '_relationship': 'has_' + field
                         }
+                        if len(_created_at) > 0:
+                            if _created_at in obj.keys():
+                                standardized_obj['_created_at'] = obj[_created_at]
+                            else: 
+                                standardized_obj['_created_at'] = to_unix(datetime.now())
+                        else: 
+                            standardized_obj['_created_at'] = to_unix(datetime.now())
+
                 else:
                     logging.warning(f"Transform function '{transform}' not found in globals.")
                     # raise ValueError(f"Transform function '{transform}' not found in globals.")

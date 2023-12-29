@@ -1,5 +1,6 @@
 {
     "flight_information": {
+        "flight_manifest_id":"71bc51ce-a67f-11ee-93b6-8a96d59b1324",
         "city_of_departure": "New York, USA",
         "departure_airport_name": "John F. Kennedy International Airport (JFK)",
         "departure_gate": "A7",
