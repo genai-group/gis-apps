@@ -342,15 +342,16 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
             # _namespace
             if len(_namespace) > 0:
                 # Use the alias if the field_aliases property is present in the parse_config
-                original_namespace = copy.deepcopy(_namespace)
                 if 'field_aliases' in parse_config.keys():
                     if _namespace in field_aliases.keys():
+                        original_namespace = copy.deepcopy(_namespace)
                         _namespace = field_aliases[_namespace]
 
                 # original code after alias has been implemented
                 namespace_short_hash = _namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
                 temp_obj['_namespace'] = _namespace
+                
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
