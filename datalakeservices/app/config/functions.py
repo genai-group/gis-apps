@@ -716,16 +716,24 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
     """
     prepared_objects = []
 
+    # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
+    if 'field_aliases' in parse_config.keys():
+        field_aliases = {x['field']: x['alias'] for x in parse_config['field_aliases']}
+
     try:
         for obj in objects:
             hashed_object = hashify(obj[_namespace], namespace=_namespace)
+            original_namespace = copy.deepcopy(_namespace)
+            if 'field_aliases' in parse_config.keys():
+                if _namespace in field_aliases.keys():
+                    _namespace = field_aliases[_namespace]
             prepared_obj = {
                 '_namespace': _namespace,
-                '_label': obj[_namespace],
+                '_label': obj[original_namespace],
                 '_guid': hashed_object['_guid'],
                 '_hash': hashed_object['_hash'],
                 '_source': obj['_guid'],
-                '_edge': 'has_' + _namespace
+                '_edge': 'has_' + original_namespace
             }
             # Adding the _created_at property
             if len(_created_at) > 0:
