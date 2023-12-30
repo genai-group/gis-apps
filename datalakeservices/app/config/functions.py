@@ -286,12 +286,14 @@ def generate_near_truly_random_arrays(n, low=1, high=1000000):
     
     return arrays
 
-def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = '') -> str:
+def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: int = 20, created_at: str = '') -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
     Parameters:
-        input_data (str or JSON-like object): The string or JSON object to be hashed.
+        data (str or JSON-like object): The string or JSON object to be hashed.
+        _namespace (str, optional): The namespace of the object to be hashed. Defaults to ''.
+        parse_config (dict, optional): The parse configuration specifying fields and transformations. Defaults to {}.
         hash_length (int, optional): The length of the hash to be returned. Defaults to 20.
         created_at (str, optional): The name of the property to be removed prior to hashing. Defaults to ''.
         
@@ -302,6 +304,10 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
     Raises:
         ValueError: If an error occurs during hashing.
     """
+
+    # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
+    if 'field_aliases' in parse_config.keys():
+        field_aliases = {x['field']: x['alias'] for x in parse_config['field_aliases']}
 
     try:
         if not isinstance(data, list):
@@ -332,15 +338,24 @@ def hashify(data, namespace: str = '', hash_length: int = 20, created_at: str = 
             if not isinstance(temp_obj, dict):
                 temp_obj = {'_label': temp_obj}
             temp_obj['_hash'] = short_hash
-            if len(namespace) > 0:
-                namespace_short_hash = namespace.lower().replace(' ','_') + '___' + short_hash
+
+            # _namespace
+            if len(_namespace) > 0:
+                # Use the alias if the field_aliases property is present in the parse_config
+                original_namespace = copy.deepcopy(_namespace)
+                if 'field_aliases' in parse_config.keys():
+                    if _namespace in field_aliases.keys():
+                        _namespace = field_aliases[_namespace]
+
+                # original code after alias has been implemented
+                namespace_short_hash = _namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
-                temp_obj['_namespace'] = namespace
+                temp_obj['_namespace'] = _namespace
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
             if isinstance(original_obj, str):
-                if len(namespace) > 0:
+                if len(_namespace) > 0:
                     return hash_list[0]
                 else:
                     return hash_list[0]['_hash']

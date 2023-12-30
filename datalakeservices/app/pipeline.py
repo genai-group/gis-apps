@@ -76,6 +76,7 @@ if len(entities) > 0:
         neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid', entity]}, data)
         neo4j_objects = standardize_objects(neo4j_objects, parse_config)
         neo4j_objects = prepare_objects_for_load(neo4j_objects, entity, parse_config)
+        pp(neo4j_objects)
         if len(neo4j_objects) > 0:
             # buiding the load statements
             load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge']])
