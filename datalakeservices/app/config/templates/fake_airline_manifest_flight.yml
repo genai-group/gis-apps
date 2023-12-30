@@ -26,13 +26,13 @@ rename_fields:
 
 field_aliases:
   - field: "flight_departure_city"
-  - alias: "city"
+    alias: "city"
   - field: "flight_departure_airport"
-  - alias: "airport"
+    alias: "airport"
   - field: "flight_arrival_city"
-  - alias: "city"
+    alias: "city"
   - field: "flight_arrival_airport"
-  - alias: "airport"
+    alias: "airport"
 
 standardize_fields:
   - field: "flight_departure_time"
