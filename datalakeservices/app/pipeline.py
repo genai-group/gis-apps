@@ -66,6 +66,7 @@ entities = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields']
 entities = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entities)   
 entities = map_func(lambda x: x['field'], entities)
 
+#%%
 # Making sure data is a list
 if not isinstance(data, list):
     data = [data]

@@ -696,7 +696,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     # Assertions
     assert isinstance(objects, list), "objects must be a list"
     assert isinstance(parse_config, dict), "parse_config must be a dictionary"
-    assert 'standardize_fields' in parse_config, "parse_config must contain 'standardize_fields'"
+    assert 'fields' in parse_config, "parse_config must contain 'standardize_fields'"
 
     # standardize_fields
     standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
@@ -707,12 +707,10 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
         standardized_objects = []
         for obj in objects:
             # standardize all of the values for which there is a key in the standardize_fields dictionary
-            for field in standardize_fields.keys():
-                if field in obj.keys():
+            for field in obj.keys():
+                if field in standardize_fields.keys():
                     obj[field] = globals()[standardize_fields[field]](obj[field])
-                    standardized_objects.append(obj)
-                else:
-                    standardized_objects.append(obj)
+            standardized_objects.append(obj)
 
         return standardized_objects
 
@@ -734,7 +732,9 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
     if 'field_aliases' in parse_config.keys():
-        field_aliases = {x['field']: x['alias'] for x in parse_config['field_aliases']}
+        field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+        field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
+        field_aliases = {x['field']: x['alias'] for x in field_aliases}
 
     try:
         for obj in objects:
