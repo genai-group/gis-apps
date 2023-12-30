@@ -33,6 +33,8 @@ field_aliases:
     alias: "city"
   - field: "flight_arrival_airport"
     alias: "airport"
+  - field: "flight_departure_gate"
+    alias: "gate"
 
 standardize_fields:
   - field: "flight_departure_time"

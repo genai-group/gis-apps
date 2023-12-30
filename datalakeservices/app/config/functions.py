@@ -286,7 +286,7 @@ def generate_near_truly_random_arrays(n, low=1, high=1000000):
     
     return arrays
 
-def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: int = 20, created_at: str = '') -> str:
+def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: int = 20, _created_at: str = '') -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
@@ -295,7 +295,7 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
         _namespace (str, optional): The namespace of the object to be hashed. Defaults to ''.
         parse_config (dict, optional): The parse configuration specifying fields and transformations. Defaults to {}.
         hash_length (int, optional): The length of the hash to be returned. Defaults to 20.
-        created_at (str, optional): The name of the property to be removed prior to hashing. Defaults to ''.
+        _created_at (str, optional): The name of the property to be removed prior to hashing. Defaults to ''.
         
     Returns:
         [Optional] str: The short hash of the input string or JSON object.
@@ -326,8 +326,8 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
             # Convert JSON-like objects to string
             if isinstance(obj, dict):
                 # removing the created_at property prior to hashing the object
-                if created_at in obj.keys():
-                    obj.pop(created_at)
+                if _created_at in obj.keys():
+                    obj.pop(_created_at)
                 input_str = json.dumps(obj, sort_keys=True)
             else:
                 input_str = obj
