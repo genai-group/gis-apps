@@ -12,7 +12,7 @@ fields:
     is_embedding: false
     is_datetime: false
     drop: false
-  - field: "departure_city"
+  - field: "city_of_departure"
     alias: "city"
     standardize: "standardize_geography"
     is_entity: true
@@ -26,7 +26,7 @@ fields:
     is_embedding: false
     is_datetime: false
     drop: false
-  - field: "arrival_city"
+  - field: "city_of_arrival"
     alias: "city"
     standardize: "standardize_geography"
     is_entity: true
@@ -100,7 +100,7 @@ edges:
     direction: ["out"]
     type: "one_to_one"
   - parents: ["airline", "flight_number", "flight_manifest_id"]
-    children: ["departure_city", "departure_airport", "arrival_city", "arrival_airport"]
+    children: ["city_of_departure", "departure_airport", "city_of_arrival", "arrival_airport"]
     direction: ["out", "out", "out", "out"]
     type: "one_to_one"
 
