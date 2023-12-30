@@ -1,0 +1,108 @@
+# Template for Processing Fake Airline Manifest Data
+
+template:
+  name: "fake_airline_manifest_flight"
+  primary_key: "flight_information"
+
+fields:
+  - field: "flight_manifest_id"
+    alias: ""
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_departure_city"
+    alias: "city"
+    standardize: "standardize_geography"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_departure_airport"
+    alias: "airport"
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_arrival_city"
+    alias: "city"
+    standardize: "standardize_geography"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_arrival_airport"
+    alias: "airport"
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "airline"
+    alias: ""
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_number"
+    alias: ""
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_departure_gate"
+    alias: "gate"
+    standardize: "standardize_name"
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_departure_time"
+    alias: ""
+    standardize: "standardize_date"
+    is_entity: false
+    is_embedding: false
+    is_datetime: true
+    drop: false
+  - field: "flight_arrival_gate"
+    alias: "gate"
+    standardize: "standardize_name"
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "flight_arrival_time"
+    alias: ""
+    standardize: "standardize_date"
+    is_entity: false
+    is_embedding: false
+    is_datetime: true
+    drop: false
+  - field: "time_to_departure"
+    alias: ""
+    standardize: ""
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: true
+
+edges:
+  - parents: ["airline"]
+    children: ["flight_number"]
+    direction: ["out"]
+    type: "one_to_one"
+  - parents: ["flight_number"]
+    children: ["flight_manifest_id"]
+    direction: ["out"]
+    type: "one_to_one"
+  - parents: ["airline", "flight_number", "flight_manifest_id"]
+    children: ["flight_departure_city", "flight_departure_airport", "flight_arrival_city", "flight_arrival_airport"]
+    direction: ["out", "out", "out", "out"]
+    type: "one_to_one"
+
+edge_properties:
+  - none

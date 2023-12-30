@@ -29,7 +29,7 @@ template_dir = './config/templates'
 
 #%%
 # Flight
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight copy.yml", "r").read())
 
 #%%
 # Filter data file
@@ -39,14 +39,10 @@ if 'primary_key' in parse_config['template']:
         data = [data]       
 
 #%%
-# Rename Fields
-if 'rename_fields' in parse_config:
-    data = rename_properties(data, parse_config['rename_fields'])
-
-#%%
 # Drop fields
-if 'drop_fields' in parse_config:
-    drop_fields = parse_config['drop_fields']
+drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
+drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
+drop_fields = map_func(lambda x: x['field'], drop_fields)
 
 if len(drop_fields) > 0:
     clean_objects = []
@@ -66,9 +62,11 @@ mongo_collection.insert_many(data)
 
 #%%
 # Entities
-if 'entities' in parse_config.keys():
-    entities = parse_config['entities']
+entities = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
+entities = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entities)   
+entities = map_func(lambda x: x['field'], entities)
 
+# Making sure data is a list
 if not isinstance(data, list):
     data = [data]
 
@@ -90,7 +88,17 @@ if len(entities) > 0:
                 logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
                 print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
 
+            # Load Neo4j Relationships
+            neo4j_edges = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_edge', '_created_at']}, neo4j_objects)
 
+            # Load Neo4j Relationships
+            #%%
+            load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_edges[0].keys()])
+            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:HAS{' + str(load_statement) + '}]-(obj2) RETURN *'
+
+            with neo4j_client.session() as session:
+                session.run(load_statement, objects=neo4j_edges)
+                logging.info(f'Loaded Objects into Neo4j: {neo4j_edges}')
 
 
 

@@ -306,9 +306,12 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
     """
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
-    if 'field_aliases' in parse_config.keys():
-        field_aliases = {x['field']: x['alias'] for x in parse_config['field_aliases']}
-
+    if 'fields' in parse_config.keys():
+        field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+        field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
+        field_aliases = {x['field']: x['alias'] for x in field_aliases}
+    else:
+        field_aliases = []
     try:
         if not isinstance(data, list):
             data = [data]
@@ -342,7 +345,7 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
             # _namespace
             if len(_namespace) > 0:
                 # Use the alias if the field_aliases property is present in the parse_config
-                if 'field_aliases' in parse_config.keys():
+                if len(field_aliases) > 0:
                     if _namespace in field_aliases.keys():
                         original_namespace = copy.deepcopy(_namespace)
                         _namespace = field_aliases[_namespace]
@@ -695,27 +698,24 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     assert isinstance(parse_config, dict), "parse_config must be a dictionary"
     assert 'standardize_fields' in parse_config, "parse_config must contain 'standardize_fields'"
 
-    standardized_objects = []
+    # standardize_fields
+    standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+    standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
+    standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
 
     try:
+        standardized_objects = []
         for obj in objects:
-            for standardize_field in parse_config['standardize_fields']:
-                field = standardize_field['field']
-                # Only processing if the field is in the object
+            # standardize all of the values for which there is a key in the standardize_fields dictionary
+            for field in standardize_fields.keys():
                 if field in obj.keys():
-                    transform = standardize_field.get('transform')
+                    obj[field] = globals()[standardize_fields[field]](obj[field])
+                    standardized_objects.append(obj)
+                else:
+                    standardized_objects.append(obj)
 
-                    if transform and transform in globals():
-                        if transform in globals().keys():
-                            transform_func = globals()[transform]
-                            transformed_value = transform_func(obj[field])
-                            obj[field] = transformed_value
-            standardized_objects.append(obj)
-        
         return standardized_objects
 
-    except KeyError as e:
-        raise RuntimeError(f"Key Error: {e}")
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
@@ -767,37 +767,37 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
-    """
-    Renames and processes properties in a list of records based on a mapping and drops specified fields.
+# def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
+#     """
+#     Renames and processes properties in a list of records based on a mapping and drops specified fields.
 
-    Args:
-    records (List[Dict[str, Any]]): List of dictionaries representing records.
-    rename_map (List[Dict[str, str]]): List of dictionaries mapping 'from' field names to 'to' field names.
-    drop_fields (List[str]): List of field names to be dropped from records.
+#     Args:
+#     records (List[Dict[str, Any]]): List of dictionaries representing records.
+#     rename_map (List[Dict[str, str]]): List of dictionaries mapping 'from' field names to 'to' field names.
+#     drop_fields (List[str]): List of field names to be dropped from records.
 
-    Returns:
-    List[Dict[str, Any]]: List of updated records with renamed and processed properties.
-    """
-    assert all('from' in mapping and 'to' in mapping for mapping in rename_map), "Each rename mapping must have 'from' and 'to' keys."
+#     Returns:
+#     List[Dict[str, Any]]: List of updated records with renamed and processed properties.
+#     """
+#     assert all('from' in mapping and 'to' in mapping for mapping in rename_map), "Each rename mapping must have 'from' and 'to' keys."
 
-    def rename_and_drop_recursively(obj: Any, rename_map: List[Dict[str, str]], drop_fields: List[str]) -> Any:
-        if isinstance(obj, dict):
-            new_obj = {}
-            for key, value in obj.items():
-                if key not in drop_fields:
-                    new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
-                    new_obj[new_key] = rename_and_drop_recursively(value, rename_map, drop_fields)
-            return new_obj
-        elif isinstance(obj, list):
-            return [rename_and_drop_recursively(item, rename_map, drop_fields) for item in obj]
-        else:
-            return obj
+#     def rename_and_drop_recursively(obj: Any, rename_map: List[Dict[str, str]], drop_fields: List[str]) -> Any:
+#         if isinstance(obj, dict):
+#             new_obj = {}
+#             for key, value in obj.items():
+#                 if key not in drop_fields:
+#                     new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
+#                     new_obj[new_key] = rename_and_drop_recursively(value, rename_map, drop_fields)
+#             return new_obj
+#         elif isinstance(obj, list):
+#             return [rename_and_drop_recursively(item, rename_map, drop_fields) for item in obj]
+#         else:
+#             return obj
 
-    try:
-        return [rename_and_drop_recursively(record, rename_map, drop_fields) for record in records]
-    except Exception as e:
-        raise ValueError(f"An error occurred while processing properties: {e}")
+#     try:
+#         return [rename_and_drop_recursively(record, rename_map, drop_fields) for record in records]
+#     except Exception as e:
+#         raise ValueError(f"An error occurred while processing properties: {e}")
 
 
 
