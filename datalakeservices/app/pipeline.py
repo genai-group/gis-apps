@@ -56,7 +56,7 @@ if len(drop_fields) > 0:
 
 #%%
 # Hashify
-data = hashify(data, parse_config, _namespace='flight_manifest')
+data = hashify(data, _namespace='flight_manifest', parse_config=parse_config)
 if not isinstance(data, list):
     data = [data]       
 
@@ -68,6 +68,9 @@ mongo_collection.insert_many(data)
 # Entities
 if 'entities' in parse_config.keys():
     entities = parse_config['entities']
+
+if not isinstance(data, list):
+    data = [data]
 
 #%%
 if len(entities) > 0:

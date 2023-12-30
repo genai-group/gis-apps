@@ -351,7 +351,7 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
                 namespace_short_hash = _namespace.lower().replace(' ','_') + '___' + short_hash
                 temp_obj['_guid'] = namespace_short_hash
                 temp_obj['_namespace'] = _namespace
-                
+
             hash_list.append(temp_obj)
 
         if len(hash_list) == 1:
@@ -738,7 +738,7 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
 
     try:
         for obj in objects:
-            hashed_object = hashify(obj[_namespace], namespace=_namespace)
+            hashed_object = hashify(obj[_namespace], _namespace=_namespace, parse_config=parse_config)
             original_namespace = copy.deepcopy(_namespace)
             if 'field_aliases' in parse_config.keys():
                 if _namespace in field_aliases.keys():
