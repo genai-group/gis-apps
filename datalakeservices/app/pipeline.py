@@ -56,7 +56,7 @@ if len(drop_fields) > 0:
 
 #%%
 # Hashify
-data = hashify(data, namespace='flight_manifest')
+data = hashify(data, parse_config, _namespace='flight_manifest')
 if not isinstance(data, list):
     data = [data]       
 
