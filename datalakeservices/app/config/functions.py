@@ -744,10 +744,10 @@ def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _cre
                 if _namespace in field_aliases.keys():
                     _namespace = field_aliases[_namespace]
             prepared_obj = {
-                '_namespace': _namespace,
+                # '_namespace': _namespace,
                 '_label': obj[original_namespace],
                 '_guid': hashed_object['_guid'],
-                '_hash': hashed_object['_hash'],
+                # '_hash': hashed_object['_hash'],
                 '_source': obj['_guid'],
                 '_edge': 'has_' + original_namespace
             }
