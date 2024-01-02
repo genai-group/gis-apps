@@ -717,7 +717,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _created_at: str = '') -> List[Dict]:
+def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
     """
     Prepare objects for hashing and loading into the database.
 
@@ -752,7 +752,7 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
                 '_edge': 'has_' + original_namespace
             }
             # Adding the _created_at property
-            if len(_created_at) > 0:
+            if len(_created_at) > 0 and str(include_created_at).lower() == 'true':
                 if _created_at in obj.keys():
                     prepared_obj['_created_at'] = obj[_created_at]
                 else: 

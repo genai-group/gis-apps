@@ -1,0 +1,89 @@
+# Template for Processing Fake Airline Manifest Data
+
+template:
+  name: "fake_airline_manifest_flight"
+  primary_key: "flight_information"
+
+rename_fields:
+  - from: "city_of_departure"
+    to: "flight_departure_city"
+  - from: "departure_airport_name"
+    to: "flight_departure_airport"
+  - from: "departure_gate"
+    to: "flight_departure_gate"
+  - from: "departure_time"
+    to: "flight_departure_time"
+  - from: "city_of_arrival"
+    to: "flight_arrival_city"
+  - from: "arrival_airport_name"
+    to: "flight_arrival_airport"
+  - from: "arrival_gate"
+    to: "flight_arrival_gate"
+  - from: "arrival_time"
+    to: "flight_arrival_time"
+  - from: "airline_name"
+    to: "airline"
+
+field_aliases:
+  - field: "flight_departure_city"
+    alias: "city"
+  - field: "flight_departure_airport"
+    alias: "airport"
+  - field: "flight_arrival_city"
+    alias: "city"
+  - field: "flight_arrival_airport"
+    alias: "airport"
+  - field: "flight_departure_gate"
+    alias: "gate"
+
+standardize_fields:
+  - field: "flight_departure_time"
+    transform: "standardize_date"
+  - field: "flight_arrival_time"
+    transform: "standardize_date"
+  - field: "flight_departure_airport"
+    transform: "standardize_name"
+  - field: "flight_arrival_airport"
+    transform: "standardize_name"
+  - field: "flight_departure_city"
+    transform: "standardize_geography"
+  - field: "flight_arrival_city"
+    transform: "standardize_geography"
+
+entities:
+  - flight_number
+  - flight_manifest_id
+  - flight_departure_city
+  - flight_departure_airport
+  - flight_arrival_city
+  - flight_arrival_airport
+  - airline
+
+embeddings:
+  - none
+
+datetime_fields:
+  - field: "flight_departure_time"
+    is_created_at: false
+  - field: "flight_arrival_time"
+    is_created_at: false
+
+drop_fields:
+  - time_to_departure
+
+edges:
+  - parents: ["airline"]
+    children: ["flight_number"]
+    direction: ["out"]
+    type: "one_to_one"
+  - parents: ["flight_number"]
+    children: ["flight_manifest_id"]
+    direction: ["out"]
+    type: "one_to_one"
+  - parents: ["airline", "flight_number", "flight_manifest_id"]
+    children: ["flight_departure_city", "flight_departure_airport", "flight_arrival_city", "flight_arrival_airport"]
+    direction: ["out", "out", "out", "out"]
+    type: "one_to_one"
+
+edge_properties:
+  - none
