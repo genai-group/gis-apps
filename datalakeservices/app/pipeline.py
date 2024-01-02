@@ -114,13 +114,13 @@ if len(entities) > 0:
             neo4j_edges = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_edge', '_created_at']}, neo4j_objects)
 
             # replace _edge with "has_source" for _edge in all objects in neo4j_edges
-            # updated_neo4j_edges = []
-            # for obj in neo4j_edges:
-            #     obj['_edge'] = 'has_source'
-            #     updated_neo4j_edges.append(obj)
+            updated_neo4j_edges = []
+            for obj in neo4j_edges:
+                obj['_edge'] = 'has_source'
+                updated_neo4j_edges.append(obj)
 
-            # neo4j_edges = copy.deepcopy(updated_neo4j_edges)
-            # del updated_neo4j_edges
+            neo4j_edges = copy.deepcopy(updated_neo4j_edges)
+            del updated_neo4j_edges
 
             # Load Neo4j Relationships
             load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_edges[0].keys()])
