@@ -60,6 +60,29 @@ if not isinstance(data, list):
 # Load data into MongoDB Collection
 mongo_collection.insert_many(data)
 
+# Load the objecty _guids into the Neo4j graph
+
+neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid']}, data)
+updated_neo4j_objects = []
+for obj in neo4j_objects:
+    obj['_source'] = 0
+    updated_neo4j_objects.append(obj)
+
+pp(updated_neo4j_objects)
+
+neo4j_objects = copy.deepcopy(updated_neo4j_objects)
+del updated_neo4j_objects
+
+if len(neo4j_objects) > 0:
+    # buiding the load statements
+    load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge']])
+    load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
+
+with neo4j_client.session() as session:
+    session.run(load_statement, objects=neo4j_objects)
+    logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
+    print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
+
 #%%
 # Entities
 entities = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
@@ -81,7 +104,7 @@ if len(entities) > 0:
         pp(neo4j_objects)
         if len(neo4j_objects) > 0:
             # buiding the load statements
-            load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge']])
+            load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge', '_source']])
             load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
             # Load objects given the schema
             with neo4j_client.session() as session:
@@ -91,12 +114,23 @@ if len(entities) > 0:
 
             # Load Neo4j Relationships
             neo4j_edges = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_edge', '_created_at']}, neo4j_objects)
+            
+            # replace _edge with "has_source" for _edge in all objects in neo4j_edges
+            updated_neo4j_edges = []
+            for obj in neo4j_edges:
+                obj['_edge'] = 'has_source'
+                updated_neo4j_edges.append(obj)
+
+            neo4j_edges = copy.deepcopy(updated_neo4j_edges)
+            del updated_neo4j_edges
 
             # Load Neo4j Relationships
             #%%
             load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_edges[0].keys()])
-            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:HAS{' + str(load_statement) + '}]-(obj2) RETURN *'
-
+            # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:HAS{' + str(load_statement) + '}]-(obj2) RETURN *'
+            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:' + str(neo4j_edges[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+            
+    
             with neo4j_client.session() as session:
                 session.run(load_statement, objects=neo4j_edges)
                 logging.info(f'Loaded Objects into Neo4j: {neo4j_edges}')
