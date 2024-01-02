@@ -112,7 +112,7 @@ if len(entities) > 0:
                 logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
                 print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
 
-            # Load Neo4j Relationships
+            # Load Source Neo4j Relationships
             neo4j_edges = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_edge', '_created_at']}, neo4j_objects)
             
             # replace _edge with "has_source" for _edge in all objects in neo4j_edges
@@ -134,6 +134,28 @@ if len(entities) > 0:
                 session.run(load_statement, objects=neo4j_edges)
                 logging.info(f'Loaded Objects into Neo4j: {neo4j_edges}')
 
+
+# Load relationships from the parse_config file
+custom_edge_data = parse_config['edges']
+
+edges_to_load = []
+for edge_object in custom_edge_data:
+    parents = edge_object['parents']
+    children = edge_object['children']
+    edge_type = edge_object['type']
+    edge_direction = edge_object['direction']
+    if 'properties' in edge_object.keys():
+        edge_properties = edge_object['properties']    
+    else:
+        edge_properties = []
+
+    for parent in parents:
+        for child in children:
+            if str(edge_direction).lower() == 'out':
+                edge_triple = {'child': child, 'parent': parent, '_edge':'has_' + str(child).lower.replace(' ', '_')}
+                for property in edge_properties:
+                    edge_triple[property] = edge_object['properties'][property]
+                edges_to_load.append(edge_triple)
 
 
 
