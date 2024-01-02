@@ -745,7 +745,7 @@ def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _cre
                     _namespace = field_aliases[_namespace]
             prepared_obj = {
                 # '_namespace': _namespace,
-                '_label': _namespace + ': ' + obj[original_namespace],
+                '_label': titlecase(_namespace) + ': ' + obj[original_namespace],
                 '_guid': hashed_object['_guid'],
                 # '_hash': hashed_object['_hash'],
                 '_source': obj['_guid'],
