@@ -16,6 +16,7 @@ import pandas as pd
 import logging.config
 import logging.handlers
 from pandas.api import types
+from titlecase import titlecase
 from pprint import pprint as pp
 from dateutil.parser import parse
 from datetime import datetime, timedelta, timezone, date
