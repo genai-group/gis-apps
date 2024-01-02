@@ -717,7 +717,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
+def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
     """
     Prepare objects for hashing and loading into the database.
 

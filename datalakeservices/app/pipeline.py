@@ -77,7 +77,7 @@ if len(entities) > 0:
         # Loading an array of entities into Neo4j
         neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid', entity]}, data)
         neo4j_objects = standardize_objects(neo4j_objects, parse_config)
-        neo4j_objects = prepare_objects_for_load(neo4j_objects, entity, parse_config, include_created_at=False)
+        neo4j_objects = prepare_entities_for_load(neo4j_objects, entity, parse_config, include_created_at=False)
         pp(neo4j_objects)
         if len(neo4j_objects) > 0:
             # buiding the load statements
