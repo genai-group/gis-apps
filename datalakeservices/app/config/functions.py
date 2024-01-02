@@ -760,6 +760,9 @@ def prepare_objects_for_load(objects, _namespace: str, parse_config: Dict, _crea
             else: 
                 prepared_obj['_created_at'] = to_unix(datetime.now())
 
+            if not str(include_created_at).lower() == 'true':
+                prepared_obj = {k:v for k,v in prepared_obj.items() if k != '_created_at'}
+
             prepared_objects.append(prepared_obj)    
 
         return prepared_objects  
