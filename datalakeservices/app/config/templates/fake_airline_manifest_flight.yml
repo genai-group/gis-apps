@@ -84,7 +84,7 @@ fields:
     drop: false
   - field: "time_to_departure"
     alias: ""
-    standardize: ""
+    standardize: "standardize_date"
     is_entity: false
     is_embedding: false
     is_datetime: false

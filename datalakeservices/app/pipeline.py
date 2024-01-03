@@ -136,6 +136,15 @@ if len(entities) > 0:
 # Load edges from the parse_config file
 edge_objects = parse_config['edges']
 
+field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
+field_aliases = {x['field']: x['alias'] for x in field_aliases}
+
+standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+# standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
+standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
+
+#%%
 edges_to_load = []
 for edge_object in edge_objects:
     parents = edge_object['parents']
@@ -150,21 +159,21 @@ for edge_object in edge_objects:
     for parent in parents:
         for child in children:
             if str(edge_direction).lower() == 'out':
-                edge_triple = {'child': child, 'parent': parent, '_edge':'has_' + str(child).lower().replace(' ', '_')}
+                # if child in field_aliases.keys():
+                #     has_variable = 'has_' + str(field_aliases[child]).lower().replace(' ', '_')
+                # else:
+                has_variable = 'has_' + str(child).lower().replace(' ', '_')
+                edge_triple = {'child': child, 'parent': parent, '_edge':has_variable}
                 for property in edge_properties:
                     edge_triple[property] = edge_object['properties'][property]
                 edges_to_load.append(edge_triple)
 
-field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-field_aliases = {x['field']: x['alias'] for x in field_aliases}
+
 
 for triple in edges_to_load:
     for object in data:
         child = object[triple['child']]
-        print(f"child: {child} {triple['_edge']} {triple['parent']}")
-        parent = object[triple['parent']]
-        print(f"parent: {parent}")
+        print(f"parent: {triple['parent']} => {triple['_edge']} => child: {triple['child']}")
 
     triple['child'] 
     triple['parent']
@@ -173,6 +182,7 @@ for triple in edges_to_load:
 
 
 # Load the edges_to_load into the Neo4j database
+#%%
 for triple in edges_to_load:
     triple
     # Load Neo4j Relationships

@@ -700,7 +700,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
 
     # standardize_fields
     standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
-    standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
+    # standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
     standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
 
     try:
