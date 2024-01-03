@@ -132,9 +132,8 @@ if len(entities) > 0:
                 logging.info(f'Loaded Objects into Neo4j: {neo4j_edges}')
 
 
-
 #%%
-# Load relationships from the parse_config file
+# Load edges from the parse_config file
 custom_edge_data = parse_config['edges']
 
 edges_to_load = []

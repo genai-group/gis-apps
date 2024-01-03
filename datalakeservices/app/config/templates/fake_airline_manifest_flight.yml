@@ -41,7 +41,7 @@ fields:
     is_datetime: false
     drop: false
   - field: "airline_name"
-    alias: ""
+    alias: "airline"
     standardize: "standardize_name"
     is_entity: true
     is_embedding: false
