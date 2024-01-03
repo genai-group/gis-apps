@@ -134,10 +134,10 @@ if len(entities) > 0:
 
 #%%
 # Load edges from the parse_config file
-custom_edge_data = parse_config['edges']
+edge_objects = parse_config['edges']
 
 edges_to_load = []
-for edge_object in custom_edge_data:
+for edge_object in edge_objects:
     parents = edge_object['parents']
     children = edge_object['children']
     edge_type = edge_object['type']
@@ -154,6 +154,10 @@ for edge_object in custom_edge_data:
                 for property in edge_properties:
                     edge_triple[property] = edge_object['properties'][property]
                 edges_to_load.append(edge_triple)
+
+
+
+
 
 # Load the edges_to_load into the Neo4j database
 for triple in edges_to_load:

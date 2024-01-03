@@ -1,0 +1,66 @@
+{
+    "report": {
+        "financialInstitution": {
+            "name": "XYZ Bank",
+            "address": "123 Finance Street",
+            "city": "Moneytown",
+            "state": "Cashland",
+            "zipCode": "12345",
+            "branchAddress": "456 Savings Blvd",
+            "branchCity": "Investville",
+            "branchState": "Fundstate",
+            "branchZipCode": "67890",
+            "accountNumbers": [
+                "123456789",
+                "987654321"
+            ]
+        },
+        "suspect": {
+            "lastName": "Doe",
+            "firstName": "John",
+            "middleName": "Q",
+            "address": "789 Fiscal Ave",
+            "ssn": "123-45-6789",
+            "ein": "987-65-4321",
+            "city": "Deposit City",
+            "state": "Loanstate",
+            "zipCode": "54321",
+            "country": "Bankland",
+            "dob": "01/01/1980",
+            "phoneResidence": "(123) 456-7890",
+            "phoneWork": "(098) 765-4321",
+            "occupation": "Trader",
+            "identification": {
+                "type": "Driver's License",
+                "number": "D1234567",
+                "issuingAuthority": "DMV of Cashland"
+            },
+            "relationshipToInstitution": "Customer",
+            "admissionConfession": "No",
+            "formsOfIdentification": [
+                "Driver's License",
+                "Passport"
+            ],
+            "employmentStatus": {
+                "stillEmployed": "No",
+                "terminated": "Yes",
+                "dateOfTermination": "06/01/2023"
+            },
+            "otherDetails": "Additional details about the suspect or the suspicious activity."
+        },
+        "transactionDetails": {
+            "dateOfActivity": "05/01/2023",
+            "typeOfActivity": "Unusual wire transfer",
+            "amount": "$10,000",
+            "narrative": "Description of the suspicious activity observed."
+        },
+        "filingInformation": {
+            "dateFiled": "07/01/2023",
+            "filedBy": "John Smith",
+            "position": "Compliance Officer"
+        },
+        "additionalInformation": {
+            "comments": "Any additional comments or observations relevant to the report."
+        }
+    }
+}
