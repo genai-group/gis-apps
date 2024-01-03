@@ -155,7 +155,20 @@ for edge_object in edge_objects:
                     edge_triple[property] = edge_object['properties'][property]
                 edges_to_load.append(edge_triple)
 
+field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
+field_aliases = {x['field']: x['alias'] for x in field_aliases}
 
+for triple in edges_to_load:
+    for object in data:
+        child = object[triple['child']]
+        print(f"child: {child} {triple['_edge']} {triple['parent']}")
+        parent = object[triple['parent']]
+        print(f"parent: {parent}")
+
+    triple['child'] 
+    triple['parent']
+    triple['_edge']
 
 
 

@@ -731,10 +731,10 @@ def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _cre
     prepared_objects = []
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
-    if 'field_aliases' in parse_config.keys():
-        field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-        field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-        field_aliases = {x['field']: x['alias'] for x in field_aliases}
+    # if 'field_aliases' in parse_config.keys():
+    field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+    field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
+    field_aliases = {x['field']: x['alias'] for x in field_aliases}
 
     try:
         for obj in objects:
@@ -769,39 +769,6 @@ def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _cre
 
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
-
-# def rename_properties(records: List[Dict[str, Any]], rename_map: List[Dict[str, str]], drop_fields: List[str] = []) -> List[Dict[str, Any]]:
-#     """
-#     Renames and processes properties in a list of records based on a mapping and drops specified fields.
-
-#     Args:
-#     records (List[Dict[str, Any]]): List of dictionaries representing records.
-#     rename_map (List[Dict[str, str]]): List of dictionaries mapping 'from' field names to 'to' field names.
-#     drop_fields (List[str]): List of field names to be dropped from records.
-
-#     Returns:
-#     List[Dict[str, Any]]: List of updated records with renamed and processed properties.
-#     """
-#     assert all('from' in mapping and 'to' in mapping for mapping in rename_map), "Each rename mapping must have 'from' and 'to' keys."
-
-#     def rename_and_drop_recursively(obj: Any, rename_map: List[Dict[str, str]], drop_fields: List[str]) -> Any:
-#         if isinstance(obj, dict):
-#             new_obj = {}
-#             for key, value in obj.items():
-#                 if key not in drop_fields:
-#                     new_key = next((item['to'] for item in rename_map if item['from'] == key), key)
-#                     new_obj[new_key] = rename_and_drop_recursively(value, rename_map, drop_fields)
-#             return new_obj
-#         elif isinstance(obj, list):
-#             return [rename_and_drop_recursively(item, rename_map, drop_fields) for item in obj]
-#         else:
-#             return obj
-
-#     try:
-#         return [rename_and_drop_recursively(record, rename_map, drop_fields) for record in records]
-#     except Exception as e:
-#         raise ValueError(f"An error occurred while processing properties: {e}")
-
 
 
 ####################################
