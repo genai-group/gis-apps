@@ -115,11 +115,20 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
     assert isinstance(parse_config, dict), "parse_config must be a dictionary"
 
     # Primary Key
-    primary_key = template['primary_key']
-    if len(primary_key) > 0:
-        if isinstance(data, dict):
-            if primary_key in data.keys():
-                data = data[primary_key]
+    if 'primary_key' in template.keys():
+        primary_key = template['primary_key']
+        if len(primary_key) > 0:
+            if isinstance(data, dict):
+                if primary_key in data.keys():
+                    data = data[primary_key]
+    else:
+        primary_key = ''
+
+    # Namespace
+    if 'namespace' in template.keys():
+        namespace = template['namespace']
+    else:
+        namespace = ''
 
     # Ensure data is a list
     if not isinstance(data, list):
@@ -134,7 +143,7 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
         data = clean_objects
 
     # Hashify the data
-    data = hashify(data, _namespace='passenger', template=template)
+    data = hashify(data, _namespace=namespace, template=template)
 
     # Standardize fields
     standardized_fields = template['standardized_fields']

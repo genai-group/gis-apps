@@ -307,7 +307,7 @@ def hashify(data, _namespace: str = '', template: dict = {}, hash_length: int = 
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
 
-    field_aliases = template['field_aliases']
+    field_aliases = template['alias_fields']
 
     try:
         if not isinstance(data, list):
