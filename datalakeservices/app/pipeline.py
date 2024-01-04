@@ -3,11 +3,8 @@
 #%%
 from config.init import *
 
-#%% 
-# Reading in the data
 data = manifest_data_0
 
-#%%
 # Getting ready to copy/paste data
 passenger_info = data['passenger_info']
 
@@ -19,9 +16,13 @@ for obj in passenger_info:
     obj['time_to_departure'] = data['flight_information']['time_to_departure']
     new_data.append(obj)
 
+
+##################################
+####    Template Directory    ####
+##################################
 #%%
-# Reading in the template file
 template_dir = './config/templates'
+
 
 ##################################
 ####    Flight Information    ####
@@ -31,14 +32,12 @@ template_dir = './config/templates'
 # Flight
 parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
 
-#%%
 # Filter data file
 if 'primary_key' in parse_config['template']:
     data = manifest_data_0[parse_config['template']['primary_key']]
     if not isinstance(data, list):
         data = [data]       
 
-#%%
 # Drop fields
 drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
 drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
@@ -50,11 +49,15 @@ if len(drop_fields) > 0:
         clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
     data = clean_objects
 
-#%%
 # Hashify
 data = hashify(data, _namespace='flight_manifest', parse_config=parse_config)
 if not isinstance(data, list):
     data = [data]       
+
+
+#########################
+####    Load Data    ####
+#########################
 
 #%%
 # Load data into MongoDB Collection
@@ -81,18 +84,15 @@ with neo4j_client.session() as session:
     logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
     print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
 
-#%%
 # Entities
 entities = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
 entities = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entities)   
 entities = map_func(lambda x: x['field'], entities)
 
-#%%
 # Making sure data is a list
 if not isinstance(data, list):
     data = [data]
 
-#%%
 if len(entities) > 0:
     for entity in entities:
         # Loading an array of entities into Neo4j
@@ -124,8 +124,9 @@ if len(entities) > 0:
 
             # Load Neo4j Relationships
             load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_edges[0].keys()])
-            # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:HAS{' + str(load_statement) + '}]-(obj2) RETURN *'
-            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:' + str(neo4j_edges[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+            # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement) + '}]-(obj2) RETURN *'
+            # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement) + '}]-(obj2) RETURN *'
+            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_guid`}) MATCH (obj2:Object{_guid:line.`_source`}) MERGE (obj1)-[owns:' + str(neo4j_edges[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
 
             with neo4j_client.session() as session:
                 session.run(load_statement, objects=neo4j_edges)
@@ -139,13 +140,12 @@ field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
 field_aliases = {x['field']: x['alias'] for x in field_aliases}
 
 standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
-# standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
 standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
 
+#%%
 # Load edges from the parse_config file
 edge_objects = parse_config['edges']
 
-#%%
 edges_to_load = []
 for edge_object in edge_objects:
     parents = edge_object['parents']
@@ -166,7 +166,7 @@ for edge_object in edge_objects:
                 has_variable = 'has_' + str(child).lower().replace(' ', '_')
                 edge_triple = {'child': child, 'parent': parent, '_edge':has_variable}
                 for property in edge_properties:
-                    edge_triple[property] = edge_object['properties'][property]
+                    edge_triple[property] = property #edge_object['properties'][property]
                 edges_to_load.append(edge_triple)
 
 # Load the edges_to_load into the Neo4j database
@@ -199,55 +199,15 @@ for triple in edges_to_load:
 for _edge in set(map_func(lambda x: x['_edge'], final_triples_to_load)):
     neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
     load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys()])
+    # New Load Statement
+    # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement) + '}]-(obj2) RETURN *'
     load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+
     pp(f"load_statement: {load_statement}")
 
     with neo4j_client.session() as session:
         session.run(load_statement, objects=neo4j_relationships)
         logging.info(f'Loaded Objects into Neo4j: {neo4j_relationships}')
-
-
-load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in final_triples_to_load[0].keys()])
-load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(final_triples_to_load[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
-
-with neo4j_client.session() as session:
-    session.run(load_statement, objects=final_triples_to_load)
-    logging.info(f'Loaded Objects into Neo4j: {final_triples_to_load}')
-
-
-
-
-
-
-
-# Load the edges_to_load into the Neo4j database
-#%%
-for triple in edges_to_load:
-    triple
-    # Load Neo4j Relationships
-    load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in triple.keys() if k not in ['child', 'parent']])
-    load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(triple['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
-
-    with neo4j_client.session() as session:
-        session.run(load_statement, objects=[triple])
-        logging.info(f'Loaded Objects into Neo4j: {triple}')
-
-
-
-#%%
-# Load Passengers into Neo4j
-neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','name']}, data)
-
-load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_relationship']])
-load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
-
-#%%
-# Load objects given the schema
-with neo4j_client.session() as session:
-    session.run(load_statement, objects=neo4j_objects)
-    logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
-    print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
-
 
 
 #####################################

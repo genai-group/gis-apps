@@ -91,21 +91,13 @@ fields:
     drop: true
 
 edges:
-  - parents: ["airline_name"]
-    children: ["flight_number"]
-    properties: []
+  - parents: ["flight_manifest_id"]
+    children: ["airline_name", "flight_number"]
+    properties: ["time_to_departure"]
     direction: "out"
     type: "one_to_one"
   - parents: ["flight_number"]
-    children: ["flight_manifest_id"]
+    children: ["airline_name", "city_of_departure", "departure_airport_name", "departure_gate", "departure_time", "city_of_arrival", "arrival_airport_name", "arrival_gate", "arrival_time"]
     properties: []
     direction: "out"
     type: "one_to_one"
-  - parents: ["airline_name", "flight_number", "flight_manifest_id"]
-    children: ["city_of_departure", "departure_airport_name", "city_of_arrival", "arrival_airport_name"]
-    properties: []
-    direction: "out"
-    type: "one_to_one"
-
-edge_properties:
-  - none

@@ -4,44 +4,51 @@ template:
   name: "fake_airline_manifest_passengers"
   primary_key: "passenger_info"
 
-rename_fields:
-  - from: "passport_information"
-    to: "passport_id"
-  - from: "full_name"
-    to: "name"
-  - from: "date_of_birth"
-    to: "dob"
-  - from: "country_of_citizenship"
-    to: "country"
-
-standardize_fields:
-  - field: "name"
-    transform: "standardize_name"
-  - field: "dob"
-    transform: "standardize_date"
-  - field: "country"
-    transform: "standardize_country"
-  - field: "passport_id"
-    transform: "standardize_passport_id"
-
-entities:
-  - name
-  - passport_id
-
-embeddings:
-  - name
-
-datetime_fields:
-  - field: "dob"
-    is_created_at: false
-
-drop_fields:
-  - id_type
+fields:
+  - field: "full_name"
+    alias: "name"
+    standardize: "standardize_name"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "gender"
+    alias: ""
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "date_of_birth"
+    alias: "dob"
+    standardize: "standardize_date"
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "country_of_citizenship"
+    alias: "country"
+    standardize: "standardize_geography"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "government_id_type"
+    alias: "id_type"
+    is_entity: false
+    is_embedding: false
+    is_datetime: false
+    drop: false
+  - field: "passport_information"
+    alias: "passport_id"
+    standardize: "standardize_passport_id"
+    is_entity: true
+    is_embedding: false
+    is_datetime: false
+    drop: false
 
 edges:
-  - parents: ["passport_id"]
-    children: ["name", "dob", "country", "id_type"]
+  - parents: ["full_name"]
+    children: ["gender", "date_of_birth", "country_of_citizenship", "government_id_type", "passport_information"]
+    properties: [""]
+    direction: "out"
     type: "one_to_one"
-
-edge_properties:
-  - time_to_departure
