@@ -169,19 +169,12 @@ for edge_object in edge_objects:
                     edge_triple[property] = edge_object['properties'][property]
                 edges_to_load.append(edge_triple)
 
-
-"""
-
-Steps:
-
-1. Get the triple
-2. Extract Triple from object
-3. Check if child and / or parent need to be standardized
-4. 
-
-"""
+# Load the edges_to_load into the Neo4j database
+#%%
+final_triples_to_load = []
 for triple in edges_to_load:
     for object in data:
+        temp_object = {}
         if triple['child'] in standardize_fields.keys():
             child = globals()[standardize_fields[triple['child']]](object[triple['child']])
         else:
@@ -192,13 +185,38 @@ for triple in edges_to_load:
         else:
             parent = object[triple['parent']]
         parent_guid = hashify(parent, _namespace=triple['parent'], parse_config=parse_config)['_guid']
+        temp_object = {'child': child_guid, 'parent': parent_guid, '_edge': triple['_edge']}
+        final_triples_to_load.append(temp_object)
 
-        print(f"child: {child}")
-        print(f"child_guid: {child_guid}")
         print(f"parent: {parent}")
         print(f"parent_guid: {parent_guid}")
+        print(f"triple['_edge']: {triple['_edge']}")
+        print(f"child: {child}")
+        print(f"child_guid: {child_guid}")
 
-    triple['_edge']
+#%%
+# Load Neo4j Relationships by edge name
+for _edge in set(map_func(lambda x: x['_edge'], final_triples_to_load)):
+    neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
+    load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys()])
+    load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+    pp(f"load_statement: {load_statement}")
+
+    with neo4j_client.session() as session:
+        session.run(load_statement, objects=neo4j_relationships)
+        logging.info(f'Loaded Objects into Neo4j: {neo4j_relationships}')
+
+
+load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in final_triples_to_load[0].keys()])
+load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(final_triples_to_load[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+
+with neo4j_client.session() as session:
+    session.run(load_statement, objects=final_triples_to_load)
+    logging.info(f'Loaded Objects into Neo4j: {final_triples_to_load}')
+
+
+
+
 
 
 
