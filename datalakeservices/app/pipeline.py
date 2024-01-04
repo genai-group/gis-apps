@@ -199,10 +199,7 @@ for triple in edges_to_load:
 for _edge in set(map_func(lambda x: x['_edge'], final_triples_to_load)):
     neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
     load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys()])
-    # New Load Statement
-    # load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement) + '}]-(obj2) RETURN *'
     load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
-
     pp(f"load_statement: {load_statement}")
 
     with neo4j_client.session() as session:
