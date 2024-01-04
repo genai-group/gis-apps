@@ -133,9 +133,7 @@ if len(entities) > 0:
 
 
 #%%
-# Load edges from the parse_config file
-edge_objects = parse_config['edges']
-
+                
 field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
 field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
 field_aliases = {x['field']: x['alias'] for x in field_aliases}
@@ -143,6 +141,9 @@ field_aliases = {x['field']: x['alias'] for x in field_aliases}
 standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
 # standardize_fields = filter_func(lambda x: str(x['standardize']).lower() == 'true', standardize_fields)
 standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
+
+# Load edges from the parse_config file
+edge_objects = parse_config['edges']
 
 #%%
 edges_to_load = []
@@ -169,14 +170,34 @@ for edge_object in edge_objects:
                 edges_to_load.append(edge_triple)
 
 
+"""
 
+Steps:
+
+1. Get the triple
+2. Extract Triple from object
+3. Check if child and / or parent need to be standardized
+4. 
+
+"""
 for triple in edges_to_load:
     for object in data:
-        child = object[triple['child']]
-        print(f"parent: {triple['parent']} => {triple['_edge']} => child: {triple['child']}")
+        if triple['child'] in standardize_fields.keys():
+            child = globals()[standardize_fields[triple['child']]](object[triple['child']])
+        else:
+            child = object[triple['child']]
+        child_guid = hashify(child, _namespace=triple['child'], parse_config=parse_config)['_guid']
+        if triple['parent'] in standardize_fields.keys():
+            parent = globals()[standardize_fields[triple['parent']]](object[triple['parent']])
+        else:
+            parent = object[triple['parent']]
+        parent_guid = hashify(parent, _namespace=triple['parent'], parse_config=parse_config)['_guid']
 
-    triple['child'] 
-    triple['parent']
+        print(f"child: {child}")
+        print(f"child_guid: {child_guid}")
+        print(f"parent: {parent}")
+        print(f"parent_guid: {parent_guid}")
+
     triple['_edge']
 
 
