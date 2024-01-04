@@ -3,6 +3,7 @@
 template:
   name: "fake_airline_manifest_flight"
   primary_key: "flight_information"
+  namespace: "flight_manifest"
 
 fields:
   - field: "flight_manifest_id"

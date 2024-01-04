@@ -3,6 +3,7 @@
 template:
   name: "fake_airline_manifest_passengers"
   primary_key: "passenger_info"
+  namespace: "passenger"
 
 fields:
   - field: "full_name"

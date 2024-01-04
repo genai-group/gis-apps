@@ -9,9 +9,6 @@ from config.init import *
 
 #%%
 
-template_dir = './config/templates'
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
-
 def process_template(parse_config: Dict) -> Dict:
     """
     Process the different components of the parse_config file.
@@ -28,7 +25,12 @@ def process_template(parse_config: Dict) -> Dict:
     try:
         primary_key = parse_config['template']['primary_key']
     except Exception as e:
-        primary_key = None
+        primary_key = ''
+
+    try:
+        namespace = parse_config['template']['namespace']
+    except Exception as e:
+        namespace = ''
 
     try:
         drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
@@ -80,6 +82,7 @@ def process_template(parse_config: Dict) -> Dict:
     # Output dict
     template_dict = {
         'primary_key': primary_key,
+        'namespace': namespace,
         'drop_fields': drop_fields,
         'alias_fields': alias_fields,
         'standardized_fields': standardized_fields,
@@ -129,6 +132,9 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
         for obj in data:
             clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
         data = clean_objects
+
+    # Hashify the data
+    data = hashify(data, _namespace='passenger', template=template)
 
     # Standardize fields
     standardized_fields = template['standardized_fields']
@@ -184,6 +190,9 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
 #####################################
 ####    Start of the Pipeline    ####
 #####################################
+
+template_dir = './config/templates'
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
 
 template = process_template(parse_config)
 

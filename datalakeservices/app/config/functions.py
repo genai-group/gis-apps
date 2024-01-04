@@ -286,7 +286,7 @@ def generate_near_truly_random_arrays(n, low=1, high=1000000):
     
     return arrays
 
-def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: int = 20, _created_at: str = '') -> str:
+def hashify(data, _namespace: str = '', template: dict = {}, hash_length: int = 20, _created_at: str = '') -> str:
     """
     Generate a short unique hash of a given string or JSON object using the SHA-256 hashing algorithm.
 
@@ -306,12 +306,9 @@ def hashify(data, _namespace: str = '', parse_config: dict = {}, hash_length: in
     """
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
-    if 'fields' in parse_config.keys():
-        field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-        field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-        field_aliases = {x['field']: x['alias'] for x in field_aliases}
-    else:
-        field_aliases = []
+
+    field_aliases = template['field_aliases']
+
     try:
         if not isinstance(data, list):
             data = [data]
