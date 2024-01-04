@@ -9,44 +9,175 @@ data = manifest_data_0
 ####    Process Template    ####
 ################################
 
-"""
-
-field: "flight_manifest_id"
-alias: ""
-standardize: "standardize_name"
-is_entity: true
-is_embedding: false
-is_datetime: false
-drop: false
-
-"""
-
+#%%
 
 template_dir = './config/templates'
 parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
 
-drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
-drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
-drop_fields = map_func(lambda x: x['field'], drop_fields)
+def process_template(parse_config: Dict) -> Dict:
+    """
+    Process the different components of the parse_config file.
 
-alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
-alias_fields = {x['field']: x['alias'] for x in alias_fields}
+    Args:
+        parse_config (Dict): parse_config dictionary
 
-standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
-standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
+    Returns:
+        Dict: updated parse_config dictionary
 
-embedding_fields = filter_func(lambda x: 'is_embedding' in x.keys(), parse_config['fields'])    
-embedding_fields = filter_func(lambda x: str(x['is_embedding']).lower() == 'true', embedding_fields)
-embedding_fields = map_func(lambda x: x['field'], embedding_fields)
+    """
+    assert isinstance(parse_config, dict), "parse_config must be a dictionary"
 
-datetime_fields = filter_func(lambda x: 'is_datetime' in x.keys(), parse_config['fields'])
-datetime_fields = filter_func(lambda x: str(x['is_datetime']).lower() == 'true', datetime_fields)
-datetime_fields = map_func(lambda x: x['field'], datetime_fields)
+    try:
+        primary_key = parse_config['template']['primary_key']
+    except Exception as e:
+        primary_key = None
 
-entity_fields = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
-entity_fields = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entity_fields)
-entity_fields = map_func(lambda x: x['field'], entity_fields)
+    try:
+        drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
+        drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
+        drop_fields = map_func(lambda x: x['field'], drop_fields)
+    except Exception as e:
+        drop_fields = []
+
+    try:
+        alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+        alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
+        alias_fields = {x['field']: x['alias'] for x in alias_fields}
+    except Exception as e:
+        alias_fields = {}
+
+    try:
+        standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+        standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
+    except Exception as e:
+        standardized_fields = {}
+
+    try:    
+        embedding_fields = filter_func(lambda x: 'is_embedding' in x.keys(), parse_config['fields'])    
+        embedding_fields = filter_func(lambda x: str(x['is_embedding']).lower() == 'true', embedding_fields)
+        embedding_fields = map_func(lambda x: x['field'], embedding_fields)
+    except Exception as e:
+        embedding_fields = []
+
+    try:    
+        datetime_fields = filter_func(lambda x: 'is_datetime' in x.keys(), parse_config['fields'])
+        datetime_fields = filter_func(lambda x: str(x['is_datetime']).lower() == 'true', datetime_fields)
+        datetime_fields = map_func(lambda x: x['field'], datetime_fields)
+    except Exception as e:
+        datetime_fields = []
+
+    try:    
+        entity_fields = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
+        entity_fields = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entity_fields)
+        entity_fields = map_func(lambda x: x['field'], entity_fields)
+    except Exception as e:
+        entity_fields = []
+
+    try:
+        calculated_entity_fields = parse_config['calculated_entities']
+        calculated_entity_fields = map_func(lambda x: {x['alias']: x['fields']}, calculated_entity_fields)
+    except Exception as e:
+        calculated_entity_fields = []
+
+    # Output dict
+    template_dict = {
+        'primary_key': primary_key,
+        'drop_fields': drop_fields,
+        'alias_fields': alias_fields,
+        'standardized_fields': standardized_fields,
+        'embedding_fields': embedding_fields,
+        'datetime_fields': datetime_fields,
+        'entity_fields': entity_fields,
+        'calculated_entity_fields': calculated_entity_fields
+    }
+
+    return template_dict
+
+
+############################
+####    Process Data    ####
+############################
+
+def process_data(data: Union[List[Dict], Dict], parse_config: Dict) -> Union[List[Dict], Dict]:
+    """
+    Process the different components of the parse_config file.
+
+    Args:
+        data (Union[List[Dict], Dict]): data to process
+        parse_config (Dict): parse_config dictionary
+
+    Returns:
+        Union[List[Dict], Dict]: processed data
+
+    """
+    assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
+    assert isinstance(parse_config, dict), "parse_config must be a dictionary"
+
+    # Making sure data is a list
+    if not isinstance(data, list):
+        data = [data]
+
+    # Drop fields
+    drop_fields = parse_config['drop_fields']
+    if len(drop_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
+        data = clean_objects
+
+    # Rename fields
+    alias_fields = parse_config['alias_fields']
+    if len(alias_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            for field in alias_fields.keys():
+                obj[alias_fields[field]] = obj[field]
+                del obj[field]
+            clean_objects.append(obj)
+        data = clean_objects
+
+    # Standardize fields
+    standardized_fields = parse_config['standardized_fields']
+    if len(standardized_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            for field in standardized_fields.keys():
+                obj[field] = globals()[standardized_fields[field]](obj[field])
+            clean_objects.append(obj)
+        data = clean_objects
+
+    # Embedding fields
+    embedding_fields = parse_config['embedding_fields']
+    if len(embedding_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            for field in embedding_fields:
+                obj[field] = globals()[field](obj[field])
+            clean_objects.append(obj)
+        data = clean_objects
+
+    # Datetime fields
+    datetime_fields = parse_config['datetime_fields']
+    if len(datetime_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            for field in datetime_fields:
+                obj[field] = globals()[field](obj[field])
+            clean_objects.append(obj)
+        data = clean_objects
+
+    # Entity fields
+    entity_fields = parse_config['entity_fields']
+    if len(entity_fields) > 0:
+        for entity in entity_fields:
+            # Loading an array of entities into Neo4j
+
+
+#####################################
+####    Start of the Pipeline    ####
+#####################################
+
+template_output = process_template(parse_config)
 
 
 

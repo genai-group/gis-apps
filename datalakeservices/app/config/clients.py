@@ -184,7 +184,6 @@ RUN WITH USERNAME AND PASSWORD
 docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=myuser -e MONGO_INITDB_ROOT_PASSWORD=mypassword --platform linux/arm64 mongo
 """
 
-
 # %%
 
 def connect_to_mongodb(host: str = 'localhost', 
@@ -424,6 +423,14 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_g
         milvus_collection.create_index(field_name, index_params)
     except Exception as e:
         raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
+
+
+###############################
+####    Pinecone Client    ####
+###############################
+    
+
+
 
 ############################
 ####    Bloom Filter    ####

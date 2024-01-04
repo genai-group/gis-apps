@@ -799,6 +799,7 @@ def search(query_str: str, expand: bool = False, foaf: bool = False) -> List[Dic
             result = list(mongo_collection.find({'_guid':query_str}))
             if str(expand).lower() == 'true':
                 # Perform Neo4j expansion
+                pass
 
             return result
 
@@ -2150,16 +2151,16 @@ redis_delete_all()
 ####    Neo4j Functions    ####
 ###############################
 
-def neo4j_query(node: Dict[str, Union[str, int]]) -> None:
+# def neo4j_query(node: Dict[str, Union[str, int]]) -> None:
 
-query_str = query
+# query_str = query
 
-neo4j_query = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[r]->(obj2:Object) RETURN obj, r, obj2"
+# neo4j_query = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[r]->(obj2:Object) RETURN obj, r, obj2"
 
-query_str2 = query_str
+# query_str2 = query_str
 
-query_str = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[]->(obj2:Object) RETURN obj, r, obj2"
+# query_str = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[]->(obj2:Object) RETURN obj, r, obj2"
 
-with neo4j_client.session() as session:
-    results = list(session.run(query_str).data())
-    return results
+# with neo4j_client.session() as session:
+#     results = list(session.run(query_str).data())
+#     return results
