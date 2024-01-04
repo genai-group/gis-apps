@@ -771,6 +771,42 @@ def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _cre
         raise RuntimeError(f"Error during processing: {e}")
 
 
+######################
+####    Search    ####
+######################
+
+"""
+
+query = "flight_manifest___e4268fb2489004f749ff"
+
+"""
+
+def search(query_str: str, expand: bool = False, foaf: bool = False) -> List[Dict]:
+    """
+    Search GIS Data Lake for a given query.
+
+    Args:
+        query_str (str): The search query.
+
+    Returns:
+        List[Dict]: A list of search results.
+    """
+    assert isinstance(query_str, str), "query must be a string"
+
+    try:
+        # Search for a GUID
+        if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)):
+            result = list(mongo_collection.find({'_guid':query_str}))
+            if str(expand).lower() == 'true':
+                # Perform Neo4j expansion
+
+            return result
+
+    except Exception as e:
+        print(f"Errors in GIS Data Lake Search: {e}")
+        return None
+
+
 ####################################
 ####    Similarity Functions    ####
 ####################################
@@ -2114,3 +2150,16 @@ redis_delete_all()
 ####    Neo4j Functions    ####
 ###############################
 
+def neo4j_query(node: Dict[str, Union[str, int]]) -> None:
+
+query_str = query
+
+neo4j_query = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[r]->(obj2:Object) RETURN obj, r, obj2"
+
+query_str2 = query_str
+
+query_str = f"MATCH (obj:Object{{_guid:'{query_str}'}})-[]->(obj2:Object) RETURN obj, r, obj2"
+
+with neo4j_client.session() as session:
+    results = list(session.run(query_str).data())
+    return results

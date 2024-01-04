@@ -52,6 +52,10 @@ fields:
     is_datetime: false
     drop: false
 
+calculated_entities:
+  - fields: ["full_name", "date_of_birth", "country_of_citizenship"]
+    alias: "identity"
+
 edges:
   - parents: ["flight_manifest_id"]
     children: ["full_name"]

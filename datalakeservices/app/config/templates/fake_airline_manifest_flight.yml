@@ -90,6 +90,10 @@ fields:
     is_datetime: false
     drop: true
 
+calculated_entities:
+  - fields: ["city_of_departure", "departure_airport_name", "departure_gate", "departure_time"]
+    alias: "departure"
+
 edges:
   - parents: ["flight_manifest_id"]
     children: ["airline_name", "flight_number"]

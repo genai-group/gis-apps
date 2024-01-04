@@ -5,12 +5,49 @@ from config.init import *
 
 data = manifest_data_0
 
+################################
+####    Process Template    ####
+################################
 
-##################################
-####    Template Directory    ####
-##################################
-#%%
+"""
+
+field: "flight_manifest_id"
+alias: ""
+standardize: "standardize_name"
+is_entity: true
+is_embedding: false
+is_datetime: false
+drop: false
+
+"""
+
+
 template_dir = './config/templates'
+parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
+
+drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
+drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
+drop_fields = map_func(lambda x: x['field'], drop_fields)
+
+alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
+alias_fields = {x['field']: x['alias'] for x in alias_fields}
+
+standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
+
+embedding_fields = filter_func(lambda x: 'is_embedding' in x.keys(), parse_config['fields'])    
+embedding_fields = filter_func(lambda x: str(x['is_embedding']).lower() == 'true', embedding_fields)
+embedding_fields = map_func(lambda x: x['field'], embedding_fields)
+
+datetime_fields = filter_func(lambda x: 'is_datetime' in x.keys(), parse_config['fields'])
+datetime_fields = filter_func(lambda x: str(x['is_datetime']).lower() == 'true', datetime_fields)
+datetime_fields = map_func(lambda x: x['field'], datetime_fields)
+
+entity_fields = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
+entity_fields = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entity_fields)
+entity_fields = map_func(lambda x: x['field'], entity_fields)
+
 
 
 ##################################
@@ -127,12 +164,12 @@ if len(entities) > 0:
 
 #%%
                 
-field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-field_aliases = {x['field']: x['alias'] for x in field_aliases}
+alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
+alias_fields = {x['field']: x['alias'] for x in alias_fields}
 
-standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
-standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
+standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
 
 #%%
 # Load edges from the parse_config file
@@ -152,8 +189,8 @@ for edge_object in edge_objects:
     for parent in parents:
         for child in children:
             if str(edge_direction).lower() == 'out':
-                # if child in field_aliases.keys():
-                #     has_variable = 'has_' + str(field_aliases[child]).lower().replace(' ', '_')
+                # if child in alias_fields.keys():
+                #     has_variable = 'has_' + str(alias_fields[child]).lower().replace(' ', '_')
                 # else:
                 has_variable = 'has_' + str(child).lower().replace(' ', '_')
                 edge_triple = {'child': child, 'parent': parent, '_edge':has_variable}
@@ -167,13 +204,13 @@ final_triples_to_load = []
 for triple in edges_to_load:
     for object in data:
         temp_object = {}
-        if triple['child'] in standardize_fields.keys():
-            child = globals()[standardize_fields[triple['child']]](object[triple['child']])
+        if triple['child'] in standardized_fields.keys():
+            child = globals()[standardized_fields[triple['child']]](object[triple['child']])
         else:
             child = object[triple['child']]
         child_guid = hashify(child, _namespace=triple['child'], parse_config=parse_config)['_guid']
-        if triple['parent'] in standardize_fields.keys():
-            parent = globals()[standardize_fields[triple['parent']]](object[triple['parent']])
+        if triple['parent'] in standardized_fields.keys():
+            parent = globals()[standardized_fields[triple['parent']]](object[triple['parent']])
         else:
             parent = object[triple['parent']]
         parent_guid = hashify(parent, _namespace=triple['parent'], parse_config=parse_config)['_guid']
@@ -328,12 +365,12 @@ if len(entities) > 0:
 
 #%%
                 
-field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-field_aliases = {x['field']: x['alias'] for x in field_aliases}
+alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
+alias_fields = {x['field']: x['alias'] for x in alias_fields}
 
-standardize_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
-standardize_fields = {x['field']: x['standardize'] for x in standardize_fields}
+standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
 
 #%%
 # Load edges from the parse_config file
@@ -353,8 +390,8 @@ for edge_object in edge_objects:
     for parent in parents:
         for child in children:
             if str(edge_direction).lower() == 'out':
-                # if child in field_aliases.keys():
-                #     has_variable = 'has_' + str(field_aliases[child]).lower().replace(' ', '_')
+                # if child in alias_fields.keys():
+                #     has_variable = 'has_' + str(alias_fields[child]).lower().replace(' ', '_')
                 # else:
                 has_variable = 'has_' + str(child).lower().replace(' ', '_')
                 edge_triple = {'child': child, 'parent': parent, '_edge':has_variable}
@@ -368,13 +405,13 @@ final_triples_to_load = []
 for triple in edges_to_load:
     for object in data:
         temp_object = {}
-        if triple['child'] in standardize_fields.keys():
-            child = globals()[standardize_fields[triple['child']]](object[triple['child']])
+        if triple['child'] in standardized_fields.keys():
+            child = globals()[standardized_fields[triple['child']]](object[triple['child']])
         else:
             child = object[triple['child']]
         child_guid = hashify(child, _namespace=triple['child'], parse_config=parse_config)['_guid']
-        if triple['parent'] in standardize_fields.keys():
-            parent = globals()[standardize_fields[triple['parent']]](object[triple['parent']])
+        if triple['parent'] in standardized_fields.keys():
+            parent = globals()[standardized_fields[triple['parent']]](object[triple['parent']])
         else:
             parent = object[triple['parent']]
         parent_guid = hashify(parent, _namespace=triple['parent'], parse_config=parse_config)['_guid']
