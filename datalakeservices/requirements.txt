@@ -27,10 +27,10 @@ PyYAML==6.0.1
 ray==2.8.1
 redis==4.4.2
 scikit-learn==1.3.2
-spacy==3.6.1
+spacy==3.7.2
 spacy-alignments==0.9.0
 spacy-legacy==3.0.12
-spacy-llm==0.4.3
+# spacy-llm==0.4.3
 spacy-loggers==1.0.4
 spacy-model-manager==0.1.3
 titlecase==2.3
