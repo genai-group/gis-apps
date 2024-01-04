@@ -88,7 +88,7 @@ fields:
     is_entity: false
     is_embedding: false
     is_datetime: false
-    drop: true
+    drop: false
 
 calculated_entities:
   - fields: ["city_of_departure", "departure_airport_name", "departure_gate", "departure_time"]

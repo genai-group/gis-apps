@@ -3,8 +3,6 @@
 #%%
 from config.init import *
 
-data = manifest_data_0
-
 ################################
 ####    Process Template    ####
 ################################
@@ -98,13 +96,13 @@ def process_template(parse_config: Dict) -> Dict:
 ####    Process Data    ####
 ############################
 
-def process_data(data: Union[List[Dict], Dict], parse_config: Dict) -> Union[List[Dict], Dict]:
+def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Dict], Dict]:
     """
     Process the different components of the parse_config file.
 
     Args:
         data (Union[List[Dict], Dict]): data to process
-        parse_config (Dict): parse_config dictionary
+        template (Dict): template_output dictionary which contains the parsed configuration
 
     Returns:
         Union[List[Dict], Dict]: processed data
@@ -113,36 +111,46 @@ def process_data(data: Union[List[Dict], Dict], parse_config: Dict) -> Union[Lis
     assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
     assert isinstance(parse_config, dict), "parse_config must be a dictionary"
 
-    # Making sure data is a list
+    # Primary Key
+    primary_key = template['primary_key']
+    if len(primary_key) > 0:
+        if isinstance(data, dict):
+            if primary_key in data.keys():
+                data = data[primary_key]
+
+    # Ensure data is a list
     if not isinstance(data, list):
         data = [data]
 
     # Drop fields
-    drop_fields = parse_config['drop_fields']
+    drop_fields = template['drop_fields']
     if len(drop_fields) > 0:
         clean_objects = []
         for obj in data:
             clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
         data = clean_objects
 
+    # Standardize fields
+    standardized_fields = template['standardized_fields']
+    if len(standardized_fields) > 0:
+        standardized_objects = []
+        for obj in data:
+            for field in standardized_fields.keys():
+                try:
+                    obj[field] = globals()[standardized_fields[field]](obj[field])
+                except Exception as e:
+                    print(f"Error standardizing field: {e}")
+            standardized_objects.append(obj)
+        data = standardized_objects
+
     # Rename fields
-    alias_fields = parse_config['alias_fields']
+    alias_fields = template['alias_fields']
     if len(alias_fields) > 0:
         clean_objects = []
         for obj in data:
             for field in alias_fields.keys():
                 obj[alias_fields[field]] = obj[field]
                 del obj[field]
-            clean_objects.append(obj)
-        data = clean_objects
-
-    # Standardize fields
-    standardized_fields = parse_config['standardized_fields']
-    if len(standardized_fields) > 0:
-        clean_objects = []
-        for obj in data:
-            for field in standardized_fields.keys():
-                obj[field] = globals()[standardized_fields[field]](obj[field])
             clean_objects.append(obj)
         data = clean_objects
 
@@ -177,7 +185,9 @@ def process_data(data: Union[List[Dict], Dict], parse_config: Dict) -> Union[Lis
 ####    Start of the Pipeline    ####
 #####################################
 
-template_output = process_template(parse_config)
+template = process_template(parse_config)
+
+data = manifest_data_0
 
 
 
