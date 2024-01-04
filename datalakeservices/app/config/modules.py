@@ -42,6 +42,9 @@ from neo4j import GraphDatabase
 # Multiprcessing
 import ray
 
+# Spacy
+import spacy
+
 # PyYaml
 import yaml
 

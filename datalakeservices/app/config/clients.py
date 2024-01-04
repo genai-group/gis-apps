@@ -304,6 +304,18 @@ def connect_to_neo4j():
 neo4j_client = connect_to_neo4j()
 
 
+#####################
+####    Spacy    ####
+#####################
+
+def connect_to_spacy():
+    try:
+        nlp = spacy.load('en_core_web_lg')
+        print(f"Connected to Spacy: {nlp}")
+        return nlp
+    except Exception as e:
+        print(f"Errors loading Spacy Client: {e}")
+        return None
 
 ############################
 ####    Redis Client    ####
@@ -562,6 +574,9 @@ if '_guid' not in list(mongo_collection.index_information()):
 
 # Kafka
 kafka_client = create_kafka_admin_client()
+
+# Spacy
+nlp = connect_to_spacy()
 
 # Neo4j
 neo4j_client = connect_to_neo4j()

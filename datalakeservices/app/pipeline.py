@@ -50,7 +50,10 @@ if not isinstance(data, list):
 
 #%%
 # Load data into MongoDB Collection
-mongo_collection.insert_many(data)
+try:    
+    mongo_collection.insert_many(data)
+except:
+    pass
 
 # Load the objecty _guids into the Neo4j graph
 #%%
