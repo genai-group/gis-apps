@@ -93,7 +93,9 @@ fields:
 
 calculated_entities:
   - fields: ["city_of_departure", "departure_airport_name", "departure_gate", "departure_time"]
-    alias: "departure"
+    alias: "departure_event"
+  - fields: ["city_of_arrival", "arrival_airport_name", "arrival_gate", "arrival_time"]
+    alias: "arrival_event"
 
 edges:
   - parents: ["flight_manifest_id"]
