@@ -124,6 +124,7 @@ from gensim import corpora
 from gensim.models.ldamodel import LdaModel
 
 # Spacy
+import spacy
 nlp = spacy.load('en_core_web_lg')
 
 # functions
