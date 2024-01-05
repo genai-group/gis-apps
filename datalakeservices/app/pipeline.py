@@ -122,9 +122,9 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
 
     # Name
     if 'name' in template.keys():
-        name = template['name']
+        template_name = template['name']
     else:
-        name = ''
+        template_name = ''
 
     # Primary Key
     if 'primary_key' in template.keys():
@@ -154,9 +154,18 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
             clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
         data = clean_objects
 
-    # Create data schema fingerprint or verify if the fingerpritn already exists
+    # Verify the data schema fingerprint is consisent with template fingerprint
     if len(data) > 0:
         data_schema_fingerprint = generate_fingerprint(data)
+        # Check if fingerprint already exists in redis
+        template_fingerprint = redis_client.get(template_name)
+        if template_fingerprint is None:
+            redis_client.set(template_name, data_schema_fingerprint)
+            logging.info(f"Added fingerprint to redis: {template_name}")
+        else:
+            # Check if the fingerprint matches what was stored in redis
+            if str(data_schema_fingerprint) != str(template_fingerprint.decode()):
+                raise Exception(f"Data schema fingerprint does not match what is stored in redis for template: {template_name}")
 
     # Hashify the data
     data = hashify(data, _namespace=namespace, template=template)
