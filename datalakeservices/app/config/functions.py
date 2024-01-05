@@ -34,6 +34,102 @@ def filter_func(func, iterable):
         raise ValueError(f"Failed to filter iterable '{iterable}' using function '{func}'. Error: {e}")
         return []
 
+def chunk_text(text: str, character_split_threshold: int = 500) -> List[str]:
+    """
+    Chunk a string into 500 character chunks with overlap of 100 characters using langchain.
+
+    Args:
+    text (str): The text to be chunked.
+
+    Returns:
+    List[str]: A list of text chunks.
+    """
+
+    # assertions
+    assert isinstance(text, str), "text must be a string"
+
+    try:
+        # chunk the text into 500 character chunks with overlap of 100 characters using langchain
+        text_chunks = textwrap.wrap(obj[_text], width=character_split_threshold)
+        return text_chunks
+    except Exception as e:
+        print(f"Errors chunking text: {e}")
+        return []
+
+###############################
+####   File Fingerprint    ####
+###############################    
+
+def generate_fingerprint(json_data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
+    """
+    Generate a fingerprint for the JSON data by creating a sorted string of unique keys.
+    This function handles both dictionaries and arrays of dictionaries by considering the keys
+    of objects within the array.
+
+    Args:
+    json_data (Union[Dict[str, Any], List[Dict[str, Any]]]): The JSON data (or list of JSON data) 
+    for which the fingerprint is to be generated.
+
+    Returns:
+    str: A SHA256 hash representing the fingerprint of the JSON schema.
+
+    Raises:
+    TypeError: If the input is not a dictionary or a list of dictionaries.
+    """
+    assert isinstance(json_data, (dict, list)), "Input must be a dictionary or a list of dictionaries."
+
+    keys_set: Set[str] = set()
+
+    def recurse_extract_keys(data: Any, parent_key: str = '') -> None:
+        if isinstance(data, dict):
+            for key, value in data.items():
+                full_key = f"{parent_key}.{key}" if parent_key else key
+                keys_set.add(full_key)
+                recurse_extract_keys(value, full_key)
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict):
+                    recurse_extract_keys(item, parent_key)
+
+    try:
+        if isinstance(json_data, list):
+            # Process each dictionary in the list separately
+            for item in json_data:
+                assert isinstance(item, dict), "List must only contain dictionaries."
+                recurse_extract_keys(item)
+        else:
+            # Process a single dictionary
+            recurse_extract_keys(json_data)
+
+        sorted_keys = sorted(keys_set)
+        keys_string = ','.join(sorted_keys)
+        fingerprint = hashlib.sha256(keys_string.encode()).hexdigest()
+        return fingerprint
+    except Exception as e:
+        raise RuntimeError(f"Error in generating fingerprint: {e}")
+
+def verify_json_schema(original_json: Dict[str, Any], new_json: Dict[str, Any]) -> bool:
+    """
+    Compare the fingerprint of the original JSON and new JSON to verify if they have the same schema.
+
+    Args:
+    original_json (Dict[str, Any]): The original JSON data.
+    new_json (Dict[str, Any]): The new JSON data to compare against the original.
+
+    Returns:
+    bool: True if both JSON data have the same schema, False otherwise.
+
+    Raises:
+    RuntimeError: If there's an error during the fingerprint generation.
+    """
+    try:
+        original_fingerprint = generate_fingerprint(original_json)
+        new_fingerprint = generate_fingerprint(new_json)
+
+        return original_fingerprint == new_fingerprint
+    except Exception as e:
+        raise RuntimeError(f"Schema verification failed: {e}")
+
 ## Datetime functions
 
 """
@@ -369,6 +465,9 @@ def hashify(data, _namespace: str = '', template: dict = {}, hash_length: int = 
         # Log the error using the logging module
         logging.error(f"An error occurred in hashify: {e}", exc_info=True)
         raise ValueError(f"Input error: {e}")
+
+
+
 
 
 ########################################

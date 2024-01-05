@@ -23,6 +23,11 @@ def process_template(parse_config: Dict) -> Dict:
     assert isinstance(parse_config, dict), "parse_config must be a dictionary"
 
     try:
+        name = parse_config['template']['name']
+    except Exception as e:
+        name = ''
+
+    try:
         primary_key = parse_config['template']['primary_key']
     except Exception as e:
         primary_key = ''
@@ -81,6 +86,7 @@ def process_template(parse_config: Dict) -> Dict:
 
     # Output dict
     template_dict = {
+        'name': name,
         'primary_key': primary_key,
         'namespace': namespace,
         'drop_fields': drop_fields,
@@ -112,7 +118,13 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
 
     """
     assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
-    assert isinstance(parse_config, dict), "parse_config must be a dictionary"
+    assert isinstance(template, dict), "parse_config must be a dictionary"
+
+    # Name
+    if 'name' in template.keys():
+        name = template['name']
+    else:
+        name = ''
 
     # Primary Key
     if 'primary_key' in template.keys():
@@ -142,8 +154,33 @@ def process_data(data: Union[List[Dict], Dict], template: Dict) -> Union[List[Di
             clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
         data = clean_objects
 
+    # Create data schema fingerprint or verify if the fingerpritn already exists
+    if len(data) > 0:
+        data_schema_fingerprint = generate_fingerprint(data)
+
     # Hashify the data
     data = hashify(data, _namespace=namespace, template=template)
+
+    return data
+
+#########################
+####    Load Data    ####
+#########################
+
+def load_data(data: Union[List[Dict], Dict], template: Dict) -> None:
+    """
+    Load data into GIS Data Lake databases
+
+    Args:
+        data (Union[List[Dict], Dict]): data to load
+        template (Dict): template_output dictionary which contains the parsed configuration
+
+    Returns:
+        None
+
+    """
+    assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
+    assert isinstance(template, dict), "parse_config must be a dictionary"
 
     # Standardize fields
     standardized_fields = template['standardized_fields']
