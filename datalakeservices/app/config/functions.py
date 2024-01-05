@@ -813,32 +813,28 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def prepare_entities_for_load(objects, _namespace: str, parse_config: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
+def prepare_entities_for_load(objects, _namespace: str, template: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
     """
     Prepare objects for hashing and loading into the database.
 
     Args:
         objects (List[Dict]): List of objects to prepare.
+        template (Dict): The template for the object.
         _created_at (int): A property name representing _created_at unix timestamp.
 
     Returns:
         List[Dict]: List of prepared objects.
     """
     prepared_objects = []
-
-    # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
-    # if 'field_aliases' in parse_config.keys():
-    field_aliases = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
-    field_aliases = filter_func(lambda x: len(str(x['alias'])) > 0, field_aliases)
-    field_aliases = {x['field']: x['alias'] for x in field_aliases}
-
+ 
     try:
         for obj in objects:
-            hashed_object = hashify(obj[_namespace], _namespace=_namespace, parse_config=parse_config)
+            hashed_object = hashify(obj[_namespace], _namespace=_namespace, template=template)
             original_namespace = copy.deepcopy(_namespace)
-            if 'field_aliases' in parse_config.keys():
-                if _namespace in field_aliases.keys():
-                    _namespace = field_aliases[_namespace]
+            # Use the alias if the field_aliases property is present in the template
+            if 'alias_fields' in template.keys():
+                if _namespace in template['alias_fields'].keys():
+                    _namespace = template['alias_fields'][_namespace]
             prepared_obj = {
                 # '_namespace': _namespace,
                 '_label': obj[original_namespace],

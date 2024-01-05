@@ -429,7 +429,24 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_g
 ####    Pinecone Client    ####
 ###############################
     
+def pinecone_connect_to_server(host: str = 'localhost', port: str = '9091') -> None:
+    """
+    Connect to a Pinecone server.
 
+    Args:
+        host (str, optional): Hostname or IP address of the Pinecone server. Defaults to 'localhost'.
+        port (str, optional): Port number of the Pinecone server. Defaults to '9091'.
+
+    Returns:
+        Pinecone: Pinecone server instance.
+    """
+    assert isinstance(host, str), "Host must be a string"
+    assert isinstance(port, str), "Port must be a string"
+
+    try:
+        return pinecone.connect(host=host, port=port)
+    except Exception as e:
+        raise ConnectionError(f"Failed to connect to Pinecone server: {e}")
 
 
 ############################
