@@ -275,7 +275,7 @@ def load_data(data: Union[List[Dict], Dict], template: Dict) -> None:
 
 
     # Building additional edge relationships as outlined in the template
-    alias_fields = template['alias_fields']                    
+    alias_fields = template['alias_fields']
     standardized_fields = template['standardized_fields']
     edge_objects = template['edges']
 
@@ -331,8 +331,8 @@ def load_data(data: Union[List[Dict], Dict], template: Dict) -> None:
         neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
         load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys() if k not in ['_child','_parent']])
         load_statement = load_statement.replace('`_edge`:', '`_label`:')
-        load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement.replace("`_guid`: line.`_guid`, `_source`: line.`_source`,","")) + '}]-(obj2) RETURN *'
-        #  => THIS IS WORKING => load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+        load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_parent`}) MATCH (obj2:Object{_guid:line.`_child`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement.replace("`_guid`: line.`_guid`, `_source`: line.`_source`,","")) + '}]-(obj2) RETURN *'
+        #  => THIS IS WORKING => load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_parent`}) MATCH (obj2:Object{_guid:line.`_child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
         pp(f"load_statement: {load_statement}")
 
         with neo4j_client.session() as session:
@@ -586,7 +586,7 @@ for triple in edges_to_load:
 for _edge in set(map_func(lambda x: x['_edge'], final_triples_to_load)):
     neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
     load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys() if k not in ['_child','_parent']])
-    load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`parent`}) MATCH (obj2:Object{_guid:line.`child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+    load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_parent`}) MATCH (obj2:Object{_guid:line.`_child`}) MERGE (obj1)-[owns:' + str(neo4j_relationships[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
     pp(f"load_statement: {load_statement}")
 
     with neo4j_client.session() as session:
