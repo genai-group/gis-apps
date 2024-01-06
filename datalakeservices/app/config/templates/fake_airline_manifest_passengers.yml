@@ -46,7 +46,7 @@ fields:
     is_embedding: false
     is_datetime: false
     drop: false
-  - field: "flight_manigest_id"
+  - field: "flight_manifest_id"
     alias: ""
     is_entity: true
     is_embedding: false
@@ -68,3 +68,4 @@ edges:
     properties: [""]
     direction: "out"
     type: "one_to_one"
+
