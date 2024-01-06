@@ -372,7 +372,6 @@ for obj in passenger_info:
 data = new_data
 del new_data
 
-
 # Process template, data, and load data
 template = process_template(parse_config)
 data = process_data(data, template)

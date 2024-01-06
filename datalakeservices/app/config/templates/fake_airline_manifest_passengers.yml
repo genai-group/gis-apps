@@ -64,7 +64,7 @@ edges:
     direction: "out"
     type: "one_to_one"
   - parents: ["full_name"]
-    children: ["gender", "date_of_birth", "country_of_citizenship", "government_id_type", "passport_information"]
+    children: ["government_id_type", "passport_information"]
     properties: [""]
     direction: "out"
     type: "one_to_one"
