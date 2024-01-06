@@ -826,6 +826,7 @@ def prepare_entities_for_load(objects, _namespace: str, template: Dict, _created
         List[Dict]: List of prepared objects.
     """
     prepared_objects = []
+    original_namespace = copy.deepcopy(_namespace)
  
     try:
         for obj in objects:
@@ -833,10 +834,10 @@ def prepare_entities_for_load(objects, _namespace: str, template: Dict, _created
             original_namespace = copy.deepcopy(_namespace)
             # Use the alias if the field_aliases property is present in the template
             if 'alias_fields' in template.keys():
-                if _namespace in template['alias_fields'].keys():
-                    _namespace = template['alias_fields'][_namespace]
+                if original_namespace in template['alias_fields'].keys():
+                    updated_namespace = template['alias_fields'][original_namespace]
             prepared_obj = {
-                # '_namespace': _namespace,
+                # '_namespace': updated_namespace,
                 '_label': obj[original_namespace],
                 '_guid': hashed_object['_guid'],
                 # '_hash': hashed_object['_hash'],

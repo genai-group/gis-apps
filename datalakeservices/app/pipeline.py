@@ -359,6 +359,19 @@ load_data(data, template)
 parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_passengers.yml", "r").read())
 
 data = manifest_data_0
+passenger_info = data['passenger_info']
+
+# Adding flight manifest and flight number to each persons data
+new_data = []
+for obj in passenger_info:
+    obj['flight_manifest_id'] = data['flight_information']['flight_manifest_id']
+    obj['flight_number'] = data['flight_information']['flight_number']
+    obj['time_to_departure'] = data['flight_information']['time_to_departure']
+    new_data.append(obj)
+
+data = new_data
+del new_data
+
 
 # Process template, data, and load data
 template = process_template(parse_config)
