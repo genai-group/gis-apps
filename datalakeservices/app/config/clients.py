@@ -78,12 +78,12 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 # Global variable for connection pool
 connection_pool = None
 
-def initialize_connection_pool():
+def initialize_connection_pool(host: str = 'localhost'):
     global connection_pool
     try:
         # Get database connection details from environment variables
         # db_host = os.environ.get('POSTGRES_DB_HOST', 'localhost')
-        db_host = os.environ.get('POSTGRES_DB_HOST', 'postgres-container')
+        db_host = os.environ.get('POSTGRES_DB_HOST', host)
         db_port = os.environ.get('POSTGRES_DB_PORT', '5432')
         # db_name = os.environ.get('POSTGRES_DB_NAME')
         db_name = 'postgres'
@@ -180,7 +180,7 @@ def create_table():
 
 # %%
 
-def connect_to_mongodb(host: str = 'mongodb',   # def connect_to_mongodb(host: str = 'localhost', 
+def connect_to_mongodb(host: str = 'localhost',   # def connect_to_mongodb(host: str = 'localhost', 
                        port: int = 27017, 
                        username: Optional[str] = None, 
                        password: Optional[str] = None, 
@@ -240,7 +240,7 @@ def connect_to_mongodb(host: str = 'mongodb',   # def connect_to_mongodb(host: s
 #################################
 
 
-def create_kafka_admin_client(bootstrap_servers: str = "kafka:9092",   # def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
+def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",   # def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
                               client_id: Optional[str] = None) -> AdminClient:
     """
     Create a Kafka AdminClient with specified parameters.
@@ -316,9 +316,9 @@ def connect_to_spacy():
 ####    Redis Client    ####
 ############################
 
-def connect_to_redis():
+def connect_to_redis(host: str = 'localhost'):
     try:
-        client = redis.Redis(host='redis', port=6379)    # client = redis.Redis(host=os.environ.get('REDIS_HOST'), port=int(os.environ.get('REDIS_PORT')))     int(os.environ.get('REDIS_PORT'))
+        client = redis.Redis(host=host, port=6379)    # client = redis.Redis(host=os.environ.get('REDIS_HOST'), port=int(os.environ.get('REDIS_PORT')))     int(os.environ.get('REDIS_PORT'))
         print(f"Connected to Redis: {client}")
         return client
     except Exception as e:
@@ -334,7 +334,7 @@ def connect_to_redis():
 # cd ~/git/gis-apps
 # docker-compose -f docker-compose-milvus.yml up 
 
-def milvus_connect_to_server(host: str = 'standalone', port: str = '19530') -> None:      # def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
+def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:      # def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
     """
     Connect to a Milvus server.
 
@@ -558,29 +558,118 @@ def connect_to_bloomfilter():
 s3_connect()
 
 # PostgreSQL
-postgres_client = connect_to_postgres()
+postgres_connected = False
+try:
+    postgres_client = connect_to_postgres('localhost')
+    postgres_connected = True
+    print("PostgreSQL client connected locally.")
+except Exception as e:
+    pass
+
+if not postgres_connected:
+    try:
+        postgres_client = connect_to_postgres('postgres-container')
+        postgres_connected = True
+        print("PostgreSQL client connected to container.")
+    except Exception as e:
+        pass
 
 # MongoDB
-mongodb_client = connect_to_mongodb()
-mongo_collection = mongodb_client['gis_main']
+mongo_connected = False
+
+try:
+    mongodb_client = connect_to_mongodb('localhost')
+    mongo_connected = True
+    print("MongoDB client connected locally.")
+except Exception as e:
+    pass
+
+if not mongo_connected:
+    try:
+        mongodb_client = connect_to_mongodb('mongodb')
+        mongo_connected = True
+        print("MongoDB client connected to container.")
+    except Exception as e:
+        pass
+    mongo_collection = mongodb_client['gis_main']
 
 if '_guid' not in list(mongo_collection.index_information()):
     mongo_collection.create_index([("_guid", 1)], unique=True)
 
 # Kafka
-kafka_client = create_kafka_admin_client()
+kafka_connected = False
+try:
+    kafka_client = create_kafka_admin_client("localhost:9092")
+    kafka_connected = True
+    print("Kafka client connected locally.")
+except Exception as e:
+    pass
+
+if not kafka_connected:
+    try:
+        kafka_client = create_kafka_admin_client("kafka:9092")
+        kafka_connected = True
+        print("Kafka client connected to container.")
+    except Exception as e:
+        pass
 
 # Spacy
 nlp = connect_to_spacy()
 
 # Neo4j
-neo4j_client = connect_to_neo4j()
+neo4j_connected = False
+
+try:
+    neo4j_client = connect_to_neo4j('bolt://localhost:7687')
+    neo4j_connected = True
+    print("Neo4j client connected locally.")
+except Exception as e:
+    pass
+
+if not neo4j_connected:
+    try:
+        neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
+        neo4j_connected = True
+        print("Neo4j client connected to container.")
+    except Exception as e:
+        pass
 
 # Redis
-redis_client = connect_to_redis()
+redis_connected = False
+
+try:
+    redis_client = connect_to_redis('localhost')
+    redis_connected = True
+    print("Redis client connected locally.")
+except Exception as e:
+    pass
+
+if not redis_connected:
+    try:
+        redis_client = connect_to_redis('redis')
+        redis_connected = True
+        print("Redis client connected to container.")
+    except Exception as e:
+        pass
 
 # Load Milvus
-milvus_connect_to_server()
+milvus_connected = False
+
+try:
+    milvus_connect_to_server('localhost')
+    milvus_connected = True
+    print("Milvus client connected locally.")
+except Exception as e:
+    pass
+
+if not milvus_connected:
+    try:
+        milvus_connect_to_server('standalone')
+        milvus_connected = True
+        print("Milvus client connected to container.")
+    except Exception as e:
+        pass
+
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")
 milvus_collection.load()
