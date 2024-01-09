@@ -349,7 +349,7 @@ def milvus_connect_to_server(host: str = 'standalone', port: str = '19530') -> N
     assert isinstance(port, str), "Port must be a string"
 
     try:
-        return milvus_connections.connect("default", host="milvus", port="19530")    # return milvus_connections.connect("default", host="localhost", port="19530")
+        return milvus_connections.connect("default", host=host, port="19530")    # return milvus_connections.connect("default", host="localhost", port="19530")
     except Exception as e:
         raise ConnectionError(f"Failed to connect to Milvus server: {e}")
 
