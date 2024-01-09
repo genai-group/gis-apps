@@ -284,7 +284,8 @@ kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
 def connect_to_neo4j():
     try:
         client = GraphDatabase.driver(
-            os.environ.get("NEO4J_URI"),
+            "bolt://neo4j-container:7687",
+            # os.environ.get("NEO4J_URI"),
             auth=(os.environ.get("NEO4J_USER"), os.environ.get("NEO4J_PASSWORD")),
             max_connection_lifetime=3600*24*30,
             keep_alive=True
