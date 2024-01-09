@@ -20,6 +20,7 @@ template_dir = './config/templates'
 # airline_flight_manifest_0_hours
 try:
     print(f"NEW DIRECTORY: {template_dir}")
+    print(f"files: {os.listdir(template_dir)}")
 except:
     pass
 
