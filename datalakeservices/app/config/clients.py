@@ -334,7 +334,7 @@ def connect_to_redis():
 # cd ~/git/gis-apps
 # docker-compose -f docker-compose-milvus.yml up 
 
-def milvus_connect_to_server(host: str = 'milvus', port: str = '19530') -> None:      # def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
+def milvus_connect_to_server(host: str = 'standalone', port: str = '19530') -> None:      # def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
     """
     Connect to a Milvus server.
 
