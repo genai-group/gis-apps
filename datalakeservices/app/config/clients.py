@@ -176,14 +176,6 @@ def create_table():
 ####    MongoDB    ####
 #######################
 
-"""
-docker pull --platform linux/arm64 mongo
-docker run --name mongodb -d -p 27017:27017 --platform linux/arm64 mongo
-
-RUN WITH USERNAME AND PASSWORD
-docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=myuser -e MONGO_INITDB_ROOT_PASSWORD=mypassword --platform linux/arm64 mongo
-"""
-
 # %%
 
 def connect_to_mongodb(host: str = 'localhost', 
