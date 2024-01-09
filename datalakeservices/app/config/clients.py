@@ -567,22 +567,22 @@ if not postgres_connected:
 
 # Kafka
 
-kafka_connected = False
+# kafka_connected = False
 
-try:
-    kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
-    kafka_connected = True
-    print("Kafka client connected to container.")
-except Exception as e:
-    pass
+# try:
+#     kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
+#     kafka_connected = True
+#     print("Kafka client connected to container.")
+# except Exception as e:
+#     pass
 
-if not kafka_connected:
-    try:
-        kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
-        kafka_connected = True
-        print("Kafka client connected locally.")
-    except Exception as e:
-        pass
+# if not kafka_connected:
+#     try:
+#         kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
+#         kafka_connected = True
+#         print("Kafka client connected locally.")
+#     except Exception as e:
+#         pass
 
 # MongoDB
 mongo_connected = False
