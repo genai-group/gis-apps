@@ -128,13 +128,6 @@ def connect_to_postgres():
     except psycopg2.Error as e:
         print(f"Error connecting to PostgreSQL: {e}")
 
-# Initialize the connection pool
-initialize_connection_pool()
-
-# Example usage
-connect_to_postgres()
-
-
 def create_table():
     try:
         # Connect to the PostgreSQL database
@@ -272,10 +265,6 @@ def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",   # def
         return AdminClient(config)
     except Exception as e:
         raise Exception(f"Error in creating Kafka AdminClient: {e}")
-
-# Creating the kafa admin client
-# kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
-kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
 
 ############################
 ####    Neo4j Client    ####
@@ -571,6 +560,24 @@ if not postgres_connected:
         postgres_client = connect_to_postgres('postgres-container')
         postgres_connected = True
         print("PostgreSQL client connected to container.")
+    except Exception as e:
+        pass
+
+# Kafka
+    
+kafka_connected = False
+try:
+    kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
+    kafka_connected = True
+    print("Kafka client connected locally.")
+except Exception as e:
+    pass
+
+if not kafka_connected:
+    try:
+        kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
+        kafka_connected = True
+        print("Kafka client connected to container.")
     except Exception as e:
         pass
 
