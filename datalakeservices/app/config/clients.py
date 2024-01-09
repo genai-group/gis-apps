@@ -549,56 +549,61 @@ s3_connect()
 
 # PostgreSQL
 postgres_connected = False
+
 try:
-    postgres_client = connect_to_postgres('localhost')
+    postgres_client = connect_to_postgres('postgres-container')
     postgres_connected = True
-    print("PostgreSQL client connected locally.")
+    print("PostgreSQL client connected to container.")
 except Exception as e:
     pass
 
+
 if not postgres_connected:
     try:
-        postgres_client = connect_to_postgres('postgres-container')
+        postgres_client = connect_to_postgres('localhost')
         postgres_connected = True
-        print("PostgreSQL client connected to container.")
+        print("PostgreSQL client connected locally.")
     except Exception as e:
         pass
 
 # Kafka
-    
+
 kafka_connected = False
+
 try:
-    kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
+    kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
     kafka_connected = True
-    print("Kafka client connected locally.")
+    print("Kafka client connected to container.")
 except Exception as e:
     pass
 
 if not kafka_connected:
     try:
-        kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
+        kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
         kafka_connected = True
-        print("Kafka client connected to container.")
+        print("Kafka client connected locally.")
     except Exception as e:
         pass
+
 
 # MongoDB
 mongo_connected = False
 
 try:
-    mongodb_client = connect_to_mongodb('localhost')
+    mongodb_client = connect_to_mongodb('mongodb')
     mongo_connected = True
-    print("MongoDB client connected locally.")
+    print("MongoDB client connected to container.")
 except Exception as e:
     pass
 
 if not mongo_connected:
     try:
-        mongodb_client = connect_to_mongodb('mongodb')
+        mongodb_client = connect_to_mongodb('localhost')
         mongo_connected = True
-        print("MongoDB client connected to container.")
+        print("MongoDB client connected locally.")
     except Exception as e:
-        pass
+        pass    
+
 
 mongo_collection = mongodb_client['gis_main']
 
@@ -607,18 +612,19 @@ if '_guid' not in list(mongo_collection.index_information()):
 
 # Kafka
 kafka_connected = False
+
 try:
-    kafka_client = create_kafka_admin_client("localhost:9092")
+    kafka_client = create_kafka_admin_client("kafka:9092")
     kafka_connected = True
-    print("Kafka client connected locally.")
+    print("Kafka client connected to container.")
 except Exception as e:
     pass
 
 if not kafka_connected:
     try:
-        kafka_client = create_kafka_admin_client("kafka:9092")
+        kafka_client = create_kafka_admin_client("localhost:9092")
         kafka_connected = True
-        print("Kafka client connected to container.")
+        print("Kafka client connected locally.")
     except Exception as e:
         pass
 
@@ -629,35 +635,36 @@ nlp = connect_to_spacy()
 neo4j_connected = False
 
 try:
-    neo4j_client = connect_to_neo4j('bolt://localhost:7687')
+    neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
     neo4j_connected = True
-    print("Neo4j client connected locally.")
+    print("Neo4j client connected to container.")
 except Exception as e:
     pass
 
 if not neo4j_connected:
     try:
-        neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
+        neo4j_client = connect_to_neo4j('bolt://localhost:7687')
         neo4j_connected = True
-        print("Neo4j client connected to container.")
+        print("Neo4j client connected locally.")
     except Exception as e:
         pass
+
 
 # Redis
 redis_connected = False
 
 try:
-    redis_client = connect_to_redis('localhost')
+    redis_client = connect_to_redis('redis')
     redis_connected = True
-    print("Redis client connected locally.")
+    print("Redis client connected to container.")
 except Exception as e:
     pass
 
 if not redis_connected:
     try:
-        redis_client = connect_to_redis('redis')
+        redis_client = connect_to_redis('localhost')
         redis_connected = True
-        print("Redis client connected to container.")
+        print("Redis client connected locally.")
     except Exception as e:
         pass
 
@@ -665,19 +672,19 @@ if not redis_connected:
 milvus_connected = False
 
 try:
-    milvus_connect_to_server('localhost')
+    milvus_connect_to_server('standalone')
     milvus_connected = True
-    print("Milvus client connected locally.")
+    print("Milvus client connected to container.")
 except Exception as e:
     pass
 
 if not milvus_connected:
     try:
-        milvus_connect_to_server('standalone')
+        milvus_connect_to_server('localhost')
         milvus_connected = True
-        print("Milvus client connected to container.")
+        print("Milvus client connected locally.")
     except Exception as e:
-        pass
+        pass    
 
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")
