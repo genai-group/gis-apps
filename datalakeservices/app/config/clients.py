@@ -557,7 +557,6 @@ try:
 except Exception as e:
     pass
 
-
 if not postgres_connected:
     try:
         postgres_client = connect_to_postgres('localhost')
@@ -585,7 +584,6 @@ if not kafka_connected:
     except Exception as e:
         pass
 
-
 # MongoDB
 mongo_connected = False
 
@@ -604,29 +602,31 @@ if not mongo_connected:
     except Exception as e:
         pass    
 
+# If connected to MongoDB, create a collection
+if mongo_connected:
+    mongo_collection = mongodb_client['gis_main']
 
-mongo_collection = mongodb_client['gis_main']
-
-if '_guid' not in list(mongo_collection.index_information()):
-    mongo_collection.create_index([("_guid", 1)], unique=True)
+    # Creating an index on the _guid field
+    if '_guid' not in list(mongo_collection.index_information()):
+        mongo_collection.create_index([("_guid", 1)], unique=True)
 
 # Kafka
-kafka_connected = False
+# kafka_connected = False
 
-try:
-    kafka_client = create_kafka_admin_client("kafka:9092")
-    kafka_connected = True
-    print("Kafka client connected to container.")
-except Exception as e:
-    pass
+# try:
+#     kafka_client = create_kafka_admin_client("kafka:9092")
+#     kafka_connected = True
+#     print("Kafka client connected to container.")
+# except Exception as e:
+#     pass
 
-if not kafka_connected:
-    try:
-        kafka_client = create_kafka_admin_client("localhost:9092")
-        kafka_connected = True
-        print("Kafka client connected locally.")
-    except Exception as e:
-        pass
+# if not kafka_connected:
+#     try:
+#         kafka_client = create_kafka_admin_client("localhost:9092")
+#         kafka_connected = True
+#         print("Kafka client connected locally.")
+#     except Exception as e:
+#         pass
 
 # Spacy
 nlp = connect_to_spacy()
@@ -648,7 +648,6 @@ if not neo4j_connected:
         print("Neo4j client connected locally.")
     except Exception as e:
         pass
-
 
 # Redis
 redis_connected = False
