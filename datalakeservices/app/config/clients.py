@@ -318,7 +318,7 @@ def connect_to_spacy():
 
 def connect_to_redis():
     try:
-        client = redis.Redis(host=os.environ.get('REDIS_HOST'), port=int(os.environ.get('REDIS_PORT')))
+        client = redis.Redis(host='redis', port=int(os.environ.get('REDIS_PORT')))    # client = redis.Redis(host=os.environ.get('REDIS_HOST'), port=int(os.environ.get('REDIS_PORT')))
         print(f"Connected to Redis: {client}")
         return client
     except Exception as e:
