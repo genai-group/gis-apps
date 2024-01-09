@@ -424,31 +424,6 @@ def milvus_create_index(collection_name: str = 'gis_main', field_name: str = '_g
     except Exception as e:
         raise Exception(f"Error in creating index on {field_name} in collection {collection_name}: {e}")
 
-
-###############################
-####    Pinecone Client    ####
-###############################
-    
-def pinecone_connect_to_server(host: str = 'localhost', port: str = '9091') -> None:
-    """
-    Connect to a Pinecone server.
-
-    Args:
-        host (str, optional): Hostname or IP address of the Pinecone server. Defaults to 'localhost'.
-        port (str, optional): Port number of the Pinecone server. Defaults to '9091'.
-
-    Returns:
-        Pinecone: Pinecone server instance.
-    """
-    assert isinstance(host, str), "Host must be a string"
-    assert isinstance(port, str), "Port must be a string"
-
-    try:
-        return pinecone.connect(host=host, port=port)
-    except Exception as e:
-        raise ConnectionError(f"Failed to connect to Pinecone server: {e}")
-
-
 ############################
 ####    Bloom Filter    ####
 ############################
@@ -506,75 +481,75 @@ def connect_to_bloomfilter():
 ####    TypeDB    ####
 ######################
 
-def connect_to_typedb(host: str = 'localhost', 
-                      port: int = 27017, 
-                      username: Optional[str] = None, 
-                      password: Optional[str] = None, 
-                      db_name: str = 'gis_main') -> Database:
-    """
-    Establishes a connection to a MongoDB database.
+# def connect_to_typedb(host: str = 'localhost', 
+#                       port: int = 27017, 
+#                       username: Optional[str] = None, 
+#                       password: Optional[str] = None, 
+#                       db_name: str = 'gis_main') -> Database:
+#     """
+#     Establishes a connection to a MongoDB database.
 
-    Parameters:
-    host (str): The hostname or IP address of the TypeDB server. Defaults to 'localhost'.
-    port (int): The port number on which TypeDB is running. Defaults to 1729.
-    username (Optional[str]): The username for TypeDB authentication. Defaults to None.
-    password (Optional[str]): The password for TypeDB authentication. Defaults to None.
-    db_name (str): The name of the database to connect to. Defaults to 'gis_main'.
+#     Parameters:
+#     host (str): The hostname or IP address of the TypeDB server. Defaults to 'localhost'.
+#     port (int): The port number on which TypeDB is running. Defaults to 1729.
+#     username (Optional[str]): The username for TypeDB authentication. Defaults to None.
+#     password (Optional[str]): The password for TypeDB authentication. Defaults to None.
+#     db_name (str): The name of the database to connect to. Defaults to 'gis_main'.
 
-    Returns:
-    Database: A TypeDB database object.
+#     Returns:
+#     Database: A TypeDB database object.
 
-    Raises:
-    AssertionError: If the provided host, port, or db_name are not valid.
+#     Raises:
+#     AssertionError: If the provided host, port, or db_name are not valid.
 
-    Example:
-    >>> typedb_client = connect_to_mongodb('localhost', 1729, 'user', 'pass', 'mydb')
-    >>> print(typedb_client.name)
+#     Example:
+#     >>> typedb_client = connect_to_mongodb('localhost', 1729, 'user', 'pass', 'mydb')
+#     >>> print(typedb_client.name)
     
-    """
+#     """
 
-    # Input validation
-    assert isinstance(host, str) and host, "Host must be a non-empty string."
-    assert isinstance(port, int) and port > 0, "Port must be a positive integer."
-    assert isinstance(db_name, str) and db_name, "Database name must be a non-empty string."
+#     # Input validation
+#     assert isinstance(host, str) and host, "Host must be a non-empty string."
+#     assert isinstance(port, int) and port > 0, "Port must be a positive integer."
+#     assert isinstance(db_name, str) and db_name, "Database name must be a non-empty string."
 
-    try:
-        # Create a TypeDB client instance
-        client = TypeDB.core_driver(TYPEDB_URI)
-        print(f"Connected to TypeDB: {client}")
+#     try:
+#         # Create a TypeDB client instance
+#         client = TypeDB.core_driver(TYPEDB_URI)
+#         print(f"Connected to TypeDB: {client}")
 
-        return client
+#         return client
     
-    except Exception as e:
-        print(f"Error connecting to TypeDB: {e}")
-        return None
+#     except Exception as e:
+#         print(f"Error connecting to TypeDB: {e}")
+#         return None
 
 # Connect to TypeDB and create a database 'gis-main'
     
-def create_typedb_database(typedb_client: type, database_name: str = 'gis_main') -> None:
-    """
-    Create a new database in the TypeDB server.
+# def create_typedb_database(typedb_client: type, database_name: str = 'gis_main') -> None:
+#     """
+#     Create a new database in the TypeDB server.
 
-    Parameters:
-    database_name (str): Name of the database to be created.
+#     Parameters:
+#     database_name (str): Name of the database to be created.
 
-    Raises:
-    AssertionError: If inputs are not in expected format.
-    Exception: For issues encountered while creating the database.
-    """
-    assert isinstance(database_name, str), "Database name must be a string"
+#     Raises:
+#     AssertionError: If inputs are not in expected format.
+#     Exception: For issues encountered while creating the database.
+#     """
+#     assert isinstance(database_name, str), "Database name must be a string"
 
-    try:
-        # Create a TypeDB client instance
-        client = TypeDB.core_driver(TYPEDB_URI)
+#     try:
+#         # Create a TypeDB client instance
+#         client = TypeDB.core_driver(TYPEDB_URI)
 
-        # Create a database
-        client.databases.create(database_name)
-        print(f"TypeDB Database created: {database_name}")
+#         # Create a database
+#         client.databases.create(database_name)
+#         print(f"TypeDB Database created: {database_name}")
     
-    except Exception as e:
-        # print(f"Error creating TypeDB Database: {e}")
-        return None    
+#     except Exception as e:
+#         # print(f"Error creating TypeDB Database: {e}")
+#         return None    
 
 
 ################################
@@ -618,6 +593,5 @@ milvus_collection.load()
 bloom_filter = connect_to_bloomfilter()
 
 # TypeDB
-typedb_client = connect_to_typedb()
-
-create_typedb_database(typedb_client, 'gis_main')
+# typedb_client = connect_to_typedb()
+# create_typedb_database(typedb_client, 'gis_main')

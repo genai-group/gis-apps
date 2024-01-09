@@ -56,6 +56,114 @@ def chunk_text(text: str, character_split_threshold: int = 500) -> List[str]:
         print(f"Errors chunking text: {e}")
         return []
 
+###########################
+####    Data Ingest    ####
+###########################
+
+def open_file(filename: str) -> Union[dict, list, None]:
+    """
+    Opens a file and reads its contents. If the file is a JSON, CSV, or Excel file, 
+    it returns the contents. If the file is CSV or Excel, it converts the contents to JSON format.
+
+    Parameters:
+    filename (str): The path to the file.
+
+    Returns:
+    Union[dict, list, None]: The contents of the file, possibly converted to a JSON-like structure.
+    """
+    assert isinstance(filename, str), "Filename must be a string"
+
+    # Get the file extension
+    _, file_extension = os.path.splitext(filename)
+
+    try:
+        if file_extension == '.json':
+            with open(filename, 'r') as file:
+                return json.load(file)
+
+        elif file_extension in ['.csv', '.xlsx']:
+            # Read the file using pandas and convert to JSON
+            if file_extension == '.csv':
+                data = pd.read_csv(filename)
+            else:  # .xlsx
+                data = pd.read_excel(filename)
+
+            return data.to_dict(orient='records')
+
+        else:
+            print("Unsupported file format. Only JSON, CSV, and Excel files are supported.")
+            return None
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None    
+
+def is_json_nested(json_obj: Union[Dict[str, Any], List[Any]]) -> bool:
+    """
+    Determines if a JSON object is nested.
+
+    Parameters:
+    json_obj (Union[Dict[str, Any], List[Any]]): The JSON object, which can be a dictionary or a list.
+
+    Returns:
+    bool: True if the JSON object is nested, False otherwise.
+    """
+
+    def _is_nested(obj: Any) -> bool:
+        if isinstance(obj, dict):
+            return any(_is_nested(v) for v in obj.values())
+        elif isinstance(obj, list):
+            return any(_is_nested(item) for item in obj)
+        return False
+
+    return _is_nested(json_obj)
+
+def flatten_json(json_obj: Union[Dict[str, Any], List[Any]]) -> Dict[str, Any]:
+    """
+    Flattens a nested JSON object into a single-level object with dot-separated keys.
+
+    Parameters:
+    json_obj (Union[Dict[str, Any], List[Any]]): The JSON object to flatten.
+
+    Returns:
+    Dict[str, Any]: The flattened JSON object.
+    """
+    assert isinstance(json_obj, (dict, list)), "Input must be a dictionary or a list"
+
+    def _flatten(current_obj: Union[Dict[str, Any], List[Any]], parent_key: str = '', sep: str = '.') -> Dict[str, Any]:
+        items = []
+        if isinstance(current_obj, dict):
+            for k, v in current_obj.items():
+                new_key = f"{parent_key}{sep}{k}" if parent_key else k
+                items.extend(_flatten(v, new_key, sep=sep).items())
+        elif isinstance(current_obj, list):
+            for i, v in enumerate(current_obj):
+                new_key = f"{parent_key}{sep}{i}" if parent_key else str(i)
+                items.extend(_flatten(v, new_key, sep=sep).items())
+        else:
+            items.append((parent_key, current_obj))
+
+        return dict(items)
+
+    return _flatten(json_obj)
+
+"""
+
+data = 'config/data/fake_airline_manifest_0_hours.json'
+data = 'config/data/iso.json'
+data = 'config/data/worldcities.csv'
+
+data = fake_customs_report_hour_0
+
+temp_data = open_file(data)
+if is_json_nested(temp_data):
+    temp_data = flatten_json(temp_data)
+
+temp_data
+
+"""
+
+
 ###############################
 ####   File Fingerprint    ####
 ###############################    
@@ -403,7 +511,10 @@ def hashify(data, _namespace: str = '', template: dict = {}, hash_length: int = 
 
     # Preparing the field aliases - This is a dictionary of field names and their aliases so that the field names can be changed prior to being loaded into the graph
 
-    field_aliases = template['alias_fields']
+    if 'alias_fields' in template.keys():
+        field_aliases = template['alias_fields']
+    else:
+        field_aliases = {}
 
     try:
         if not isinstance(data, list):
@@ -2257,3 +2368,340 @@ redis_delete_all()
 # with neo4j_client.session() as session:
 #     results = list(session.run(query_str).data())
 #     return results
+
+
+################################
+####    Process Template    ####
+################################
+
+#%%
+
+def process_template(parse_config: Dict) -> Dict:
+    """
+    Process the different components of the parse_config file.
+
+    Args:
+        parse_config (Dict): parse_config dictionary
+
+    Returns:
+        Dict: updated parse_config dictionary
+
+    """
+    assert isinstance(parse_config, dict), "parse_config must be a dictionary"
+
+    try:
+        name = parse_config['template']['name']
+    except Exception as e:
+        name = ''
+
+    try:
+        primary_key = parse_config['template']['primary_key']
+    except Exception as e:
+        primary_key = ''
+
+    try:
+        namespace = parse_config['template']['namespace']
+    except Exception as e:
+        namespace = ''
+
+    try:
+        drop_fields = filter_func(lambda x: 'drop' in x.keys(), parse_config['fields'])
+        drop_fields = filter_func(lambda x: str(x['drop']).lower() == 'true', drop_fields)
+        drop_fields = map_func(lambda x: x['field'], drop_fields)
+    except Exception as e:
+        drop_fields = []
+
+    try:
+        alias_fields = filter_func(lambda x: 'alias' in x.keys(), parse_config['fields'])
+        alias_fields = filter_func(lambda x: len(str(x['alias'])) > 0, alias_fields)
+        alias_fields = {x['field']: x['alias'] for x in alias_fields}
+    except Exception as e:
+        alias_fields = {}
+
+    try:
+        standardized_fields = filter_func(lambda x: 'standardize' in x.keys(), parse_config['fields'])
+        standardized_fields = {x['field']: x['standardize'] for x in standardized_fields}
+    except Exception as e:
+        standardized_fields = {}
+
+    try:    
+        embedding_fields = filter_func(lambda x: 'is_embedding' in x.keys(), parse_config['fields'])    
+        embedding_fields = filter_func(lambda x: str(x['is_embedding']).lower() == 'true', embedding_fields)
+        embedding_fields = map_func(lambda x: x['field'], embedding_fields)
+    except Exception as e:
+        embedding_fields = []
+
+    try:    
+        datetime_fields = filter_func(lambda x: 'is_datetime' in x.keys(), parse_config['fields'])
+        datetime_fields = filter_func(lambda x: str(x['is_datetime']).lower() == 'true', datetime_fields)
+        datetime_fields = map_func(lambda x: x['field'], datetime_fields)
+    except Exception as e:
+        datetime_fields = []
+
+    try:    
+        entity_fields = filter_func(lambda x: 'is_entity' in x.keys(), parse_config['fields'])
+        entity_fields = filter_func(lambda x: str(x['is_entity']).lower() == 'true', entity_fields)
+        entity_fields = map_func(lambda x: x['field'], entity_fields)
+    except Exception as e:
+        entity_fields = []
+
+    try:
+        calculated_entity_fields = parse_config['calculated_entities']
+        calculated_entity_fields = map_func(lambda x: {x['alias']: x['fields']}, calculated_entity_fields)
+    except Exception as e:
+        calculated_entity_fields = []
+
+    try:
+        edges = parse_config['edges']
+    except Exception as e:
+        edges = []
+
+    # Output dict
+    template_dict = {
+        'name': name,
+        'primary_key': primary_key,
+        'namespace': namespace,
+        'drop_fields': drop_fields,
+        'alias_fields': alias_fields,
+        'standardized_fields': standardized_fields,
+        'embedding_fields': embedding_fields,
+        'datetime_fields': datetime_fields,
+        'entity_fields': entity_fields,
+        'calculated_entity_fields': calculated_entity_fields,
+        'edges': edges
+    }
+
+    return template_dict
+
+
+############################
+####    Process Data    ####
+############################
+
+def process_data(data: Union[List[Dict], Dict], parse_config, template: Dict) -> Union[List[Dict], Dict]:
+    """
+    Process the different components of the parse_config file.
+
+    Args:
+        data (Union[List[Dict], Dict]): data to process
+        template (Dict): template_output dictionary which contains the parsed configuration
+
+    Returns:
+        Union[List[Dict], Dict]: processed data
+
+    """
+    assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
+    assert isinstance(template, dict), "parse_config must be a dictionary"
+
+    # Name
+    if 'name' in template.keys():
+        template_name = template['name']
+    else:
+        template_name = ''
+
+    # Primary Key
+    if 'primary_key' in template.keys():
+        primary_key = template['primary_key']
+        if len(primary_key) > 0:
+            if isinstance(data, dict):
+                if primary_key in data.keys():
+                    data = data[primary_key]
+    else:
+        primary_key = ''
+
+    # Namespace
+    if 'namespace' in template.keys():
+        namespace = template['namespace']
+    else:
+        namespace = ''
+
+    # Ensure data is a list
+    if not isinstance(data, list):
+        data = [data]
+
+    # Drop fields
+    drop_fields = template['drop_fields']
+    if len(drop_fields) > 0:
+        clean_objects = []
+        for obj in data:
+            clean_objects.append({k:v for k,v in obj.items() if k not in drop_fields})
+        data = clean_objects
+
+    # Verify the data schema fingerprint is consisent with template fingerprint
+    # if len(data) > 0:
+    #     data_schema_fingerprint = generate_fingerprint(data)
+    #     # Check if fingerprint already exists in redis
+    #     template_fingerprint = redis_client.get(template_name)
+    #     if template_fingerprint is None:
+    #         redis_client.set(template_name, data_schema_fingerprint)
+    #         logging.info(f"Added fingerprint to redis: {template_name}")
+    #     else:
+    #         # Check if the fingerprint matches what was stored in redis
+    #         if str(data_schema_fingerprint) != str(template_fingerprint.decode()):
+    #             raise Exception(f"Data schema fingerprint does not match what is stored in redis for template: {template_name}")
+
+    # Hashify the data
+    data = hashify(data, _namespace=namespace, template=template)
+
+    return data
+
+#########################
+####    Load Data    ####
+#########################
+
+def load_data(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> None:
+    """
+    Load data into GIS Data Lake databases
+
+    Args:
+        data (Union[List[Dict], Dict]): data to load
+        template (Dict): template_output dictionary which contains the parsed configuration
+
+    Returns:
+        Status of job load (success or failure for each database)
+
+    """
+    assert isinstance(data, (list, dict)), "data must be a list of dictionaries or a dictionary"
+    assert isinstance(template, dict), "parse_config must be a dictionary"
+
+    # Ensure data is a list
+    if not isinstance(data, list): 
+        data = [data]
+
+    ###########
+    # MongoDB #
+    ###########
+    
+    try:
+        mongo_collection.insert_many(data)
+    except Exception as e:
+        pass
+
+    #########
+    # Neo4j #
+    #########
+
+    try:
+        neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid']}, data)
+        updated_neo4j_objects = []
+        for obj in neo4j_objects:
+            obj['_label'] = 'source'
+            updated_neo4j_objects.append(obj)
+
+        neo4j_objects = copy.deepcopy(updated_neo4j_objects)
+        del updated_neo4j_objects
+
+        if len(neo4j_objects) > 0:
+            load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge']])
+            load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
+
+        with neo4j_client.session() as session:
+            session.run(load_statement, objects=neo4j_objects)
+            logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
+            print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
+
+        # Neo4j - Entities
+        entities = template['entity_fields']
+        if len(entities) > 0:
+            for entity in entities:
+                # Loading an array of entities into Neo4j
+                neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid', entity]}, data)
+                neo4j_objects = standardize_objects(neo4j_objects, parse_config, template)
+                neo4j_objects = prepare_entities_for_load(neo4j_objects, entity, template, include_created_at=False)
+                pp(neo4j_objects)
+                if len(neo4j_objects) > 0:
+                    # buiding the load statements
+                    load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_objects[0].keys() if k not in ['_edge', '_source']])
+                    load_statement = f'UNWIND $objects AS line MERGE (obj:Object {{ {load_statement} }})'
+                    # Load objects given the schema
+                    with neo4j_client.session() as session:
+                        session.run(load_statement, objects=neo4j_objects)
+                        logging.info(f'Loaded Objects into Neo4j: {neo4j_objects}')
+                        print(f"Loaded Objects into Neo4j: {len(neo4j_objects)}")
+
+                    # Load Source Neo4j Relationships
+                    neo4j_edges = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid','_source','_edge', '_created_at']}, neo4j_objects)
+
+                    # replace _edge with "has_source" for _edge in all objects in neo4j_edges
+                    updated_neo4j_edges = []
+                    for obj in neo4j_edges:
+                        obj['_edge'] = 'has_source'
+                        updated_neo4j_edges.append(obj)
+
+                    neo4j_edges = copy.deepcopy(updated_neo4j_edges)
+                    del updated_neo4j_edges
+
+                    # Load Neo4j Relationships
+                    load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_edges[0].keys()])
+                    load_statement = load_statement.replace('`_edge`:', '`_label`:')
+                    load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_source`}) MATCH (obj2:Object{_guid:line.`_guid`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement.replace("`_guid`: line.`_guid`, `_source`: line.`_source`,","")) + '}]-(obj2) RETURN *'
+                    #  => THIS IS THE WORKING SOLUTION => load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_guid`}) MATCH (obj2:Object{_guid:line.`_source`}) MERGE (obj1)-[owns:' + str(neo4j_edges[0]['_edge']) + '{' + str(load_statement) + '}]-(obj2) RETURN *'
+
+                    with neo4j_client.session() as session:
+                        session.run(load_statement, objects=neo4j_edges)
+                        logging.info(f'Loaded Objects into Neo4j: {neo4j_edges}')
+
+        # Building additional edge relationships as outlined in the template
+        alias_fields = template['alias_fields']
+        standardized_fields = template['standardized_fields']
+        edge_objects = template['edges']
+
+        edges_to_load = []
+        for edge_object in edge_objects:
+            parents = edge_object['parents']
+            children = edge_object['children']
+            edge_type = edge_object['type']
+            edge_direction = edge_object['direction']
+            if 'properties' in edge_object.keys():
+                edge_properties = edge_object['properties']
+            else:
+                edge_properties = []
+
+            for parent in parents:
+                for child in children:
+                    if str(edge_direction).lower() == 'out':
+                        has_variable = 'has_' + str(child).lower().replace(' ', '_')
+                        edge_triple = {'_child': child, '_parent': parent, '_edge':has_variable}
+                        for property in edge_properties:
+                            edge_triple[property] = property #edge_object['properties'][property]
+                        edges_to_load.append(edge_triple)
+
+        # Load the edges_to_load into the Neo4j database
+        final_triples_to_load = []
+        for triple in edges_to_load:
+            for object in data:
+                temp_object = {}
+                if triple['_child'] in standardized_fields.keys():
+                    child = globals()[standardized_fields[triple['_child']]](object[triple['_child']])
+                else:
+                    child = object[triple['_child']]
+                child_guid = hashify(child, _namespace=triple['_child'], template=template)['_guid']
+                if triple['_parent'] in standardized_fields.keys():
+                    parent = globals()[standardized_fields[triple['_parent']]](object[triple['_parent']])
+                else:
+                    parent = object[triple['_parent']]
+                parent_guid = hashify(parent, _namespace=triple['_parent'], template=template)['_guid']
+                temp_object = {'_child': child_guid, '_parent': parent_guid, '_edge': triple['_edge']}
+                final_triples_to_load.append(temp_object)
+
+        # Load Neo4j Relationships by edge name
+        for _edge in set(map_func(lambda x: x['_edge'], final_triples_to_load)):
+            neo4j_relationships = filter_func(lambda x: x['_edge'] == _edge, final_triples_to_load)
+            load_statement = ', '.join([f'`{k}`: line.`{k}`' for k in neo4j_relationships[0].keys() if k not in ['_child','_parent']])
+            load_statement = load_statement.replace('`_edge`:', '`_label`:')
+            load_statement = 'UNWIND $objects AS line MATCH (obj1:Object{_guid:line.`_parent`}) MATCH (obj2:Object{_guid:line.`_child`}) MERGE (obj1)-[owns:OWNS{' + str(load_statement.replace("`_guid`: line.`_guid`, `_source`: line.`_source`,","")) + '}]-(obj2) RETURN *'
+
+            with neo4j_client.session() as session:
+                session.run(load_statement, objects=neo4j_relationships)
+                logging.info(f'Loaded Objects into Neo4j: {neo4j_relationships}')
+
+
+        # Calculate entities
+        calculated_entities = template['calculated_entity_fields']
+        if len(calculated_entities) > 0:
+            for calculated_entity in calculated_entities:
+                calculated_entity_title = list(calculated_entity.keys())[0]
+                calculated_entity_fields = calculated_entity[calculated_entity_title]
+    except Exception as e:
+        print(f"Errors loading Neo4j Database: {e}")
+
