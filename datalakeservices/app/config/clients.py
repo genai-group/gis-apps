@@ -270,10 +270,11 @@ def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",   # def
 ####    Neo4j Client    ####
 ############################
 
-def connect_to_neo4j():
+def connect_to_neo4j(host: str = 'bolt://localhost:7687'):
     try:
         client = GraphDatabase.driver(
-            "bolt://neo4j-container:7687",
+            host,
+            # "bolt://neo4j-container:7687",
             # os.environ.get("NEO4J_URI"),
             auth=(os.environ.get("NEO4J_USER"), os.environ.get("NEO4J_PASSWORD")),
             max_connection_lifetime=3600*24*30,
@@ -285,7 +286,7 @@ def connect_to_neo4j():
         print(f"Errors loading Neo4j Client: {e}")
         return None
     
-neo4j_client = connect_to_neo4j()
+# neo4j_client = connect_to_neo4j()
 
 
 #####################
@@ -598,7 +599,8 @@ if not mongo_connected:
         print("MongoDB client connected to container.")
     except Exception as e:
         pass
-    mongo_collection = mongodb_client['gis_main']
+
+mongo_collection = mongodb_client['gis_main']
 
 if '_guid' not in list(mongo_collection.index_information()):
     mongo_collection.create_index([("_guid", 1)], unique=True)
