@@ -82,7 +82,8 @@ def initialize_connection_pool():
     global connection_pool
     try:
         # Get database connection details from environment variables
-        db_host = os.environ.get('POSTGRES_DB_HOST', 'localhost')
+        # db_host = os.environ.get('POSTGRES_DB_HOST', 'localhost')
+        db_host = os.environ.get('POSTGRES_DB_HOST', 'postgres-container')
         db_port = os.environ.get('POSTGRES_DB_PORT', '5432')
         # db_name = os.environ.get('POSTGRES_DB_NAME')
         db_name = 'postgres'
@@ -138,7 +139,8 @@ def create_table():
     try:
         # Connect to the PostgreSQL database
         conn = psycopg2.connect(
-            host='localhost',
+            # host='localhost',
+            host='postgres-container',
             port='5432',
             dbname='your_database_name',
             user='your_username',
@@ -178,7 +180,7 @@ def create_table():
 
 # %%
 
-def connect_to_mongodb(host: str = 'localhost', 
+def connect_to_mongodb(host: str = 'mongodb',   # def connect_to_mongodb(host: str = 'localhost', 
                        port: int = 27017, 
                        username: Optional[str] = None, 
                        password: Optional[str] = None, 
@@ -215,7 +217,8 @@ def connect_to_mongodb(host: str = 'localhost',
     try:
         # Create a MongoDB client instance
         # client = MongoClient(host, port, username=username, password=password)
-        client = MongoClient('mongodb://localhost:27017/')
+        # client = MongoClient('mongodb://localhost:27017/')
+        client = MongoClient('mongodb://mongodb:27017/')
 
         # Access the specified database
         db = client[db_name]
@@ -237,7 +240,7 @@ def connect_to_mongodb(host: str = 'localhost',
 #################################
 
 
-def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
+def create_kafka_admin_client(bootstrap_servers: str = "kafka:9092",   # def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
                               client_id: Optional[str] = None) -> AdminClient:
     """
     Create a Kafka AdminClient with specified parameters.
@@ -271,8 +274,8 @@ def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
         raise Exception(f"Error in creating Kafka AdminClient: {e}")
 
 # Creating the kafa admin client
-kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
-
+# kafka_client = create_kafka_admin_client("localhost:9092", "my_client_id")
+kafka_client = create_kafka_admin_client("kafka:9092", "my_client_id")
 
 ############################
 ####    Neo4j Client    ####
@@ -330,7 +333,7 @@ def connect_to_redis():
 # cd ~/git/gis-apps
 # docker-compose -f docker-compose-milvus.yml up 
 
-def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
+def milvus_connect_to_server(host: str = 'milvus', port: str = '19530') -> None:      # def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> None:
     """
     Connect to a Milvus server.
 
@@ -345,7 +348,7 @@ def milvus_connect_to_server(host: str = 'localhost', port: str = '19530') -> No
     assert isinstance(port, str), "Port must be a string"
 
     try:
-        return milvus_connections.connect("default", host="localhost", port="19530")
+        return milvus_connections.connect("default", host="milvus", port="19530")    # return milvus_connections.connect("default", host="localhost", port="19530")
     except Exception as e:
         raise ConnectionError(f"Failed to connect to Milvus server: {e}")
 
