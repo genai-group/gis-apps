@@ -19,6 +19,11 @@ template_dir = './config/templates'
 
 # airline_flight_manifest_0_hours
 try:
+    print(f"NEW DIRECTORY: {template_dir}")
+except:
+    pass
+
+try:
     data_dir = './config/data'
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
     manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
