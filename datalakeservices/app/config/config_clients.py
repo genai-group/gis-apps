@@ -563,17 +563,16 @@ s3_connect()
 # PostgreSQL
 postgres_connected = False
 
-try:
-    postgres_client = connect_to_postgres('postgres-container')
-    postgres_connected = True
-    print("PostgreSQL client connected to container.")
-except Exception as e:
-    pass
+if GIS_ENVIRONMENT == 'local':
+    try:
+        postgres_client = connect_to_postgres('postgres-container')
+        print("PostgreSQL client connected to container.")
+    except Exception as e:
+        pass
 
-if not postgres_connected:
+if GIS_ENVIRONMENT == 'dev':
     try:
         postgres_client = connect_to_postgres('localhost')
-        postgres_connected = True
         print("PostgreSQL client connected locally.")
     except Exception as e:
         pass
@@ -598,30 +597,27 @@ if not postgres_connected:
 #         pass
 
 # MongoDB
-mongo_connected = False
 
-try:
-    mongodb_client = connect_to_mongodb('mongodb')
-    mongo_connected = True
-    print("MongoDB client connected to container.")
-except Exception as e:
-    pass
+if GIS_ENVIRONMENT == 'dev':
+    try:
+        mongodb_client = connect_to_mongodb('mongodb')
+        print("MongoDB client connected to container.")
+    except Exception as e:
+        pass
 
-if not mongo_connected:
+if GIS_ENVIRONMENT == 'local':
     try:
         mongodb_client = connect_to_mongodb('localhost')
-        mongo_connected = True
         print("MongoDB client connected locally.")
     except Exception as e:
         pass    
 
 # If connected to MongoDB, create a collection
-if mongo_connected:
-    mongo_collection = mongodb_client['gis_main']
+mongo_collection = mongodb_client['gis_main']
 
-    # Creating an index on the _guid field
-    if '_guid' not in list(mongo_collection.index_information()):
-        mongo_collection.create_index([("_guid", 1)], unique=True)
+# Creating an index on the _guid field
+if '_guid' not in list(mongo_collection.index_information()):
+    mongo_collection.create_index([("_guid", 1)], unique=True)
 
 # Kafka
 # kafka_connected = False
@@ -645,34 +641,30 @@ if mongo_connected:
 nlp = connect_to_spacy()
 
 # Neo4j
-neo4j_connected = False
+if GIS_ENVIRONMENT == 'dev':    
+    try:
+        neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
+        print("Neo4j client connected to container.")
+    except Exception as e:
+        pass
 
-try:
-    neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
-    neo4j_connected = True
-    print("Neo4j client connected to container.")
-except Exception as e:
-    pass
-
-if not neo4j_connected:
+if GIS_ENVIRONMENT == 'local':
     try:
         neo4j_client = connect_to_neo4j('bolt://localhost:7687')
-        neo4j_connected = True
         print("Neo4j client connected locally.")
     except Exception as e:
         pass
 
 # Redis
-redis_connected = False
+if GIS_ENVIRONMENT == 'dev':
+    try:
+        redis_client = connect_to_redis('redis')
+        redis_connected = True
+        print("Redis client connected to container.")
+    except Exception as e:
+        pass
 
-try:
-    redis_client = connect_to_redis('redis')
-    redis_connected = True
-    print("Redis client connected to container.")
-except Exception as e:
-    pass
-
-if not redis_connected:
+if GIS_ENVIRONMENT == 'local':
     try:
         redis_client = connect_to_redis('localhost')
         redis_connected = True
@@ -681,19 +673,16 @@ if not redis_connected:
         pass
 
 # Load Milvus
-milvus_connected = False
+if GIS_ENVIRONMENT == 'dev':
+    try:
+        milvus_connect_to_server('standalone')
+        print("Milvus client connected to container.")
+    except Exception as e:
+        pass
 
-try:
-    milvus_connect_to_server('standalone')
-    milvus_connected = True
-    print("Milvus client connected to container.")
-except Exception as e:
-    pass
-
-if not milvus_connected:
+if GIS_ENVIRONMENT == 'local':
     try:
         milvus_connect_to_server('localhost')
-        milvus_connected = True
         print("Milvus client connected locally.")
     except Exception as e:
         pass    
@@ -703,16 +692,14 @@ milvus_create_index("gis_main", "vector")
 milvus_collection.load()
 
 # Load Vault
-vault_connected = False
+if GIS_ENVIRONMENT == 'dev':
+    try:
+        vault_client = connect_to_vault('http://vault:8200')
+        print("Vault client connected to container.")
+    except Exception as e:
+        pass
 
-try:
-    vault_client = connect_to_vault('http://vault:8200')
-    vault_connected = True
-    print("Vault client connected to container.")
-except Exception as e:
-    pass
-
-if not vault_connected:
+if GIS_ENVIRONMENT == 'local':
     try:
         vault_client = connect_to_vault('http://127.0.0.1:8200')
         vault_connected = True
