@@ -174,7 +174,7 @@ def create_table():
 # %%
 
 def connect_to_mongodb(host: str = 'localhost',   # def connect_to_mongodb(host: str = 'localhost', 
-                       port: int = 27017, 
+                       port: int = 27017,
                        username: Optional[str] = None, 
                        password: Optional[str] = None, 
                        db_name: str = 'mydatabase') -> Database:
@@ -602,7 +602,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        mongodb_client = connect_to_mongodb('mongodb')
+        mongodb_client = connect_to_mongodb('mongodb-container')
         print("MongoDB client connected to container.")
     except Exception as e:
         pass
@@ -660,7 +660,7 @@ if GIS_ENVIRONMENT == 'local':
 # Redis
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        redis_client = connect_to_redis('redis')
+        redis_client = connect_to_redis('redis-container')
         redis_connected = True
         print("Redis client connected to container.")
     except Exception as e:
@@ -677,7 +677,7 @@ if GIS_ENVIRONMENT == 'local':
 # Load Milvus
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        milvus_connect_to_server('standalone')
+        milvus_connect_to_server('milvus-container')
         print("Milvus client connected to container.")
     except Exception as e:
         pass
@@ -696,7 +696,7 @@ milvus_collection.load()
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        vault_client = connect_to_vault('http://vault:8200')
+        vault_client = connect_to_vault('http://vault-container:8200')
         print("Vault client connected to container.")
     except Exception as e:
         pass
