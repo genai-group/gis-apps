@@ -4,9 +4,11 @@
 from config.config_init import *
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
+CORS(app)
 
 # Swagger UI configuration
 SWAGGER_URL = '/swagger'  # URL for exposing Swagger UI

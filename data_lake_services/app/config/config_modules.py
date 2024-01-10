@@ -82,6 +82,8 @@ from confluent_kafka.admin import AdminClient, NewTopic
 
 # Swagger
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_cors import CORS
+
 
 
 # Vault
