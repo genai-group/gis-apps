@@ -51,5 +51,17 @@ def create_item():
         "data": data
     }), 201
 
+@app.route('/search', methods=['GET'])
+def perform_search():
+    # Assuming JSON input with 'query'
+    query_str = request.json['query']
+    # Here you would typically perform a search query against a database
+    results = search(query_str)
+    # For the sake of example, we'll just return the query
+    return jsonify({
+        "status": "success",
+        "data": results
+    }), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

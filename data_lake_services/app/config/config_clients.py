@@ -600,27 +600,27 @@ if GIS_ENVIRONMENT == 'local':
 
 # MongoDB
 
-# if GIS_ENVIRONMENT == 'flask-local':
-#     try:
-#         mongodb_client = connect_to_mongodb('mongodb-container')
-#         print("MongoDB client connected to container.")
-#     except Exception as e:
-#         print(f"Error connecting to MongoDB with Flask API: {e}")
-#         pass
+if GIS_ENVIRONMENT == 'flask-local':
+    try:
+        mongodb_client = connect_to_mongodb('mongodb-container')
+        print("MongoDB client connected to container.")
+    except Exception as e:
+        print(f"Error connecting to MongoDB with Flask API: {e}")
+        pass
 
-# if GIS_ENVIRONMENT == 'local':
-#     try:
-#         mongodb_client = connect_to_mongodb('localhost')
-#         print("MongoDB client connected locally.")
-#     except Exception as e:
-#         pass    
+if GIS_ENVIRONMENT == 'local':
+    try:
+        mongodb_client = connect_to_mongodb('localhost')
+        print("MongoDB client connected locally.")
+    except Exception as e:
+        pass    
 
-# # If connected to MongoDB, create a collection
-# mongo_collection = mongodb_client['gis_main']
+# If connected to MongoDB, create a collection
+mongo_collection = mongodb_client['gis_main']
 
-# # Creating an index on the _guid field
-# if '_guid' not in list(mongo_collection.index_information()):
-#     mongo_collection.create_index([("_guid", 1)], unique=True)
+# Creating an index on the _guid field
+if '_guid' not in list(mongo_collection.index_information()):
+    mongo_collection.create_index([("_guid", 1)], unique=True)
 
 # Kafka
 # kafka_connected = False

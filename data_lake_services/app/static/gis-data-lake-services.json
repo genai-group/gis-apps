@@ -60,6 +60,34 @@
             }
           }
         }
+      },
+      "/search": {
+        "post": {
+          "summary": "Perform a search query",
+          "tags": ["Search"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Search results",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SearchResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "components": {
@@ -75,8 +103,35 @@
               "type": "string"
             }
           }
+        },
+        "SearchRequest": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query string"
+            }
+          },
+          "required": ["query"]
+        },
+        "SearchResponse": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status of the search operation"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "description": "Search results"
+            }
+          },
+          "required": ["status", "data"]
         }
       }
     }
   }
-  

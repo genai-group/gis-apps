@@ -1000,12 +1000,18 @@ def search(query_str: str, expand: bool = False, foaf: bool = False) -> List[Dic
     try:
         # Search for a GUID
         if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)):
-            result = list(mongo_collection.find({'_guid':query_str}))
+            results = list(mongo_collection.find({'_guid':query_str}))
             if str(expand).lower() == 'true':
                 # Perform Neo4j expansion
                 pass
+        
+        # Search Neo4j for a label
+        elif 'match' in query_str.lower() and 'return' in query_str.lower():
+            with neo4j_client.session() as session:
+                results = list(session.run(query_str).data())
+                return results
 
-            return result
+        return results
 
     except Exception as e:
         print(f"Errors in GIS Data Lake Search: {e}")
@@ -2368,7 +2374,6 @@ redis_delete_all()
 # with neo4j_client.session() as session:
 #     results = list(session.run(query_str).data())
 #     return results
-
 
 ################################
 ####    Process Template    ####
