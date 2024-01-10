@@ -51,7 +51,7 @@ def create_item():
         "data": data
     }), 201
 
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['GET','POST'])
 def perform_search():
     # Assuming JSON input with 'query'
     query_str = request.args.get('query')
