@@ -38,5 +38,16 @@ def get_items():
     ]
     return jsonify(items)
 
+@app.route('/item', methods=['POST'])
+def create_item():
+    # Assuming JSON input with 'name' and 'description'
+    data = request.json
+    # Here you would typically process the data and save it to a database
+    # For the sake of example, we'll just return it
+    return jsonify({
+        "status": "success",
+        "data": data
+    }), 201
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
