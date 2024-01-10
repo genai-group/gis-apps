@@ -11,8 +11,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Swagger UI configuration
-SWAGGER_URL = '/swagger'  # URL for exposing Swagger UI
-API_URL = '/static/swagger.json'  # URL for the Swagger JSON
+SWAGGER_URL = '/gis-data-lake-services'  # URL for exposing Swagger UI
+API_URL = '/static/gis-data-lake-services.json'  # URL for the Swagger JSON
 
 # Create a Swagger UI blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(

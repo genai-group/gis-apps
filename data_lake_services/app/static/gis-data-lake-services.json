@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
     "info": {
-      "title": "Sample API",
-      "description": "API description in Markdown.",
+      "title": "GIS Data Lake Services API",
+      "description": "The GIS Data Lake Services API grants access to the GIS data lake which stores, processes and analyzes counterterrorism data from partner countries.",
       "version": "1.0.0"
     },
     "servers": [
