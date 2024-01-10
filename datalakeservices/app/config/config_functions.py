@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 #%%
-from config.variables import *
-from config.modules import *
-from config.clients import *
+from config.config_variables import *
+from config.config_modules import *
+from config.config_clients import *
 
 ###############################
 ####    Basic Functions    ####

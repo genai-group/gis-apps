@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 #%%
-from config.variables import *
-from config.modules import *
+from config.config_variables import *
+from config.config_modules import *
 
 ######################################
 ####    Ray - multi-processing    ####
