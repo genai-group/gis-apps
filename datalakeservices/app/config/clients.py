@@ -538,6 +538,19 @@ def connect_to_bloomfilter():
 #         return None    
 
 
+############################
+####    Vault Server    ####
+############################
+    
+def connect_to_vault(url: str = 'http://127.0.0.1:8200') -> hvac.Client:
+    try:
+        vault_client = hvac.Client(url=os.environ.get("VAULT_ADDR"), token=os.environ.get("VAULT_TOKEN"))
+        print(f"Connected to Vault: {vault_client}")
+        return client
+    except Exception as e:
+        print(f"Errors loading Vault Client: {e}")
+        return None
+
 ################################
 ####    Creating Clients    ####
 ################################
@@ -688,6 +701,24 @@ if not milvus_connected:
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")
 milvus_collection.load()
+
+# Load Vault
+vault_connected = False
+
+try:
+    vault_client = connect_to_vault('http://vault:8200')
+    vault_connected = True
+    print("Vault client connected to container.")
+except Exception as e:
+    pass
+
+if not vault_connected:
+    try:
+        vault_client = connect_to_vault('http://127.0.0.1:8200')
+        vault_connected = True
+        print("Vault client connected locally.")
+    except Exception as e:
+        pass
 
 # Bloom Filter
 bloom_filter = connect_to_bloomfilter()

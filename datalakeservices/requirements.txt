@@ -10,6 +10,7 @@ Flask-RESTful==0.3.10
 Flask-SQLAlchemy==3.1.1
 geographiclib==2.0
 geopy==2.4.1
+hvac==2.1.0
 lxml==4.9.3
 minio==7.2.0
 motor==3.3.2

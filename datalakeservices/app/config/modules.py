@@ -80,6 +80,9 @@ from psycopg2 import pool, sql
 from confluent_kafka import Producer, Consumer, KafkaException
 from confluent_kafka.admin import AdminClient, NewTopic
 
+# Vault
+import hvac
+
 # AWS
 import boto3
 from botocore.exceptions import ClientError
