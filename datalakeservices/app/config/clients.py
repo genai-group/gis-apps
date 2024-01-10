@@ -546,7 +546,7 @@ def connect_to_vault(url: str = 'http://127.0.0.1:8200') -> hvac.Client:
     try:
         vault_client = hvac.Client(url=os.environ.get("VAULT_ADDR"), token=os.environ.get("VAULT_TOKEN"))
         print(f"Connected to Vault: {vault_client}")
-        return client
+        return vault_client
     except Exception as e:
         print(f"Errors loading Vault Client: {e}")
         return None

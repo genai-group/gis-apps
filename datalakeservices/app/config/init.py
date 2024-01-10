@@ -15,7 +15,7 @@ from config.functions import *
 
 # Loading the YAML files from the config/templates directory
 # template_dir = './config/templates'
-template_dir = 'config/templates'
+template_dir = './config/templates'
 # data_ingest = yaml.safe_load(open(f"{template_dir}/data_ingest.yml", "r").read())
 
 # airline_flight_manifest_0_hours
@@ -27,7 +27,7 @@ except:
     pass
 
 try:
-    data_dir = './config/data'
+    data_dir = 'config/data'
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
     manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
     manifest_data_72 = json.loads(open(f"{data_dir}/fake_airline_manifest_72_hours.json", "r").read()) 
