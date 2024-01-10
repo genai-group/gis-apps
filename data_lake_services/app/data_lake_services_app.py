@@ -26,7 +26,17 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.route('/')
 def home():
-    return "<h1>Welcome to the Flask API!</h1>"
+    return "<h1>Welcome to GIS Data Lake Services!</h1>"
+
+@app.route('/items', methods=['GET'])
+def get_items():
+    # Example data - you can modify this with real data or database queries
+    items = [
+        {"id": 1, "name": "Item 1"},
+        {"id": 2, "name": "Item 2"},
+        {"id": 3, "name": "Item 3"}
+    ]
+    return jsonify(items)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
