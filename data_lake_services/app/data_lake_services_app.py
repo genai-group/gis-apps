@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #%%
-from config.init import *
+from config.config_init import *
 
 from flask import Flask, jsonify, request
 from flask_swagger_ui import get_swaggerui_blueprint
