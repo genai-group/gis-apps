@@ -8,6 +8,11 @@ from flask import Flask, jsonify, request
 #%%
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    # This route will display a simple message or HTML page
+    return "<h1>Welcome to the Flask API!</h1>"
+
 @app.route('/api/item', methods=['POST'])
 def create_item():
     data = request.json
@@ -25,7 +30,8 @@ def get_item(item_id):
     return jsonify(item), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Bind to 0.0.0.0 to make the application externally visible
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 
 # from flask import Flask, jsonify, request
