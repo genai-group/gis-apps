@@ -558,20 +558,22 @@ def connect_to_vault(url: str = 'http://127.0.0.1:8200') -> hvac.Client:
 #%%
 
 # S3
-s3_connect()
+s3_client = s3_connect()
 
 # PostgreSQL
-postgres_connected = False
 
-if GIS_ENVIRONMENT == 'local':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
+        # Initialize the connection pool
+        initialize_connection_pool('postgres-container')
         postgres_client = connect_to_postgres('postgres-container')
         print("PostgreSQL client connected to container.")
     except Exception as e:
         pass
 
-if GIS_ENVIRONMENT == 'flask-local':
+if GIS_ENVIRONMENT == 'local':
     try:
+        initialize_connection_pool('localhost')
         postgres_client = connect_to_postgres('localhost')
         print("PostgreSQL client connected locally.")
     except Exception as e:
