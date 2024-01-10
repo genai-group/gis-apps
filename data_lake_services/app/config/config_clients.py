@@ -211,7 +211,7 @@ def connect_to_mongodb(host: str = 'localhost',   # def connect_to_mongodb(host:
         # Create a MongoDB client instance
         # client = MongoClient(host, port, username=username, password=password)
         # client = MongoClient('mongodb://localhost:27017/')
-        client = MongoClient(f'mongo://{host}:27017/')
+        client = MongoClient(f'mongodb://{host}:27017/')
 
         # Access the specified database
         db = client[db_name]
