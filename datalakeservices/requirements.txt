@@ -8,6 +8,7 @@ Flask-Cors==3.0.10
 Flask-HTTPAuth==4.8.0
 Flask-RESTful==0.3.10
 Flask-SQLAlchemy==3.1.1
+flask-swagger-ui==4.11.1
 geographiclib==2.0
 geopy==2.4.1
 hvac==2.1.0

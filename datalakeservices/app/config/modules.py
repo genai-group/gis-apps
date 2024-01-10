@@ -80,6 +80,10 @@ from psycopg2 import pool, sql
 from confluent_kafka import Producer, Consumer, KafkaException
 from confluent_kafka.admin import AdminClient, NewTopic
 
+# Swagger
+from flask_swagger_ui import get_swaggerui_blueprint
+
+
 # Vault
 import hvac
 
