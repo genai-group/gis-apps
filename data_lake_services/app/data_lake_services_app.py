@@ -54,7 +54,7 @@ def create_item():
 @app.route('/search', methods=['GET'])
 def perform_search():
     # Assuming JSON input with 'query'
-    query_str = request.json['query']
+    query_str = request.args.get('query')
     # Here you would typically perform a search query against a database
     results = search(query_str)
     # For the sake of example, we'll just return the query
