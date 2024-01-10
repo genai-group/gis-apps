@@ -173,45 +173,81 @@ def create_table():
 
 # %%
 
-def connect_to_mongodb(host: str = 'localhost',   # def connect_to_mongodb(host: str = 'localhost', 
-                       port: int = 27017,
-                       username: Optional[str] = None, 
-                       password: Optional[str] = None, 
-                       db_name: str = 'mydatabase') -> Database:
+# def connect_to_mongodb(host: str = 'localhost',   # def connect_to_mongodb(host: str = 'localhost', 
+#                        port: int = 27017,
+#                        username: Optional[str] = None, 
+#                        password: Optional[str] = None, 
+#                        db_name: str = 'mydatabase') -> Database:
+#     """
+#     Establishes a connection to a MongoDB database.
+
+#     Parameters:
+#     host (str): The hostname or IP address of the MongoDB server. Defaults to 'localhost'.
+#     port (int): The port number on which MongoDB is running. Defaults to 27017.
+#     username (Optional[str]): The username for MongoDB authentication. Defaults to None.
+#     password (Optional[str]): The password for MongoDB authentication. Defaults to None.
+#     db_name (str): The name of the database to connect to. Defaults to 'mydatabase'.
+
+#     Returns:
+#     Database: A MongoDB database object.
+
+#     Raises:
+#     AssertionError: If the provided host, port, or db_name are not valid.
+#     ConnectionFailure: If the connection to the MongoDB server fails.
+#     PyMongoError: For other PyMongo related errors.
+
+#     Example:
+#     >>> mongodb_client = connect_to_mongodb('localhost', 27017, 'user', 'pass', 'mydb')
+#     >>> print(mongodb_client.name)
+#     mydb
+#     """
+
+#     # Input validation
+#     assert isinstance(host, str) and host, "Host must be a non-empty string."
+#     assert isinstance(port, int) and port > 0, "Port must be a positive integer."
+#     assert isinstance(db_name, str) and db_name, "Database name must be a non-empty string."
+
+#     try:
+#         # Create a MongoDB client instance
+#         # client = MongoClient(host, port, username=username, password=password)
+#         # client = MongoClient('mongodb://localhost:27017/')
+#         client = MongoClient(f'mongodb://{host}:27017/')
+
+#         # Access the specified database
+#         db = client[db_name]
+
+#         # Attempt a simple operation to verify the connection
+#         db.command('ping')
+
+#         print(f"Connected to MongoDB: {db_name}")
+
+#         return db
+#     except ConnectionFailure as e:
+#         raise ConnectionFailure(f"Failed to connect to MongoDB: {e}")
+#     except PyMongoError as e:
+#         raise PyMongoError(f"An error occurred with PyMongo: {e}")
+
+def connect_to_mongodb(host: str = 'localhost', port: int = 27017, 
+                       username: Optional[str] = None, password: Optional[str] = None, 
+                       db_name: str = 'mydatabase') -> MongoClient:
     """
     Establishes a connection to a MongoDB database.
-
-    Parameters:
-    host (str): The hostname or IP address of the MongoDB server. Defaults to 'localhost'.
-    port (int): The port number on which MongoDB is running. Defaults to 27017.
-    username (Optional[str]): The username for MongoDB authentication. Defaults to None.
-    password (Optional[str]): The password for MongoDB authentication. Defaults to None.
-    db_name (str): The name of the database to connect to. Defaults to 'mydatabase'.
-
-    Returns:
-    Database: A MongoDB database object.
-
-    Raises:
-    AssertionError: If the provided host, port, or db_name are not valid.
-    ConnectionFailure: If the connection to the MongoDB server fails.
-    PyMongoError: For other PyMongo related errors.
-
-    Example:
-    >>> mongodb_client = connect_to_mongodb('localhost', 27017, 'user', 'pass', 'mydb')
-    >>> print(mongodb_client.name)
-    mydb
+    ... [rest of the docstring] ...
     """
 
-    # Input validation
-    assert isinstance(host, str) and host, "Host must be a non-empty string."
-    assert isinstance(port, int) and port > 0, "Port must be a positive integer."
-    assert isinstance(db_name, str) and db_name, "Database name must be a non-empty string."
+    if not host or not isinstance(host, str):
+        raise ValueError("Host must be a non-empty string.")
+    if not isinstance(port, int) or port <= 0:
+        raise ValueError("Port must be a positive integer.")
+    if not db_name or not isinstance(db_name, str):
+        raise ValueError("Database name must be a non-empty string.")
 
     try:
-        # Create a MongoDB client instance
-        # client = MongoClient(host, port, username=username, password=password)
-        # client = MongoClient('mongodb://localhost:27017/')
-        client = MongoClient(f'mongodb://{host}:27017/')
+        # Form the connection string
+        if username and password:
+            client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/{db_name}')
+        else:
+            client = MongoClient(f'mongodb://{host}:{port}/{db_name}')
 
         # Access the specified database
         db = client[db_name]
@@ -602,7 +638,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        mongodb_client = connect_to_mongodb('mongodb')
+        mongodb_client = connect_to_mongodb('mongodb-container')
         print("MongoDB client connected to container.")
     except Exception as e:
         print(f"Error connecting to MongoDB with Flask API: {e}")
