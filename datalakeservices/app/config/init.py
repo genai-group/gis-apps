@@ -26,7 +26,7 @@ except:
     pass
 
 try:
-    data_dir = 'config/data'
+    data_dir = 'app/config/data'
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
     manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
     manifest_data_72 = json.loads(open(f"{data_dir}/fake_airline_manifest_72_hours.json", "r").read()) 
