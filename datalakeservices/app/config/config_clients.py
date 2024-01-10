@@ -570,7 +570,7 @@ if GIS_ENVIRONMENT == 'local':
     except Exception as e:
         pass
 
-if GIS_ENVIRONMENT == 'dev':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
         postgres_client = connect_to_postgres('localhost')
         print("PostgreSQL client connected locally.")
@@ -598,7 +598,7 @@ if GIS_ENVIRONMENT == 'dev':
 
 # MongoDB
 
-if GIS_ENVIRONMENT == 'dev':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
         mongodb_client = connect_to_mongodb('mongodb')
         print("MongoDB client connected to container.")
@@ -641,7 +641,7 @@ if '_guid' not in list(mongo_collection.index_information()):
 nlp = connect_to_spacy()
 
 # Neo4j
-if GIS_ENVIRONMENT == 'dev':    
+if GIS_ENVIRONMENT == 'flask-local':    
     try:
         neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
         print("Neo4j client connected to container.")
@@ -656,7 +656,7 @@ if GIS_ENVIRONMENT == 'local':
         pass
 
 # Redis
-if GIS_ENVIRONMENT == 'dev':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
         redis_client = connect_to_redis('redis')
         redis_connected = True
@@ -673,7 +673,7 @@ if GIS_ENVIRONMENT == 'local':
         pass
 
 # Load Milvus
-if GIS_ENVIRONMENT == 'dev':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
         milvus_connect_to_server('standalone')
         print("Milvus client connected to container.")
@@ -692,7 +692,7 @@ milvus_create_index("gis_main", "vector")
 milvus_collection.load()
 
 # Load Vault
-if GIS_ENVIRONMENT == 'dev':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
         vault_client = connect_to_vault('http://vault:8200')
         print("Vault client connected to container.")
