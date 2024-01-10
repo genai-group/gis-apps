@@ -18,8 +18,13 @@ from config.config_functions import *
 template_dir = './config/templates'
 # data_ingest = yaml.safe_load(open(f"{template_dir}/data_ingest.yml", "r").read())
 
-try:
+if GIS_ENVIRONMENT == 'flask-local':
     data_dir = 'app/config/data'
+
+if GIS_ENVIRONMENT == 'local':
+    data_dir = 'config/data'
+
+try:
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
     manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
     manifest_data_72 = json.loads(open(f"{data_dir}/fake_airline_manifest_72_hours.json", "r").read()) 
