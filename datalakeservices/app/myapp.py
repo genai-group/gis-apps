@@ -4,9 +4,22 @@
 from config.init import *
 
 from flask import Flask, jsonify, request
+from flask_swagger_ui import get_swaggerui_blueprint
 
 #%%
 app = Flask(__name__)
+
+# Swagger UI configuration
+SWAGGER_URL = '/swagger'  # URL for exposing Swagger UI (without trailing '/')
+API_URL = '/static/swagger.json'  # Our API url (can be a local resource or remote)
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={  # Swagger UI config overrides
+        'app_name': "GIS Data Lake Services"
+    }
+)
 
 @app.route('/')
 def home():
@@ -30,50 +43,4 @@ def get_item(item_id):
     return jsonify(item), 200
 
 if __name__ == '__main__':
-    # Bind to 0.0.0.0 to make the application externally visible
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
-# from flask import Flask, jsonify, request
-
-# app = Flask(__name__)
-
-# @app.route('/some_endpoint', methods=['GET', 'POST'])
-# def some_function():
-#     try:
-#         # Your logic here
-#         # Use request.args or request.json to access request data
-#         return jsonify({"message": "Success"}), 200
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-
-
-# def handler(event, context):
-#     try:
-#         response_payload = {}
-#         if 'header' in event['params']:
-#             ## some function
-#             pass
-#         else:
-#             ## some function
-#             pass
-#         print(f"some_function: {some_function_results}")
-#         return(json.dumps(some_function_results))
-#     except Exception as e:
-#         print(f"Error in handler: {e}")
-#         return([])
-
-# if __name__ == "__main__":
-#     # remove json.dumpss()
-#     event_data = json.loads(json.dumps(sys.argv[1]))
-#     print("processing eventdata: ", event_data)
-#     event = {}
-#     event['Records'] = event_data
-#     context = None
-#     result = handler(event, context)
-#     if result['status'] != 200:
-#         exit(1)

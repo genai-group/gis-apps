@@ -18,13 +18,6 @@ from config.functions import *
 template_dir = './config/templates'
 # data_ingest = yaml.safe_load(open(f"{template_dir}/data_ingest.yml", "r").read())
 
-# airline_flight_manifest_0_hours
-try:
-    print(f"Curr Dir: {os.getcwd()}")
-    print(f"files: {os.listdir(os.getcwd())}")
-except:
-    pass
-
 try:
     data_dir = 'app/config/data'
     manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
