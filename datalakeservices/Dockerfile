@@ -15,7 +15,7 @@ RUN python -m spacy download en_core_web_lg
 RUN python -m pip install --upgrade pymupdf
 
 # Define environment variable
-ENV FLASK_APP=app/data_lake_services_app.py
+ENV FLASK_APP=app/data_lake_app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Expose port 5000
