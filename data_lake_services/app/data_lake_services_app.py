@@ -51,12 +51,21 @@ def create_item():
         "data": data
     }), 201
 
-@app.route('/search', methods=['GET','POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def perform_search():
-    # Assuming JSON input with 'query'
-    query_str = request.args.get('query')
+    if request.method == 'POST':
+        # For POST request, get data from request body
+        query_str = request.json.get('query') if request.json else None
+    else:
+        # For GET request, get data from query parameters
+        query_str = request.args.get('query')
+
+    if query_str is None:
+        return jsonify({"status": "error", "message": "No query provided"}), 400
+
     # Here you would typically perform a search query against a database
-    results = search(query_str)
+    results = search(query_str)  # Assuming 'search' is a defined function
+
     # For the sake of example, we'll just return the query
     return jsonify({
         "status": "success",
