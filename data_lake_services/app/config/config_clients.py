@@ -602,7 +602,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        mongodb_client = connect_to_mongodb('mongodb-container')
+        mongodb_client = connect_to_mongodb('mongo')
         print("MongoDB client connected to container.")
     except Exception as e:
         pass
