@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Export" nillable="true" type="Export" />
+  <xs:complexType name="Export">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Transmission" type="Transmission" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Passenger" type="Passenger" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Flights" type="ArrayOfFlight" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Documents" type="ArrayOfDocument" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Dispositions" type="ArrayOfDisposition" />
+      <xs:element minOccurs="0" maxOccurs="1" name="PNRs" type="ArrayOfPNR" />
+      <xs:element minOccurs="0" maxOccurs="1" name="RuleHits" type="ArrayOfRuleHit" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ListHits" type="ArrayOfListHit" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FPEHits" type="ArrayOfFPEHit" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Special" type="xs:boolean" />
+      <xs:element minOccurs="0" maxOccurs="1" nillable ="true" name="Raw" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="ReportingFlight" nillable="true" type="Flight" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Visa" type="Visa" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Transmission">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Source" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="HostCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ExportDateTime" type="xs:dateTime" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Passenger">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DOB" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Title" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FirstName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="MiddleName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="LastName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Suffix" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="CitizenshipCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ResidencyCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="PassengerType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Gender" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Embarkation" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Debarkation" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="RecordLocator" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfFlight">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Flight" nillable="true" type="Flight" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Flight">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="LegId" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Carrier" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FlightNumber" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FlightDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Origin" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="OriginCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Destination" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DestinationCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ETD" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ETA" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Thru" type="xs:boolean" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfDocument">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Document" nillable="true" type="Document" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Document">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="FirstName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="MiddleName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="LastName" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DOB" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Gender" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="DocumentType" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Number" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="IssuanceCountry" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="IssuanceDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ExpirationDate" type="xs:dateTime" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfDisposition">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Disposition" nillable="true" type="Disposition" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Disposition">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Comment" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Status" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="xs:dateTime" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfPNR">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PNR" nillable="true" type="PNR" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PNR">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="RecordLocator" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="BookingDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Flights" type="ArrayOfFlight" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Documents" type="ArrayOfDocument" />
+      <xs:element minOccurs="0" maxOccurs="1" name="PhoneNumbers" type="ArrayOfPhone" />
+      <xs:element minOccurs="0" maxOccurs="1" name="EmailAddresses" type="ArrayOfEmail" />
+      <xs:element minOccurs="0" maxOccurs="1" name="TravelAgency" type="TravelAgency" />
+      <xs:element minOccurs="0" maxOccurs="1" nillable ="true" name="Raw" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfPhone">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Phone" nillable="true" type="Phone" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Phone">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="PhoneNumber" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfEmail">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Email" nillable="true" type="Email" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Email">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Address" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="TravelAgency">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Phone" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfRuleHit">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="RuleHit" nillable="true" type="RuleHit" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RuleHit">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Title" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Category" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Owners" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Special" type="xs:boolean" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfListHit">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ListHit" nillable="true" type="ListHit" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ListHit">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Id" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="MasterListTitle" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Category" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ListTitle" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="EntryDetails" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Owners" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Special" type="xs:boolean" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ArrayOfFPEHit">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FPEHit" nillable="true" type="FPEHit" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FPEHit">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="FPEID" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="HitType" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Visa">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Response" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Reason" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+</xs:schema>

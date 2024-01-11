@@ -60,10 +60,16 @@ def chunk_text(text: str, character_split_threshold: int = 500) -> List[str]:
 ####    Data Ingest    ####
 ###########################
 
-def open_file(filename: str) -> Union[dict, list, None]:
+import os
+import json
+import pandas as pd
+import xmltodict
+
+def open_file(filename: str):
     """
-    Opens a file and reads its contents. If the file is a JSON, CSV, or Excel file, 
-    it returns the contents. If the file is CSV or Excel, it converts the contents to JSON format.
+    Opens a file and reads its contents. If the file is a JSON, CSV, Excel, XML, XSD, or TXT file, 
+    it returns the contents. If the file is CSV, Excel, XML, XSD, or certain TXT files, 
+    it converts the contents to JSON format.
 
     Parameters:
     filename (str): The path to the file.
@@ -90,13 +96,28 @@ def open_file(filename: str) -> Union[dict, list, None]:
 
             return data.to_dict(orient='records')
 
+        elif file_extension in ['.xml', '.xsd']:
+            # Read the file and convert XML/XSD to dict
+            with open(filename, 'r') as file:
+                return xmltodict.parse(file.read())
+
+        elif file_extension == '.txt':
+            # Read the text file (assuming simple key-value pairs)
+            with open(filename, 'r') as file:
+                data = {}
+                for line in file:
+                    key, value = line.strip().split(':')
+                    data[key.strip()] = value.strip()
+                return data
+
         else:
-            print("Unsupported file format. Only JSON, CSV, and Excel files are supported.")
+            print("Unsupported file format. Supported formats are JSON, CSV, Excel, XML, XSD, and TXT.")
             return None
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return None    
+        return None
+
 
 def is_json_nested(json_obj: Union[Dict[str, Any], List[Any]]) -> bool:
     """
