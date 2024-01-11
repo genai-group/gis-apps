@@ -66,6 +66,44 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
         print(f"MinIO Client Connection Error: {e}")
         return None
 
+########################
+####    RabbitMQ    ####
+########################
+    
+def connect_to_rabbitmq(host: str = 'localhost', user: str = os.environ.get('RABBITMQ_USERNAME'), password: str = os.environ.get('RABBITMQ_PASSWORD'), connection_parameters: Optional[URLParameters] = None) -> BlockingConnection:
+    """
+    Create and return a connection to RabbitMQ.
+
+    Args:
+    url (str): The connection URL for RabbitMQ, e.g., 'amqp://user:password@localhost:5672/'.
+    connection_parameters (URLParameters, optional): Additional connection parameters. 
+    Default is None, which means the connection will use only the URL.
+
+    Returns:
+    BlockingConnection: A pika BlockingConnection instance.
+
+    Raises:
+    AssertionError: If the URL is not provided or is empty.
+    pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
+
+    Example:
+    connection = create_rabbitmq_connection('amqp://user:password@localhost:5672/')
+    """
+    assert host, "RabbitMQ connection URL must be provided."
+
+    try:
+        url = f'amqp://{user}:{password}@{host}:5672/'
+        if connection_parameters:
+            parameters = pika.URLParameters(url)
+            parameters.update(connection_parameters)
+        else:
+            parameters = pika.URLParameters(url)
+
+        return pika.BlockingConnection(parameters)
+    except pika.exceptions.AMQPConnectionError as e:
+        raise pika.exceptions.AMQPConnectionError(f"Failed to connect to RabbitMQ: {e}")
+
+
 ##########################
 ####    PostgreSQL    ####
 ##########################
@@ -725,6 +763,21 @@ if GIS_ENVIRONMENT == 'local':
         print("Milvus client connected locally.")
     except Exception as e:
         pass    
+
+# Load RabbitMQ
+if GIS_ENVIRONMENT == 'flask-local':
+    try:
+        rabbitmq_client = connect_to_rabbitmq('rabbitmq-container')
+        print("RabbitMQ client connected to container.")
+    except Exception as e:
+        pass
+
+if GIS_ENVIRONMENT == 'local':
+    try:
+        rabbitmq_client = connect_to_rabbitmq('localhost')
+        print("RabbitMQ client connected locally.")
+    except Exception as e:
+        pass        
 
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")

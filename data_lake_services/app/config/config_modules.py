@@ -42,6 +42,9 @@ from pymilvus import (
 # Neo4j
 from neo4j import GraphDatabase
 
+# Pika - RabbitMQ
+import pika
+
 # Multiprcessing
 import ray
 
