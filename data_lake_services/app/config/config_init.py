@@ -22,15 +22,12 @@ if GIS_ENVIRONMENT == 'flask-local':
     data_dir = 'app/config/data/synthetic'
 
 if GIS_ENVIRONMENT == 'local':
-    data_dir = './config/data/synthetic'
+    data_dir = 'config/data/synthetic'
 
 try:
     manifest_data_0 = open_file(f"{data_dir}/fake_airline_manifest_0_hours.json")
     manifest_data_24 = open_file(f"{data_dir}/fake_airline_manifest_24_hours.json")
     manifest_data_72 = open_file(f"{data_dir}/fake_airline_manifest_72_hours.json")
-    # manifest_data_0 = json.loads(open(f"{data_dir}/fake_airline_manifest_0_hours.json", "r").read())   
-    # manifest_data_24 = json.loads(open(f"{data_dir}/fake_airline_manifest_24_hours.json", "r").read())
-    # manifest_data_72 = json.loads(open(f"{data_dir}/fake_airline_manifest_72_hours.json", "r").read()) 
     print(f"Successfully loaded data for the fake_airline_manifest files (0, 24 adn 72 hours).")
 except Exception as e:
     print(f"Error loading data: {e}")
@@ -41,9 +38,6 @@ try:
     fake_passport_0 = open_file(f"{data_dir}/fake_passport_0_hours.json")
     fake_passport_24 = open_file(f"{data_dir}/fake_passport_24_hours.json")
     fake_passport_72 = open_file(f"{data_dir}/fake_passport_72_hours.json")
-    # fake_passport_hour_0 = json.loads(open(f"{data_dir}/fake_passport_hour_0.json", "r").read())
-    # fake_passport_hour_24 = json.loads(open(f"{data_dir}/fake_passport_hour_24.json", "r").read())
-    # fake_passport_hour_72 = json.loads(open(f"{data_dir}/fake_passport_hour_72.json", "r").read())
     print(f"Successfully loaded data for the fake_passport data files (0, 24 adn 72 hours).")
 except Exception as e:
     print(f"Error loading fake_passport: {e}")
@@ -54,9 +48,6 @@ try:
     fake_customs_report_hour_0 = open_file(f"{data_dir}/fake_customs_report_0_hours.json")
     fake_customs_report_hour_24 = open_file(f"{data_dir}/fake_customs_report_24_hours.json")
     fake_customs_report_hour_72 = open_file(f"{data_dir}/fake_customs_report_72_hours.json")
-    # fake_customs_report_hour_0 = json.loads(open(f"{data_dir}/fake_customs_report_hour_0.json", "r").read())
-    # fake_customs_report_hour_24 = json.loads(open(f"{data_dir}/fake_customs_report_hour_24.json", "r").read())
-    # fake_customs_report_hour_72 = json.loads(open(f"{data_dir}/fake_customs_report_hour_72.json", "r").read())
     print(f"Successfully loaded data for the fake_customs_report data files (0, 24 adn 72 hours).")
 except Exception as e:
     print(f"Error loading fake_customs_report: {e}")
@@ -76,7 +67,7 @@ if GIS_ENVIRONMENT == 'local':
 # Global Terrorism Index
 try:
     gti = open_file(f"{data_dir}/global_terrorism_index.csv")
-    # gti = pd.read_csv(f"{data_dir}/global_terrorism_index.csv")
+    gti = pd.DataFrame(gti)
     gti.set_index('country', inplace=True)
     gti_dict = gti.to_dict('index')
     print(f"Successfully loaded data for the Global Terrorism Index data file.")
@@ -86,8 +77,7 @@ except Exception as e:
 
 # Reading ISO json object
 try:
-    iso_data = open_file(f"{data_dir}/iso.json", "r").read()
-    # iso_data = json.loads(open(f"{data_dir}/iso.json", "r").read())
+    iso_data = open_file(f"{data_dir}/iso.json")
     iso_data = pd.DataFrame(iso_data)
     iso_data.set_index('name', inplace=True)
     iso_dict = iso_data.to_dict('index')
@@ -105,7 +95,7 @@ except Exception as e:
 # Reading in the International Government IDs - Sheet1.csv
 try:
     government_ids = open_file(f"{data_dir}/International Government IDs - Sheet1.csv")
-    # government_ids = pd.read_csv(f"{data_dir}/International Government IDs - Sheet1.csv")
+    government_ids = pd.DataFrame(government_ids)
     government_ids = government_ids.to_dict(orient='records')
     government_ids = {obj['Country']:{'Name':obj['Name'], 'Description':obj['Description']} for obj in government_ids}
     print(f"Successfully loaded data for the International Government IDs.")
@@ -116,15 +106,13 @@ except Exception as e:
 # IATA International Airport Codes
 try:
     airport_codes = open_file(f"{data_dir}/international_airport_codes.csv")
-    # airport_codes = pd.read_csv(f"{data_dir}/international_airport_codes.csv")
-    airport_codes = airport_codes.to_dict('records')
+    print(f"Successfully loaded data for the Airport Codes.")
 except Exception as e:
     print(f"Errors reading in IATA international airport codes.")    
 
 # World Cities
 try:
     world_cities = open_file(f"{data_dir}/worldcities.csv")
-    # world_cities = pd.read_csv(f"{data_dir}/worldcities.csv")   
 except Exception as e:
     print(f"Errors reading in world cities.")
 
@@ -139,3 +127,58 @@ if GIS_ENVIRONMENT == 'flask-local':
 if GIS_ENVIRONMENT == 'local':
     data_dir = 'config/data/sample_data'
 
+try:
+    raw_pax_list_3 = open_file(f'{data_dir}/RAW PAX LIST 3.txt')
+    print(f"Successfully loaded data for the RAW PAX LIST 3.txt file.")
+except Exception as e:
+    print(f"Error loading RAW PAX LIST 3.txt: {e}")
+    pass
+
+try:
+    atsg_passenger_export = open_file(f'{data_dir}/ATSG Passenger Export.xsd')
+    print(f"Successfully loaded data for the ATSG Passenger Export.xsd file.")
+except Exception as e:
+    print(f"Error loading ATSG Passenger Export.xsd: {e}")
+    pass
+
+try:
+    raw_pnrgov = open_file(f'{data_dir}/RAW PNRGOV ESGBSC.txt')
+    print(f"Successfully loaded data for the RAW PNRGOV ESGBSC.txt file.")
+except Exception as e:
+    print(f"Error loading RAW PNRGOV ESGBSC.txt: {e}")
+    pass
+
+try:
+    raw_paxlist = open_file(f'{data_dir}/RAW PAXLIST 2.txt')
+    print(f"Successfully loaded data for the RAW PAXLIST 2.txt file.")
+except Exception as e:
+    print(f"Error loading RAW PAXLIST 2.txt: {e}")
+    pass
+
+try:
+    atsg_export = open_file(f'{data_dir}/ATSG EXPORT with raw PNRGOV and API.xml')
+    print(f"Successfully loaded data for the ATSG EXPORT with raw PNRGOV and API.xml file.")
+except Exception as e:
+    print(f"Error loading ATSG EXPORT with raw PNRGOV and API.xml: {e}")
+    pass
+
+try:
+    raw_pnrgov_khnpul = open_file(f'{data_dir}/RAW PNRGOV KHNPUL.txt')
+    print(f"Successfully loaded data for the RAW PNRGOV KHNPUL.txt file.")
+except Exception as e:
+    print(f"Error loading RAW PNRGOV KHNPUL.txt: {e}")
+    pass
+
+try:
+    raw_api_paxlist = open_file(f'{data_dir}/RAW API PAXLIST 1.txt')
+    print(f"Successfully loaded data for the RAW API PAXLIST 1.txt file.")
+except Exception as e:
+    print(f"Error loading RAW API PAXLIST 1.txt: {e}")
+    pass
+
+try:
+    raw_pnrgov_kxugjf = open_file(f'{data_dir}/RAW PNRGOV KXUGJF.txt')
+    print(f"Successfully loaded data for the RAW PNRGOV KXUGJF.txt file.")
+except Exception as e:
+    print(f"Error loading RAW PNRGOV KXUGJF.txt: {e}")
+    pass
