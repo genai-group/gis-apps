@@ -65,57 +65,57 @@ def create_item():
         "data": data
     }), 201
 
-# @app.route('/search', methods=['POST'])
-# def perform_search():
-#     query_str = request.json.get('query') if request.json else None
-
-#     if query_str is None:
-#         return jsonify({"status": "error", "message": "No query provided"}), 400
-
-#     # Here you would typically perform a search query against a database
-#     results = search(query_str)  # Assuming 'search' is a defined function
-
-#     # For the sake of example, we'll just return the query
-#     return jsonify({
-#         "status": "success",
-#         "data": results
-#     }), 200
-
 @app.route('/search', methods=['POST'])
 def perform_search():
-    data = request.json.get('query')
-    if not data:
-        return jsonify({"error": "No search query provided"}), 400
-    task = process_search_data.delay(data)
-    return jsonify({"task_id": task.id}), 202
+    query_str = request.json.get('query') if request.json else None
 
-@celery.task
-def process_search_data(query):
-    # Call the original search function here
-    results = original_search_function(query)
-    return results
+    if query_str is None:
+        return jsonify({"status": "error", "message": "No query provided"}), 400
 
-@app.route('/status/<task_id>', methods=['GET'])
-def get_task_status(task_id):
-    task = process_search_data.AsyncResult(task_id)
-    if not task:
-        return jsonify({"error": "Invalid task ID"}), 404
-    return jsonify({"task_id": task_id, "status": task.status})
+    # Here you would typically perform a search query against a database
+    results = search(query_str)  # Assuming 'search' is a defined function
 
-@app.route('/result/<task_id>', methods=['GET'])
-def get_task_result(task_id):
-    task = process_search_data.AsyncResult(task_id)
-    if not task:
-        return jsonify({"error": "Invalid task ID"}), 404
-    if task.status == 'SUCCESS':
-        return jsonify({"task_id": task_id, "status": task.status, "result": task.result})
-    return jsonify({"task_id": task_id, "status": task.status}), 202
+    # For the sake of example, we'll just return the query
+    return jsonify({
+        "status": "success",
+        "data": results
+    }), 200
 
-def original_search_function(query):
-    # Implement your actual search logic here
-    results = search(query)
-    time.sleep(2)  # Simulating a time-consuming search operation
-    return results
+# @app.route('/search', methods=['POST'])
+# def perform_search():
+#     data = request.json.get('query')
+#     if not data:
+#         return jsonify({"error": "No search query provided"}), 400
+#     task = process_search_data.delay(data)
+#     return jsonify({"task_id": task.id}), 202
+
+# @celery.task
+# def process_search_data(query):
+#     # Call the original search function here
+#     results = original_search_function(query)
+#     return results
+
+# @app.route('/status/<task_id>', methods=['GET'])
+# def get_task_status(task_id):
+#     task = process_search_data.AsyncResult(task_id)
+#     if not task:
+#         return jsonify({"error": "Invalid task ID"}), 404
+#     return jsonify({"task_id": task_id, "status": task.status})
+
+# @app.route('/result/<task_id>', methods=['GET'])
+# def get_task_result(task_id):
+#     task = process_search_data.AsyncResult(task_id)
+#     if not task:
+#         return jsonify({"error": "Invalid task ID"}), 404
+#     if task.status == 'SUCCESS':
+#         return jsonify({"task_id": task_id, "status": task.status, "result": task.result})
+#     return jsonify({"task_id": task_id, "status": task.status}), 202
+
+# def original_search_function(query):
+#     # Implement your actual search logic here
+#     results = search(query)
+#     time.sleep(2)  # Simulating a time-consuming search operation
+#     return results
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
