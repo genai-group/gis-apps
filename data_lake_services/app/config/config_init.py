@@ -86,7 +86,7 @@ except Exception as e:
 
 # Reading ISO json object
 try:
-    iso_data = open_file(f"{data_dir}/iso.json", "r").read())
+    iso_data = open_file(f"{data_dir}/iso.json", "r").read()
     # iso_data = json.loads(open(f"{data_dir}/iso.json", "r").read())
     iso_data = pd.DataFrame(iso_data)
     iso_data.set_index('name', inplace=True)
