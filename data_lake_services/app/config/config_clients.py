@@ -69,7 +69,9 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ########################
 ####    RabbitMQ    ####
 ########################
-    
+
+URLParameters = {}
+
 def connect_to_rabbitmq(host: str = 'localhost', user: str = os.environ.get('RABBITMQ_USERNAME'), password: str = os.environ.get('RABBITMQ_PASSWORD'), connection_parameters: Optional[URLParameters] = None) -> BlockingConnection:
     """
     Create and return a connection to RabbitMQ.
