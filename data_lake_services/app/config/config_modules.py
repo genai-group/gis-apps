@@ -12,6 +12,7 @@ import random
 import hashlib
 import logging
 import textwrap
+import xmltodict
 import unicodedata
 import numpy as np
 import pandas as pd

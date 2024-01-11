@@ -60,10 +60,10 @@ def chunk_text(text: str, character_split_threshold: int = 500) -> List[str]:
 ####    Data Ingest    ####
 ###########################
 
-import os
-import json
-import pandas as pd
-import xmltodict
+# import os
+# import json
+# import pandas as pd
+# import xmltodict
 
 def open_file(filename: str):
     """
