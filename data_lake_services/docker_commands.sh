@@ -21,4 +21,4 @@ docker network inspect gis-dl-local-network
 ####    Docker Compose    ####
 ##############################
 
-docker-compose -f infrastructure/docker-compose.yml up -d
+docker-compose -f docker-compose.yml up -d
