@@ -19,7 +19,7 @@ flask-swagger-ui==4.11.1
 geographiclib==2.0
 geopy==2.4.1
 hvac==2.1.0
-kombu-5.3.4
+kombu==5.3.4
 lxml==4.9.3
 minio==7.2.0
 motor==3.3.2
