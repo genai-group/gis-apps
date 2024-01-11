@@ -1,0 +1,117 @@
+{
+    "businessEntity": {
+        "businessName": "Greenfield Constructions LLC",
+        "dba": "GreenCon",
+        "address": "200 Industrial Way, Greenfield, NY, 12010",
+        "contactInfo": {
+            "phone": "555-987-6543",
+            "email": "info@greencon.com"
+        },
+        "entityType": "Limited Liability Company",
+        "ein": "12-3456789",
+        "incorporationDetails": {
+            "state": "New York",
+            "date": "2015-03-25"
+        },
+        "owners": [
+            {
+                "name": "Emma Clark",
+                "title": "Managing Member",
+                "ownershipPercentage": 60
+            },
+            {
+                "name": "Robert Turner",
+                "title": "Member",
+                "ownershipPercentage": 40
+            }
+        ]
+    },
+    "accountDetails": {
+        "accountNumber": "12345678901",
+        "accountType": "Business Operating Account",
+        "openingDate": "2015-04-10",
+        "currentBalance": 750000.00
+    },
+    "transactionHistory": [
+        {
+            "date": "2023-11-15",
+            "amount": 50000.00,
+            "type": "Check Payment",
+            "description": "Construction materials from BuildMart",
+            "transactionId": "TX1234567890101"
+        },
+        {
+            "date": "2023-11-18",
+            "amount": -30000.00,
+            "type": "Direct Deposit",
+            "description": "Monthly payroll",
+            "transactionId": "TX1234567890102"
+        }
+    ],
+    "associatedAccounts": [
+        {
+            "accountNumber": "98765432101",
+            "accountType": "Business Investment Account",
+            "bankName": "Greenfield Bank & Trust",
+            "balance": 500000.00
+        }
+    ],
+    "signatoryInformation": [
+        {
+            "name": "Emma Clark",
+            "title": "Managing Member",
+            "dob": "1982-08-10",
+            "address": "789 Willow Lane, Greenfield, NY, 12010"
+        },
+        {
+            "name": "Robert Turner",
+            "title": "Member",
+            "dob": "1978-05-22",
+            "address": "456 Maple Dr, Greenfield, NY, 12011"
+        }
+    ],
+    "loanInformation": [
+        {
+            "loanNumber": "LN987654321",
+            "type": "Equipment Financing Loan",
+            "amount": 100000.00,
+            "dateIssued": "2021-07-15",
+            "dueDate": "2024-07-15",
+            "interestRate": 4.5,
+            "status": "Active"
+        }
+    ],
+    "auditTrails": [
+        {
+            "action": "Change of Address",
+            "date": "2023-10-05",
+            "performedBy": "Emma Clark",
+            "description": "Updated business address to current location"
+        }
+    ],
+    "communicationRecords": {
+        "emails": [
+            {
+                "date": "2023-11-01",
+                "subject": "Inquiry about Loan Interest Rate",
+                "status": "Replied"
+            }
+        ],
+        "calls": [
+            {
+                "date": "2023-10-30",
+                "time": "09:45",
+                "duration": "00:15:30",
+                "nature": "Discussion about extending credit line"
+            }
+        ]
+    },
+    "suspiciousActivities": [
+        {
+            "date": "2023-11-18",
+            "activity": "Large direct deposit flagged as unusual for payroll",
+            "amount": 30000.00,
+            "investigationStatus": "Under Review"
+        }
+    ]
+}

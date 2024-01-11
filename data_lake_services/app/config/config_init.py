@@ -22,7 +22,7 @@ if GIS_ENVIRONMENT == 'flask-local':
     data_dir = 'app/config/data/synthetic'
 
 if GIS_ENVIRONMENT == 'local':
-    data_dir = 'config/data/synthetic'
+    data_dir = './config/data/synthetic'
 
 try:
     manifest_data_0 = open_file(f"{data_dir}/fake_airline_manifest_0_hours.json")
@@ -75,7 +75,7 @@ if GIS_ENVIRONMENT == 'local':
 
 # Global Terrorism Index
 try:
-    git = open_file(f"{data_dir}/global_terrorism_index.csv")
+    gti = open_file(f"{data_dir}/global_terrorism_index.csv")
     # gti = pd.read_csv(f"{data_dir}/global_terrorism_index.csv")
     gti.set_index('country', inplace=True)
     gti_dict = gti.to_dict('index')

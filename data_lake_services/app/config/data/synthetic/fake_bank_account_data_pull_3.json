@@ -1,0 +1,117 @@
+{
+    "businessEntity": {
+        "businessName": "Bright Future Solar Solutions LLC",
+        "dba": "BF Solar",
+        "address": "350 Sunlight Ave, Solar City, AZ, 85001",
+        "contactInfo": {
+            "phone": "602-123-4567",
+            "email": "contact@bfsolar.com"
+        },
+        "entityType": "Limited Liability Company",
+        "ein": "67-8901234",
+        "incorporationDetails": {
+            "state": "Arizona",
+            "date": "2018-07-15"
+        },
+        "owners": [
+            {
+                "name": "Linda Martinez",
+                "title": "CEO",
+                "ownershipPercentage": 55
+            },
+            {
+                "name": "Carlos Rodriguez",
+                "title": "COO",
+                "ownershipPercentage": 45
+            }
+        ]
+    },
+    "accountDetails": {
+        "accountNumber": "21098765432",
+        "accountType": "Business Checking",
+        "openingDate": "2018-08-01",
+        "currentBalance": 250000.00
+    },
+    "transactionHistory": [
+        {
+            "date": "2023-09-10",
+            "amount": 100000.00,
+            "type": "Wire Transfer",
+            "description": "Investment in new solar panel technology",
+            "transactionId": "TX2109876543201"
+        },
+        {
+            "date": "2023-09-12",
+            "amount": -20000.00,
+            "type": "Online Payment",
+            "description": "Payment to SolarTech Supplies",
+            "transactionId": "TX2109876543202"
+        }
+    ],
+    "associatedAccounts": [
+        {
+            "accountNumber": "32109876543",
+            "accountType": "Business Savings",
+            "bankName": "Arizona State Bank",
+            "balance": 50000.00
+        }
+    ],
+    "signatoryInformation": [
+        {
+            "name": "Linda Martinez",
+            "title": "CEO",
+            "dob": "1979-04-28",
+            "address": "101 Desert Road, Solar City, AZ, 85002"
+        },
+        {
+            "name": "Carlos Rodriguez",
+            "title": "COO",
+            "dob": "1981-11-15",
+            "address": "202 Energy Blvd, Solar City, AZ, 85003"
+        }
+    ],
+    "loanInformation": [
+        {
+            "loanNumber": "LN321098765",
+            "type": "Business Expansion Loan",
+            "amount": 150000.00,
+            "dateIssued": "2019-04-01",
+            "dueDate": "2024-04-01",
+            "interestRate": 6.0,
+            "status": "Active"
+        }
+    ],
+    "auditTrails": [
+        {
+            "action": "Large Wire Transfer",
+            "date": "2023-09-10",
+            "performedBy": "CEO Linda Martinez",
+            "description": "Approval for investment in new technology"
+        }
+    ],
+    "communicationRecords": {
+        "emails": [
+            {
+                "date": "2023-08-30",
+                "subject": "Query about Large Wire Transfer Fees",
+                "status": "Replied"
+            }
+        ],
+        "calls": [
+            {
+                "date": "2023-08-25",
+                "time": "10:00",
+                "duration": "00:20:00",
+                "nature": "Inquiry about business loan rates"
+            }
+        ]
+    },
+    "suspiciousActivities": [
+        {
+            "date": "2023-09-10",
+            "activity": "Unexpected large wire transfer",
+            "amount": 100000.00,
+            "investigationStatus": "Pending"
+        }
+    ]
+}
