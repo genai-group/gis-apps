@@ -769,26 +769,25 @@ if GIS_ENVIRONMENT == 'local':
     except Exception as e:
         pass    
 
+# Creating Milvus collection
+milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
+milvus_create_index("gis_main", "vector")
+milvus_collection.load()
+
 # Load RabbitMQ
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        rabbitmq_client = connect_to_rabbitmq('rabbitmq-container')
-        print("RabbitMQ client connected to container.")
+        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container')
+        print("RabbitMQ connection created successfully with container.")
     except Exception as e:
         pass
 
 if GIS_ENVIRONMENT == 'local':
     try:
-        rabbitmq_client = connect_to_rabbitmq('localhost')
-        print("RabbitMQ client connected locally.")
+        rabbitmq_connection = connect_to_rabbitmq('localhost')
+        print("RabbitMQ connection created successfully locally.")
     except Exception as e:
         pass        
-
-
-
-milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
-milvus_create_index("gis_main", "vector")
-milvus_collection.load()
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
