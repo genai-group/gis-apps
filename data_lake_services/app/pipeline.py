@@ -13,8 +13,8 @@ data = manifest_data_0
 
 #%%
 # Airline
-template_dir = './config/templates'
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
+template_data_directory = './config/templates/data'
+parse_config = yaml.safe_load(open(f"{template_data_directory}/fake_airline_manifest_flight.yml", "r").read())
 
 #%%
 # Process template
@@ -31,7 +31,7 @@ load_data(data, parse_config, template)
 
 #%%
 # Airline
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_passengers.yml", "r").read())
+parse_config = yaml.safe_load(open(f"{template_data_directory}/fake_airline_manifest_passengers.yml", "r").read())
 
 data = manifest_data_0
 passenger_info = data['passenger_info']
@@ -60,7 +60,7 @@ load_data(data, parse_config, template)
 
 #%%
 # Flight
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_flight.yml", "r").read())
+parse_config = yaml.safe_load(open(f"{template_data_directory}/fake_airline_manifest_flight.yml", "r").read())
 
 # Filter data file
 if 'primary_key' in parse_config['template']:
@@ -99,7 +99,7 @@ if not isinstance(data, list):
 
 #%%
 # Passengers
-parse_config = yaml.safe_load(open(f"{template_dir}/fake_airline_manifest_passengers.yml", "r").read())
+parse_config = yaml.safe_load(open(f"{template_data_directory}/fake_airline_manifest_passengers.yml", "r").read())
 
 
 # Filter data file
