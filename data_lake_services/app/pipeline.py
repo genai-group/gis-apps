@@ -53,7 +53,6 @@ template = process_template(parse_config)
 data = process_data(data, parse_config, template)
 load_data(data, parse_config, template)
 
-
 ##################################
 ####    Flight Information    ####
 ##################################

@@ -39,11 +39,16 @@ from pymilvus import (
     Collection as MilvusCollection,
 )
 
+# PyXB => .xsd files
+import pyxb.utils.domutils as domutils
+
 # Neo4j
 from neo4j import GraphDatabase
 
 # Pika - RabbitMQ
 import pika
+from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
+
 
 # Multiprcessing
 import ray

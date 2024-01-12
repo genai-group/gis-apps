@@ -96,10 +96,13 @@ def open_file(filename: str):
 
             return data.to_dict(orient='records')
 
-        elif file_extension in ['.xml', '.xsd']:
+        elif file_extension in ['.xml']:
             # Read the file and convert XML/XSD to dict
             with open(filename, 'r') as file:
                 return xmltodict.parse(file.read())
+
+        elif file_extension in ['.xsd']:
+            return domutils.StringToDOM(filename)            
 
         elif file_extension == '.txt':
             # Read the text file (assuming simple key-value pairs)
@@ -2731,3 +2734,24 @@ def load_data(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict)
     except Exception as e:
         print(f"Errors loading Neo4j Database: {e}")
 
+
+#############################################
+####    RabbitMQ / Pika Functionality    ####
+#############################################
+        
+def create_channel(connection: BlockingConnection) -> BlockingChannel:
+    """
+    Create and return a channel using the provided RabbitMQ connection.
+
+    Args:
+    connection (BlockingConnection): A pika BlockingConnection instance.
+
+    Returns:
+    BlockingChannel: A pika BlockingChannel instance.
+
+    Raises:
+    AssertionError: If the connection is not provided or is not a BlockingConnection instance.
+    """
+    assert isinstance(connection, BlockingConnection), "A valid BlockingConnection must be provided."
+
+    return connection.channel()        
