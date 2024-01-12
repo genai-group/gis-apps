@@ -96,13 +96,13 @@ def open_file(filename: str):
 
             return data.to_dict(orient='records')
 
-        elif file_extension in ['.xml']:
+        elif file_extension in ['.xml', '.xsd']:
             # Read the file and convert XML/XSD to dict
             with open(filename, 'r') as file:
                 return xmltodict.parse(file.read())
 
-        elif file_extension in ['.xsd']:
-            return domutils.StringToDOM(filename)            
+        # elif file_extension in ['.xsd']:
+        #     return domutils.StringToDOM(filename)            
 
         elif file_extension == '.txt':
             # Read the text file (assuming simple key-value pairs)
