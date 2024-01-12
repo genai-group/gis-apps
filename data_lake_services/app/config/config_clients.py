@@ -70,7 +70,7 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
-def connect_to_rabbitmq(host: str = 'localhost', user: str = None, password: str = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, password: Optional[str] = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
     """
     Create and return a connection to RabbitMQ.
 
@@ -89,19 +89,24 @@ def connect_to_rabbitmq(host: str = 'localhost', user: str = None, password: str
     pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
 
     Example:
-    connection = connect_to_rabbitmq('localhost')
+    connection = connect_to_rabbitmq('localhost', 'user', 'password')
     """
     assert host, "RabbitMQ host must be provided."
 
+    # Get username and password from environment variables if not provided
     user = user or os.environ.get('RABBITMQ_USERNAME')
     password = password or os.environ.get('RABBITMQ_PASSWORD')
 
+    # Construct the URL for the connection
     url = f'amqp://{user}:{password}@{host}:5672/'
+
+    # Use connection parameters if provided, else create from URL
     if connection_parameters:
         parameters = connection_parameters
     else:
         parameters = pika.URLParameters(url)
 
+    # Create and return the connection
     return pika.BlockingConnection(parameters)
 
 ##########################
