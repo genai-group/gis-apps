@@ -47,6 +47,7 @@ from neo4j import GraphDatabase
 
 # Pika - RabbitMQ
 import pika
+from pika import URLParameters
 from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
 
 

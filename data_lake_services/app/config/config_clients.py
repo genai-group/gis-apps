@@ -70,41 +70,39 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
-URLParameters = None
-
-def connect_to_rabbitmq(host: str = 'localhost', user: str = os.environ.get('RABBITMQ_USERNAME'), password: str = os.environ.get('RABBITMQ_PASSWORD'), connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+def connect_to_rabbitmq(host: str = 'localhost', user: str = None, password: str = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
     """
     Create and return a connection to RabbitMQ.
 
     Args:
-    url (str): The connection URL for RabbitMQ, e.g., 'amqp://user:password@localhost:5672/'.
+    host (str): The hostname for RabbitMQ, e.g., 'localhost'.
+    user (str, optional): The username for RabbitMQ. Default is taken from RABBITMQ_USERNAME environment variable.
+    password (str, optional): The password for RabbitMQ. Default is taken from RABBITMQ_PASSWORD environment variable.
     connection_parameters (URLParameters, optional): Additional connection parameters. 
-    Default is None, which means the connection will use only the URL.
+    Default is None, which means the connection will use only the host, user, and password.
 
     Returns:
     BlockingConnection: A pika BlockingConnection instance.
 
     Raises:
-    AssertionError: If the URL is not provided or is empty.
+    AssertionError: If the host is not provided or is empty.
     pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
 
     Example:
-    connection = create_rabbitmq_connection('amqp://user:password@localhost:5672/')
+    connection = connect_to_rabbitmq('localhost')
     """
-    assert host, "RabbitMQ connection URL must be provided."
+    assert host, "RabbitMQ host must be provided."
 
-    try:
-        url = f'amqp://{user}:{password}@{host}:5672/'
-        if connection_parameters:
-            parameters = pika.URLParameters(url)
-            parameters.update(connection_parameters)
-        else:
-            parameters = pika.URLParameters(url)
+    user = user or os.environ.get('RABBITMQ_USERNAME')
+    password = password or os.environ.get('RABBITMQ_PASSWORD')
 
-        return pika.BlockingConnection(parameters)
-    except pika.exceptions.AMQPConnectionError as e:
-        raise pika.exceptions.AMQPConnectionError(f"Failed to connect to RabbitMQ: {e}")
+    url = f'amqp://{user}:{password}@{host}:5672/'
+    if connection_parameters:
+        parameters = connection_parameters
+    else:
+        parameters = pika.URLParameters(url)
 
+    return pika.BlockingConnection(parameters)
 
 ##########################
 ####    PostgreSQL    ####
