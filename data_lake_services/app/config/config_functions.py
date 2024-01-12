@@ -2738,20 +2738,5 @@ def load_data(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict)
 #############################################
 ####    RabbitMQ / Pika Functionality    ####
 #############################################
-        
-def create_channel(connection: BlockingConnection) -> BlockingChannel:
-    """
-    Create and return a channel using the provided RabbitMQ connection.
 
-    Args:
-    connection (BlockingConnection): A pika BlockingConnection instance.
 
-    Returns:
-    BlockingChannel: A pika BlockingChannel instance.
-
-    Raises:
-    AssertionError: If the connection is not provided or is not a BlockingConnection instance.
-    """
-    assert isinstance(connection, BlockingConnection), "A valid BlockingConnection must be provided."
-
-    return connection.channel()        

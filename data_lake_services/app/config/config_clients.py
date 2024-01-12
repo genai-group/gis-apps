@@ -109,6 +109,26 @@ def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, pas
     # Create and return the connection
     return pika.BlockingConnection(parameters)
 
+def rabbitmq_create_channel(connection: BlockingConnection) -> BlockingChannel:
+    """
+    Create and return a channel using the provided RabbitMQ connection.
+
+    Args:
+    connection (BlockingConnection): A pika BlockingConnection instance.
+
+    Returns:
+    BlockingChannel: A pika BlockingChannel instance.
+
+    Raises:
+    AssertionError: If the connection is not provided or is not a BlockingConnection instance.
+    """
+    assert isinstance(connection, BlockingConnection), "A valid BlockingConnection must be provided."
+
+    try:
+        return connection.channel()        
+    except Exception as e:
+        raise Exception(f"Error creating channel: {e}")
+
 ##########################
 ####    PostgreSQL    ####
 ##########################
@@ -779,6 +799,8 @@ if GIS_ENVIRONMENT == 'flask-local':
     try:
         rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container')
         print("RabbitMQ connection created successfully with container.")
+        rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
+        print(f"RabbitMQ channel created successfully with container.")
     except Exception as e:
         pass
 
@@ -786,6 +808,8 @@ if GIS_ENVIRONMENT == 'local':
     try:
         rabbitmq_connection = connect_to_rabbitmq('localhost')
         print("RabbitMQ connection created successfully locally.")
+        rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
+        print(f"RabbitMQ channel created successfully with container.")
     except Exception as e:
         pass        
 
