@@ -781,6 +781,8 @@ if GIS_ENVIRONMENT == 'local':
     except Exception as e:
         pass        
 
+
+
 milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
 milvus_create_index("gis_main", "vector")
 milvus_collection.load()
