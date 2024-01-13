@@ -40,7 +40,7 @@ from pymilvus import (
 )
 
 # PyXB => .xsd files
-import pyxb.utils.domutils as domutils
+# import pyxb.utils.domutils as domutils
 
 # Neo4j
 from neo4j import GraphDatabase
