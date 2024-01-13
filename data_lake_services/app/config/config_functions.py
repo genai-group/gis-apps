@@ -2739,4 +2739,86 @@ def load_data(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict)
 ####    RabbitMQ / Pika Functionality    ####
 #############################################
 
+def declare_queue(channel: BlockingChannel, queue_name: str):
+    """
+    Declare a queue on the provided channel.
 
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue to declare.
+
+    Raises:
+    AssertionError: If the channel or queue_name is not provided.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    assert queue_name, "Queue name must be provided."
+
+    try:
+        channel.queue_declare(queue=queue_name)
+        print(f"Declared queue: {queue_name}")
+    except Exception as e:
+        raise Exception(f"Error declaring queue: {e}")
+    
+def set_consumer_callback(channel: BlockingChannel, queue_name: str, callback: Callable):
+    """
+    Set a callback function for consuming messages from a queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue to consume messages from.
+    callback (Callable): The callback function to be called when a message is received.
+
+    Raises:
+    AssertionError: If any of the arguments are not provided or are not of the correct type.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    assert queue_name, "Queue name must be provided."
+    assert callable(callback), "Callback must be a callable function."
+
+    try:
+        channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+        print(f"Set callback for queue: {queue_name}")
+    except Exception as e:
+        raise Exception(f"Error setting callback for queue: {e}")
+
+def publish_message(channel: BlockingChannel, queue_name: str, message: str):
+    """
+    Publish a message to a specified queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue to publish the message to.
+    message (str): The message to be published.
+
+    Raises:
+    AssertionError: If any of the arguments are not provided.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    assert queue_name, "Queue name must be provided."
+    assert message or isinstance(message, str), "Message must be provided and must be a string."
+
+    try:
+        channel.basic_publish(exchange='', routing_key=queue_name, body=message)
+        print(f"Published message to queue: {queue_name}")
+    except Exception as e:
+        raise Exception(f"Error publishing message to queue: {e}")
+    
+def start_consuming(channel: BlockingChannel):
+    """
+    Start consuming messages from the queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+
+    Raises:
+    AssertionError: If the channel is not provided.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
+
+
+    
