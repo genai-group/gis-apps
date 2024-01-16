@@ -165,7 +165,9 @@ async def rabbitmq_create_channel_async(connection: aio_pika.Connection) -> aio_
     assert isinstance(connection, aio_pika.Connection), "A valid aio_pika.Connection must be provided."
 
     try:
-        return await connection.channel()
+        channel = await connection.channel()
+        print(f"channel: {dir(channel)}")
+        return channel
     except Exception as e:
         raise Exception(f"Error creating channel asynchronously: {e}")
 
@@ -188,6 +190,7 @@ async def rabbitmq_create_queue_async(channel: aio_pika.Channel, queue_name: str
 
     try:
         await channel.declare_queue(queue_name, durable=True)
+        print(f"Queue: {queue_name}")
         return queue_name
     except Exception as e:
         raise Exception(f"Error creating queue '{queue_name}' asynchronously: {e}")
@@ -212,6 +215,7 @@ async def rabbitmq_create_exchange_async(channel: aio_pika.Channel, exchange_nam
 
     try:
         await channel.declare_exchange(name=exchange_name, type=exchange_type, durable=True)
+        print(f"exchange_name: {exchange_name}")
         return exchange_name
     except Exception as e:
         raise Exception(f"Error creating exchange '{exchange_name}' asynchronously: {e}")
@@ -239,6 +243,7 @@ async def rabbitmq_create_binding_async(channel: aio_pika.Channel, queue_name: s
         queue = await channel.get_queue(queue_name)
         exchange = await channel.get_exchange(exchange_name)
         await queue.bind(exchange, routing_key)
+        return True
     except Exception as e:
         raise Exception(f"Error creating binding between '{queue_name}' and '{exchange_name}' asynchronously: {e}")
 
@@ -263,11 +268,12 @@ async def rabbitmq_create_consumer_async(channel: aio_pika.Channel, queue_name: 
     try:
         queue = await channel.get_queue(queue_name)
         await queue.consume(callback)
+        return True
     except Exception as e:
         raise Exception(f"Error creating consumer for queue '{queue_name}' asynchronously: {e}")
 
 async def setup_rabbitmq_pipeline_async(rabbitmq_connection: aio_pika.Connection,
-                                        queue_name: str, exchange_name: str, exchange_type: str, 
+                                        queue_name: str, exchange_name: str, exchange_type: str,
                                         routing_key: Optional[str], callback) -> None:
     """
     Asynchronously set up the RabbitMQ pipeline.
