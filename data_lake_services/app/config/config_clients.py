@@ -70,166 +70,194 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
-def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, password: Optional[str] = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+async def connect_to_rabbitmq_async(host: str = 'localhost', 
+                                    user: Optional[str] = None, 
+                                    password: Optional[str] = None, 
+                                    connection_parameters: Optional[URLParameters] = None) -> aio_pika.Connection:
     """
-    Create and return a connection to RabbitMQ.
+    Asynchronously create and return a connection to RabbitMQ.
 
     Args:
-    host (str): The hostname for RabbitMQ, e.g., 'localhost'.
-    user (str, optional): The username for RabbitMQ. Default is taken from RABBITMQ_USERNAME environment variable.
-    password (str, optional): The password for RabbitMQ. Default is taken from RABBITMQ_PASSWORD environment variable.
-    connection_parameters (URLParameters, optional): Additional connection parameters. 
-    Default is None, which means the connection will use only the host, user, and password.
+        host (str): The hostname for RabbitMQ, e.g., 'localhost'.
+        user (Optional[str]): The username for RabbitMQ. Defaults to environment variable RABBITMQ_USERNAME or 'guest'.
+        password (Optional[str]): The password for RabbitMQ. Defaults to environment variable RABBITMQ_PASSWORD or 'guest'.
+        connection_parameters (Optional[URLParameters]): Additional connection parameters. Default is None.
 
     Returns:
-    BlockingConnection: A pika BlockingConnection instance.
+        aio_pika.Connection: An aio_pika Connection instance.
 
     Raises:
-    AssertionError: If the host is not provided or is empty.
-    pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
-
-    Example:
-    connection = connect_to_rabbitmq('localhost', 'user', 'password')
+        AssertionError: If the host is not provided or is empty.
+        aio_pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
+        Exception: For any other unexpected errors.
     """
     assert host, "RabbitMQ host must be provided."
 
-    # Get username and password from environment variables if not provided
-    user = user or os.environ.get('RABBITMQ_USERNAME')
-    password = password or os.environ.get('RABBITMQ_PASSWORD')
+    user = user or os.environ.get('RABBITMQ_USERNAME', 'guest')
+    password = password or os.environ.get('RABBITMQ_PASSWORD', 'guest')
 
-    # Construct the URL for the connection
-    url = f'amqp://{user}:{password}@{host}:5672/'
+    url = f'amqp://{user}:{password}@{host}/'
 
-    # Use connection parameters if provided, else create from URL
     if connection_parameters:
         parameters = connection_parameters
     else:
-        parameters = pika.URLParameters(url)
-
-    # Create and return the connection
-    return pika.BlockingConnection(parameters)
-
-def rabbitmq_create_channel(connection: BlockingConnection) -> BlockingChannel:
-    """
-    Create and return a channel using the provided RabbitMQ connection.
-
-    Args:
-    connection (BlockingConnection): A pika BlockingConnection instance.
-
-    Returns:
-    BlockingChannel: A pika BlockingChannel instance.
-
-    Raises:
-    AssertionError: If the connection is not provided or is not a BlockingConnection instance.
-    """
-    assert isinstance(connection, BlockingConnection), "A valid BlockingConnection must be provided."
+        parameters = URLParameters(url)
 
     try:
-        return connection.channel()        
+        return await aio_pika.connect_robust(parameters)
+    except aio_pika.exceptions.AMQPConnectionError as e:
+        raise ConnectionError(f"Failed to connect to RabbitMQ: {e}")
     except Exception as e:
-        raise Exception(f"Error creating channel: {e}")
+        raise Exception(f"Unexpected error while connecting to RabbitMQ: {e}")
 
-def rabbitmq_create_queue(channel: BlockingChannel, queue_name: str) -> str:
+async def rabbitmq_create_channel_async(connection: aio_pika.Connection) -> aio_pika.Channel:
     """
-    Create a new RabbitMQ queue.
+    Asynchronously create and return a channel using the provided RabbitMQ connection.
 
     Args:
-    channel (BlockingChannel): A pika BlockingChannel instance.
-    queue_name (str): The name of the queue to be created.
+        connection (aio_pika.Connection): An aio_pika Connection instance.
 
     Returns:
-    str: The name of the created queue.
-    """
-    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
-    channel.queue_declare(queue=queue_name)
-    return queue_name
+        aio_pika.Channel: An aio_pika Channel instance.
 
-def rabbitmq_create_exchange(channel: BlockingChannel, exchange_name: str, exchange_type: str) -> str:
+    Raises:
+        AssertionError: If the connection is not provided or is not an aio_pika Connection instance.
+        Exception: For any errors in channel creation.
     """
-    Create a new RabbitMQ exchange.
+    assert isinstance(connection, aio_pika.Connection), "A valid aio_pika.Connection must be provided."
+
+    try:
+        return await connection.channel()
+    except Exception as e:
+        raise Exception(f"Error creating channel asynchronously: {e}")
+
+async def rabbitmq_create_queue_async(channel: aio_pika.Channel, queue_name: str) -> str:
+    """
+    Asynchronously create a new RabbitMQ queue.
 
     Args:
-    channel (BlockingChannel): A pika BlockingChannel instance.
-    exchange_name (str): The name of the exchange to be created.
-    exchange_type (str): The type of the exchange (e.g., 'direct', 'topic', 'fanout').
+        channel (aio_pika.Channel): An aio_pika Channel instance.
+        queue_name (str): The name of the queue to be created.
 
     Returns:
-    str: The name of the created exchange.
-    """
-    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
-    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type)
-    return exchange_name
+        str: The name of the created queue.
 
-def rabbitmq_create_binding(channel: BlockingChannel, queue_name: str, exchange_name: str, routing_key: Optional[str] = '') -> None:
+    Raises:
+        AssertionError: If the channel is not provided or is not an aio_pika Channel instance.
+        Exception: For any errors in queue creation.
     """
-    Create a new binding between a queue and an exchange.
+    assert isinstance(channel, aio_pika.Channel), "A valid aio_pika.Channel must be provided."
+
+    try:
+        await channel.declare_queue(queue_name, durable=True)
+        return queue_name
+    except Exception as e:
+        raise Exception(f"Error creating queue '{queue_name}' asynchronously: {e}")
+
+async def rabbitmq_create_exchange_async(channel: aio_pika.Channel, exchange_name: str, exchange_type: str) -> str:
+    """
+    Asynchronously create a new RabbitMQ exchange.
 
     Args:
-    channel (BlockingChannel): A pika BlockingChannel instance.
-    queue_name (str): The name of the queue.
-    exchange_name (str): The name of the exchange.
-    routing_key (str, optional): The routing key for the binding. Default is an empty string.
+        channel (aio_pika.Channel): An aio_pika Channel instance.
+        exchange_name (str): The name of the exchange to be created.
+        exchange_type (str): The type of the exchange (e.g., 'direct', 'topic', 'fanout').    
 
     Returns:
-    None
-    """
-    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
-    channel.queue_bind(queue=queue_name, exchange=exchange_name, routing_key=routing_key)
+        str: The name of the created exchange.
 
-def rabbitmq_create_consumer(channel: BlockingChannel, queue_name: str, callback) -> None:
+    Raises:
+        AssertionError: If the channel is not provided or is not an aio_pika Channel instance.
+        Exception: For any errors in exchange creation.
     """
-    Create a consumer for a RabbitMQ queue.
+    assert isinstance(channel, aio_pika.Channel), "A valid aio_pika.Channel must be provided."
+
+    try:
+        await channel.declare_exchange(name=exchange_name, type=exchange_type, durable=True)
+        return exchange_name
+    except Exception as e:
+        raise Exception(f"Error creating exchange '{exchange_name}' asynchronously: {e}")
+
+async def rabbitmq_create_binding_async(channel: aio_pika.Channel, queue_name: str, exchange_name: str, routing_key: Optional[str] = '') -> None:
+    """
+    Asynchronously create a new binding between a queue and an exchange.
 
     Args:
-    channel (BlockingChannel): A pika BlockingChannel instance.
-    queue_name (str): The name of the queue.
-    callback (callable): A callback function to handle incoming messages.
+        channel (aio_pika.Channel): An aio_pika Channel instance.
+        queue_name (str): The name of the queue.
+        exchange_name (str): The name of the exchange.
+        routing_key (Optional[str]): The routing key for the binding. Default is an empty string.
 
     Returns:
-    None
-    """
-    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
-    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+        None
 
-def setup_rabbitmq_pipeline(host: str, user: Optional[str], password: Optional[str], 
-                            queue_name: str, exchange_name: str, exchange_type: str, 
-                            routing_key: Optional[str], callback):
+    Raises:
+        AssertionError: If the channel is not provided or is not an aio_pika Channel instance.
+        Exception: For any errors in binding creation.
     """
+    assert isinstance(channel, aio_pika.Channel), "A valid aio_pika.Channel must be provided."
+
+    try:
+        queue = await channel.get_queue(queue_name)
+        exchange = await channel.get_exchange(exchange_name)
+        await queue.bind(exchange, routing_key)
+    except Exception as e:
+        raise Exception(f"Error creating binding between '{queue_name}' and '{exchange_name}' asynchronously: {e}")
+
+async def rabbitmq_create_consumer_async(channel: aio_pika.Channel, queue_name: str, callback) -> None:
+    """
+    Asynchronously create a consumer for a RabbitMQ queue.
+
+    Args:
+        channel (aio_pika.Channel): An aio_pika Channel instance.
+        queue_name (str): The name of the queue.
+        callback (callable): A callback function to handle incoming messages.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the channel is not provided or is not an aio_pika Channel instance.
+        Exception: For any errors in consumer setup.
+    """
+    assert isinstance(channel, aio_pika.Channel), "A valid aio_pika.Channel must be provided."
+
+    try:
+        queue = await channel.get_queue(queue_name)
+        await queue.consume(callback)
+    except Exception as e:
+        raise Exception(f"Error creating consumer for queue '{queue_name}' asynchronously: {e}")
+
+async def setup_rabbitmq_pipeline_async(host: str, user: Optional[str], password: Optional[str], 
+                                        queue_name: str, exchange_name: str, exchange_type: str, 
+                                        routing_key: Optional[str], callback):
+    """
+    Asynchronously set up the RabbitMQ pipeline.
+
     Args:
     host (str): The hostname for RabbitMQ.
     user (str, optional): The username for RabbitMQ.
     password (str, optional): The password for RabbitMQ.
     queue_name (str): The name of the queue to be created.
     exchange_name (str): The name of the exchange to be created.
-    exchange_type (str): The type of the exchange (e.g., 'direct', 'topic', 'fanout').
-    routing_key (str, optional): The routing key for the binding. Default is an empty string.
+    exchange_type (str): The type of the exchange.
+    routing_key (str, optional): The routing key for the binding.
     callback (callable): A callback function to handle incoming messages.
-
-    Returns:
-    None
 
     Raises:
     Exception: If any part of the setup fails.
     """
-    from sspipe import p
-
     try:
-        # Establish connection and create channel
-        connection = (host | p(lambda h: connect_to_rabbitmq(h, user, password)))
-        channel = (connection | p(rabbitmq_create_channel))
-
-        # Create queue, exchange, and binding
-        queue_name | p(lambda q: rabbitmq_create_queue(channel, q))
-        exchange_name | p(lambda e: rabbitmq_create_exchange(channel, e, exchange_type))
-        (queue_name, exchange_name, routing_key) | p(lambda q, e, rk: rabbitmq_create_binding(channel, q, e, rk))
-
-        # Create consumer
-        (queue_name, callback) | p(lambda q, cb: rabbitmq_create_consumer(channel, q, cb))
+        connection = await connect_to_rabbitmq_async(host, user, password)
+        channel = await rabbitmq_create_channel_async(connection)
+        await rabbitmq_create_queue_async(channel, queue_name)
+        await rabbitmq_create_exchange_async(channel, exchange_name, exchange_type)
+        await rabbitmq_create_binding_async(channel, queue_name, exchange_name, routing_key)
+        await rabbitmq_create_consumer_async(channel, queue_name, callback)
 
         print("RabbitMQ pipeline setup complete.")
-
     except Exception as e:
-        raise Exception(f"Error in setting up RabbitMQ pipeline: {e}")
+        raise Exception(f"Error in setting up RabbitMQ pipeline asynchronously: {e}")
 
 
 ##########################
