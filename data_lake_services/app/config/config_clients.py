@@ -356,7 +356,10 @@ async def rabbitmq_log_action_async(db_client: AsyncIOMotorClient, log_data: dic
     except Exception as e:
         raise Exception(f"Error logging RabbitMQ action asynchronously: {e}")
 
-
+async def sample_callback(message: aio_pika.IncomingMessage):
+    async with message.process():
+        print("Received message:", message.body.decode())
+        # Further processing can be done here
 
 
 ##########################
@@ -1058,7 +1061,7 @@ if GIS_ENVIRONMENT == 'local':
                                         exchange_name, 
                                         exchange_type, 
                                         routing_key, 
-                                        callback)
+                                        sample_callback)
         
     except Exception as e:
         print(f"Error connecting to RabbitMQ locally: {e}")
@@ -1074,7 +1077,7 @@ if GIS_ENVIRONMENT == 'flask-local':
                                         exchange_name, 
                                         exchange_type, 
                                         routing_key, 
-                                        callback)
+                                        sample_callback)
 
     except Exception as e:
         print(f"Error connecting to RabbitMQ with Flask API: {e}")

@@ -88,7 +88,7 @@ import pytest
 import redis
 
 # Typing
-from typing import List, Dict, Tuple, Union, Any, Optional, Coroutine, Callable, Awaitable, Iterable, AsyncIterable, TypeVar, Generic, Iterator
+from typing import List, Dict, Tuple, Union, Any, Optional, Coroutine, Callable, Awaitable, Iterable, AsyncIterable, TypeVar, Generic, Iterator, Callable
 
 # Connect to PostgreSQL
 import psycopg2
