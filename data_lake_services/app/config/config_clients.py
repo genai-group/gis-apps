@@ -1050,6 +1050,7 @@ if GIS_ENVIRONMENT == 'local':
     routing_key = 'example_routing_key'
 
     try:
+        print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
         rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
         print("RabbitMQ connection created successfully locally.")
         setup_rabbitmq_pipeline_async(rabbitmq_connection,
@@ -1065,6 +1066,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
+        print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
         rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
         print("RabbitMQ connection created successfully with container.")
         setup_rabbitmq_pipeline_async(rabbitmq_connection,

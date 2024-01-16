@@ -104,6 +104,7 @@ def upload_document():
 
         # Output the file type
         file_type = file.content_type
+        logging.info(f"File Type: {file_type}")
 
     return jsonify({
         "status": "success",
