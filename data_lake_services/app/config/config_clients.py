@@ -70,7 +70,7 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
-def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str], password: Optional[str], connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = '', password: Optional[str] = '', connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
     """
     Create and return a connection to RabbitMQ.
 
