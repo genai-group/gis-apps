@@ -97,10 +97,9 @@ def upload_document():
         filename = secure_filename(file.filename)
         document_name = request.form.get('name', filename)  # Default to original filename if name not provided
 
-        UPLOAD_FOLDER = '/uploads'
-
         # Save the file to the specified UPLOAD_FOLDER
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(file_path)
 
     return jsonify({

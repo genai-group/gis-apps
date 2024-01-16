@@ -23,3 +23,5 @@ NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD', 'password')
 
 # TypeDB Credentials
 TYPEDB_URI = os.environ.get('TYPEDB_HOST', 'localhost') + ':' + os.environ.get('TYPEDB_PORT', '1729')
+
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', 'uploads')
