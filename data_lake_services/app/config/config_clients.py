@@ -70,6 +70,45 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
+def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, password: Optional[str] = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+    """
+    Create and return a connection to RabbitMQ.
+
+    Args:
+    host (str): The hostname for RabbitMQ, e.g., 'localhost'.
+    user (str, optional): The username for RabbitMQ. Default is taken from RABBITMQ_USERNAME environment variable.
+    password (str, optional): The password for RabbitMQ. Default is taken from RABBITMQ_PASSWORD environment variable.
+    connection_parameters (URLParameters, optional): Additional connection parameters. 
+    Default is None, which means the connection will use only the host, user, and password.
+
+    Returns:
+    BlockingConnection: A pika BlockingConnection instance.
+
+    Raises:
+    AssertionError: If the host is not provided or is empty.
+    pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
+
+    Example:
+    connection = connect_to_rabbitmq('localhost', 'user', 'password')
+    """
+    assert host, "RabbitMQ host must be provided."
+
+    # Get username and password from environment variables if not provided
+    user = user or os.environ.get('RABBITMQ_USERNAME')
+    password = password or os.environ.get('RABBITMQ_PASSWORD')
+
+    # Construct the URL for the connection
+    url = f'amqp://{user}:{password}@{host}:5672/'
+
+    # Use connection parameters if provided, else create from URL
+    if connection_parameters:
+        parameters = connection_parameters
+    else:
+        parameters = pika.URLParameters(url)
+
+    # Create and return the connection
+    return pika.BlockingConnection(parameters)
+
 async def connect_to_rabbitmq_async(host: str = 'localhost', 
                                     user: Optional[str] = None, 
                                     password: Optional[str] = None, 
@@ -228,9 +267,9 @@ async def rabbitmq_create_consumer_async(channel: aio_pika.Channel, queue_name: 
     except Exception as e:
         raise Exception(f"Error creating consumer for queue '{queue_name}' asynchronously: {e}")
 
-async def setup_rabbitmq_pipeline_async(host: str, user: Optional[str], password: Optional[str], 
+async def setup_rabbitmq_pipeline_async(rabbitmq_connection: aio_pika.Connection,
                                         queue_name: str, exchange_name: str, exchange_type: str, 
-                                        routing_key: Optional[str], callback):
+                                        routing_key: Optional[str], callback) -> None:
     """
     Asynchronously set up the RabbitMQ pipeline.
 
@@ -248,8 +287,8 @@ async def setup_rabbitmq_pipeline_async(host: str, user: Optional[str], password
     Exception: If any part of the setup fails.
     """
     try:
-        connection = await connect_to_rabbitmq_async(host, user, password)
-        channel = await rabbitmq_create_channel_async(connection)
+        # connection = await connect_to_rabbitmq_async(host, user, password)
+        channel = await rabbitmq_create_channel_async(rabbitmq_connection)
         await rabbitmq_create_queue_async(channel, queue_name)
         await rabbitmq_create_exchange_async(channel, exchange_name, exchange_type)
         await rabbitmq_create_binding_async(channel, queue_name, exchange_name, routing_key)
@@ -1012,54 +1051,28 @@ if GIS_ENVIRONMENT == 'local':
     routing_key = 'example_routing_key'
 
     try:
-        rabbitmq_connection = await connect_to_rabbitmq_async('localhost', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        rabbitmq_connection = connect_to_rabbitmq('localhost')
         print("RabbitMQ connection created successfully locally.")
-
-        rabbitmq_channel = await rabbitmq_create_channel_async(rabbitmq_connection)
-        print("RabbitMQ channel created successfully.")
-
-        # Create queue
-        await rabbitmq_create_queue_async(rabbitmq_channel, queue_name)
-        print(f"Queue '{queue_name}' created successfully.")
-
-        # Create exchange
-        await rabbitmq_create_exchange_async(rabbitmq_channel, exchange_name, exchange_type)
-        print(f"Exchange '{exchange_name}' created successfully.")
-
-        # Create binding
-        await rabbitmq_create_binding_async(rabbitmq_channel, queue_name, exchange_name, routing_key)
-        print(f"Binding created successfully for queue '{queue_name}' and exchange '{exchange_name}'.")
-
-        # Create consumer
-        await rabbitmq_create_consumer_async(rabbitmq_channel, queue_name, callback)
-        print(f"Consumer created successfully for queue '{queue_name}'.")
-
+        setup_rabbitmq_pipeline_async(rabbitmq_connection,
+                                        queue_name, 
+                                        exchange_name, 
+                                        exchange_type, 
+                                        routing_key, 
+                                        callback)
+        
     except Exception as e:
         pass
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        rabbitmq_connection = await connect_to_rabbitmq_async('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container')
         print("RabbitMQ connection created successfully with container.")
-
-        rabbitmq_channel = await rabbitmq_create_channel_async(rabbitmq_connection)
-        print("RabbitMQ channel created successfully with container.")
-
-        # Create queue
-        await rabbitmq_create_queue_async(rabbitmq_channel, queue_name)
-        print(f"Queue '{queue_name}' created successfully.")
-
-        # Create exchange
-        await rabbitmq_create_exchange_async(rabbitmq_channel, exchange_name, exchange_type)
-        print(f"Exchange '{exchange_name}' created successfully.")
-
-        # Create binding
-        await rabbitmq_create_binding_async(rabbitmq_channel, queue_name, exchange_name, routing_key)
-        print(f"Binding created successfully for queue '{queue_name}' and exchange '{exchange_name}'.")
-
-        # Create consumer
-        await rabbitmq_create_consumer_async(rabbitmq_channel, queue_name, callback)
-        print(f"Consumer created successfully for queue '{queue_name}'.")
+        setup_rabbitmq_pipeline_async(rabbitmq_connection,
+                                        queue_name, 
+                                        exchange_name, 
+                                        exchange_type, 
+                                        routing_key, 
+                                        callback)
 
     except Exception as e:
         pass
