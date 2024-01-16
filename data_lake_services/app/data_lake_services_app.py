@@ -102,10 +102,14 @@ def upload_document():
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(file_path)
 
+        # Output the file type
+        file_type = file.content_type
+
     return jsonify({
         "status": "success",
         "message": f"File '{document_name}' uploaded successfully",
-        "file_path": file_path
+        "file_path": file_path,
+        "file_type": file_type
     }), 200
 
 
