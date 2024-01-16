@@ -81,6 +81,33 @@ def perform_search():
         "data": results
     }), 200
 
+@app.route('/upload', methods=['POST'])
+def upload_document():
+    # Check if the post request has the file part
+    if 'document' not in request.files:
+        return jsonify({"status": "error", "message": "No file part"}), 400
+    file = request.files['document']
+
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "No selected file"}), 400
+
+    if file:
+        filename = secure_filename(file.filename)
+        document_name = request.form.get('name', filename)  # Default to original filename if name not provided
+
+        # Save the file to the specified UPLOAD_FOLDER
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+    return jsonify({
+        "status": "success",
+        "message": f"File '{document_name}' uploaded successfully",
+        "file_path": file_path
+    }), 200
+
+
 # @app.route('/search', methods=['POST'])
 # def perform_search():
 #     data = request.json.get('query')

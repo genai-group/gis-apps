@@ -88,7 +88,61 @@
             }
           }
         }
-      }
+      },
+      "/upload": {
+        "post": {
+            "summary": "Upload a document",
+            "tags": ["Upload"],
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "multipart/form-data": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "document": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "The document to upload"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Name for the document"
+                                }
+                            },
+                            "required": ["document"]
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "201": {
+                    "description": "Document uploaded successfully",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Status of the upload operation"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "description": "Additional information about the upload"
+                                    }
+                                },
+                                "required": ["status"]
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Invalid request or missing file"
+                    }
+                }
+            }
+        }
     },
     "components": {
       "schemas": {
