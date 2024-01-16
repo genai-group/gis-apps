@@ -1051,7 +1051,7 @@ if GIS_ENVIRONMENT == 'local':
     routing_key = 'example_routing_key'
 
     try:
-        rabbitmq_connection = connect_to_rabbitmq('localhost')
+        rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
         print("RabbitMQ connection created successfully locally.")
         setup_rabbitmq_pipeline_async(rabbitmq_connection,
                                         queue_name, 
