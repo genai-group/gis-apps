@@ -70,7 +70,7 @@ def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
 ####    RabbitMQ    ####
 ########################
 
-def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, password: Optional[str] = None, connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
+def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str], password: Optional[str], connection_parameters: Optional[URLParameters] = None) -> pika.BlockingConnection:
     """
     Create and return a connection to RabbitMQ.
 
@@ -92,10 +92,9 @@ def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = None, pas
     connection = connect_to_rabbitmq('localhost', 'user', 'password')
     """
     assert host, "RabbitMQ host must be provided."
-
-    # Get username and password from environment variables if not provided
-    user = user or os.environ.get('RABBITMQ_USERNAME')
-    password = password or os.environ.get('RABBITMQ_PASSWORD')
+    assert isinstance(host, str), "RabbitMQ host must be a string."
+    assert isinstance(user, str), "RabbitMQ username must be a string."
+    assert isinstance(password, str), "RabbitMQ password must be a string."
 
     # Construct the URL for the connection
     url = f'amqp://{user}:{password}@{host}:5672/'
@@ -1061,7 +1060,7 @@ if GIS_ENVIRONMENT == 'local':
                                         callback)
         
     except Exception as e:
-        print(f"Error connecting to RabbitMQ locally: {e}"")
+        print(f"Error connecting to RabbitMQ locally: {e}")
         pass
 
 if GIS_ENVIRONMENT == 'flask-local':
