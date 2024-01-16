@@ -129,6 +129,125 @@ def rabbitmq_create_channel(connection: BlockingConnection) -> BlockingChannel:
     except Exception as e:
         raise Exception(f"Error creating channel: {e}")
 
+def rabbitmq_create_queue(channel: BlockingChannel, queue_name: str) -> str:
+    """
+    Create a new RabbitMQ queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue to be created.
+
+    Returns:
+    str: The name of the created queue.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    channel.queue_declare(queue=queue_name)
+    return queue_name
+
+
+def rabbitmq_create_queue(channel: BlockingChannel, queue_name: str) -> str:
+    """
+    Create a new RabbitMQ queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue to be created.
+
+    Returns:
+    str: The name of the created queue.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    channel.queue_declare(queue=queue_name)
+    return queue_name
+
+def rabbitmq_create_exchange(channel: BlockingChannel, exchange_name: str, exchange_type: str) -> str:
+    """
+    Create a new RabbitMQ exchange.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    exchange_name (str): The name of the exchange to be created.
+    exchange_type (str): The type of the exchange (e.g., 'direct', 'topic', 'fanout').
+
+    Returns:
+    str: The name of the created exchange.
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type)
+    return exchange_name
+
+def rabbitmq_create_binding(channel: BlockingChannel, queue_name: str, exchange_name: str, routing_key: Optional[str] = '') -> None:
+    """
+    Create a new binding between a queue and an exchange.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue.
+    exchange_name (str): The name of the exchange.
+    routing_key (str, optional): The routing key for the binding. Default is an empty string.
+
+    Returns:
+    None
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    channel.queue_bind(queue=queue_name, exchange=exchange_name, routing_key=routing_key)
+
+def rabbitmq_create_consumer(channel: BlockingChannel, queue_name: str, callback) -> None:
+    """
+    Create a consumer for a RabbitMQ queue.
+
+    Args:
+    channel (BlockingChannel): A pika BlockingChannel instance.
+    queue_name (str): The name of the queue.
+    callback (callable): A callback function to handle incoming messages.
+
+    Returns:
+    None
+    """
+    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
+    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+def setup_rabbitmq_pipeline(host: str, user: Optional[str], password: Optional[str], 
+                            queue_name: str, exchange_name: str, exchange_type: str, 
+                            routing_key: Optional[str], callback):
+    """
+    Args:
+    host (str): The hostname for RabbitMQ.
+    user (str, optional): The username for RabbitMQ.
+    password (str, optional): The password for RabbitMQ.
+    queue_name (str): The name of the queue to be created.
+    exchange_name (str): The name of the exchange to be created.
+    exchange_type (str): The type of the exchange (e.g., 'direct', 'topic', 'fanout').
+    routing_key (str, optional): The routing key for the binding. Default is an empty string.
+    callback (callable): A callback function to handle incoming messages.
+
+    Returns:
+    None
+
+    Raises:
+    Exception: If any part of the setup fails.
+    """
+    from sspipe import p
+
+    try:
+        # Establish connection and create channel
+        connection = (host | p(lambda h: connect_to_rabbitmq(h, user, password)))
+        channel = (connection | p(rabbitmq_create_channel))
+
+        # Create queue, exchange, and binding
+        queue_name | p(lambda q: rabbitmq_create_queue(channel, q))
+        exchange_name | p(lambda e: rabbitmq_create_exchange(channel, e, exchange_type))
+        (queue_name, exchange_name, routing_key) | p(lambda q, e, rk: rabbitmq_create_binding(channel, q, e, rk))
+
+        # Create consumer
+        (queue_name, callback) | p(lambda q, cb: rabbitmq_create_consumer(channel, q, cb))
+
+        print("RabbitMQ pipeline setup complete.")
+
+    except Exception as e:
+        raise Exception(f"Error in setting up RabbitMQ pipeline: {e}")
+
+
 ##########################
 ####    PostgreSQL    ####
 ##########################
