@@ -29,4 +29,3 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     UPLOAD_FOLDER = 'app/config/uploads'
-
