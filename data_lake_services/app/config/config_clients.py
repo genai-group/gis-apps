@@ -1068,6 +1068,11 @@ if GIS_ENVIRONMENT == 'local':
         pass
 
 if GIS_ENVIRONMENT == 'flask-local':
+    queue_name = 'example_queue'
+    exchange_name = 'example_exchange'
+    exchange_type = 'direct'
+    routing_key = 'example_routing_key'
+
     try:
         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
         rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
