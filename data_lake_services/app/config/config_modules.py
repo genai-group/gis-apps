@@ -12,6 +12,8 @@ import random
 import sspipe
 import hashlib
 import logging
+import asyncio
+import aio_pika
 import textwrap
 import xmltodict
 import unicodedata

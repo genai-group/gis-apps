@@ -144,22 +144,6 @@ def rabbitmq_create_queue(channel: BlockingChannel, queue_name: str) -> str:
     channel.queue_declare(queue=queue_name)
     return queue_name
 
-
-def rabbitmq_create_queue(channel: BlockingChannel, queue_name: str) -> str:
-    """
-    Create a new RabbitMQ queue.
-
-    Args:
-    channel (BlockingChannel): A pika BlockingChannel instance.
-    queue_name (str): The name of the queue to be created.
-
-    Returns:
-    str: The name of the created queue.
-    """
-    assert isinstance(channel, BlockingChannel), "A valid BlockingChannel must be provided."
-    channel.queue_declare(queue=queue_name)
-    return queue_name
-
 def rabbitmq_create_exchange(channel: BlockingChannel, exchange_name: str, exchange_type: str) -> str:
     """
     Create a new RabbitMQ exchange.
