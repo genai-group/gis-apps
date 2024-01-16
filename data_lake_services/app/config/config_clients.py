@@ -259,6 +259,67 @@ async def setup_rabbitmq_pipeline_async(host: str, user: Optional[str], password
     except Exception as e:
         raise Exception(f"Error in setting up RabbitMQ pipeline asynchronously: {e}")
 
+async def rabbitmq_store_config_async(db_client: AsyncIOMotorClient, config_data: dict, collection_name: str) -> None:
+    """
+    Asynchronously store RabbitMQ configuration data in MongoDB.
+
+    Args:
+    db_client (AsyncIOMotorClient): Asynchronous MongoDB client instance.
+    config_data (dict): Configuration data to be stored.
+    collection_name (str): The name of the MongoDB collection.
+
+    Raises:
+    Exception: If storing data fails.
+    """
+    try:
+        db = db_client['rabbitmq_config_db']
+        collection = db[collection_name]
+        await collection.insert_one(config_data)
+    except Exception as e:
+        raise Exception(f"Error storing RabbitMQ configuration asynchronously: {e}")
+
+async def rabbitmq_get_config_async(db_client: AsyncIOMotorClient, collection_name: str) -> Optional[dict]:
+    """
+    Asynchronously retrieve RabbitMQ configuration data from MongoDB.
+
+    Args:
+    db_client (AsyncIOMotorClient): Asynchronous MongoDB client instance.
+    collection_name (str): The name of the MongoDB collection.
+
+    Returns:
+    Optional[dict]: Configuration data if found, else None.
+
+    Raises:
+    Exception: If retrieval fails.
+    """
+    try:
+        db = db_client['rabbitmq_config_db']
+        collection = db[collection_name]
+        return await collection.find_one()
+    except Exception as e:
+        raise Exception(f"Error retrieving RabbitMQ configuration asynchronously: {e}")
+
+async def rabbitmq_log_action_async(db_client: AsyncIOMotorClient, log_data: dict, log_collection: str = "rabbitmq_logs") -> None:
+    """
+    Asynchronously log actions or changes related to RabbitMQ configurations in MongoDB.
+
+    Args:
+    db_client (AsyncIOMotorClient): Asynchronous MongoDB client instance.
+    log_data (dict): Log data to be stored.
+    log_collection (str): The name of the MongoDB log collection.
+
+    Raises:
+    Exception: If logging fails.
+    """
+    try:
+        db = db_client['rabbitmq_config_db']
+        collection = db[log_collection]
+        await collection.insert_one(log_data)
+    except Exception as e:
+        raise Exception(f"Error logging RabbitMQ action asynchronously: {e}")
+
+
+
 
 ##########################
 ####    PostgreSQL    ####
@@ -926,23 +987,82 @@ milvus_create_index("gis_main", "vector")
 milvus_collection.load()
 
 # Load RabbitMQ
-if GIS_ENVIRONMENT == 'flask-local':
+# if GIS_ENVIRONMENT == 'flask-local':
+#     try:
+#         rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container')
+#         print("RabbitMQ connection created successfully with container.")
+#         rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
+#         print(f"RabbitMQ channel created successfully with container.")
+#     except Exception as e:
+#         pass
+
+# if GIS_ENVIRONMENT == 'local':
+#     try:
+#         rabbitmq_connection = connect_to_rabbitmq('localhost')
+#         print("RabbitMQ connection created successfully locally.")
+#         rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
+#         print(f"RabbitMQ channel created successfully with container.")
+#     except Exception as e:
+#         pass        
+
+if GIS_ENVIRONMENT == 'local':
+    queue_name = 'example_queue'
+    exchange_name = 'example_exchange'
+    exchange_type = 'direct'
+    routing_key = 'example_routing_key'
+
     try:
-        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container')
-        print("RabbitMQ connection created successfully with container.")
-        rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
-        print(f"RabbitMQ channel created successfully with container.")
+        rabbitmq_connection = await connect_to_rabbitmq_async('localhost', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        print("RabbitMQ connection created successfully locally.")
+
+        rabbitmq_channel = await rabbitmq_create_channel_async(rabbitmq_connection)
+        print("RabbitMQ channel created successfully.")
+
+        # Create queue
+        await rabbitmq_create_queue_async(rabbitmq_channel, queue_name)
+        print(f"Queue '{queue_name}' created successfully.")
+
+        # Create exchange
+        await rabbitmq_create_exchange_async(rabbitmq_channel, exchange_name, exchange_type)
+        print(f"Exchange '{exchange_name}' created successfully.")
+
+        # Create binding
+        await rabbitmq_create_binding_async(rabbitmq_channel, queue_name, exchange_name, routing_key)
+        print(f"Binding created successfully for queue '{queue_name}' and exchange '{exchange_name}'.")
+
+        # Create consumer
+        await rabbitmq_create_consumer_async(rabbitmq_channel, queue_name, callback)
+        print(f"Consumer created successfully for queue '{queue_name}'.")
+
     except Exception as e:
         pass
 
-if GIS_ENVIRONMENT == 'local':
+if GIS_ENVIRONMENT == 'flask-local':
     try:
-        rabbitmq_connection = connect_to_rabbitmq('localhost')
-        print("RabbitMQ connection created successfully locally.")
-        rabbitmq_channel = rabbitmq_create_channel(rabbitmq_connection)
-        print(f"RabbitMQ channel created successfully with container.")
+        rabbitmq_connection = await connect_to_rabbitmq_async('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        print("RabbitMQ connection created successfully with container.")
+
+        rabbitmq_channel = await rabbitmq_create_channel_async(rabbitmq_connection)
+        print("RabbitMQ channel created successfully with container.")
+
+        # Create queue
+        await rabbitmq_create_queue_async(rabbitmq_channel, queue_name)
+        print(f"Queue '{queue_name}' created successfully.")
+
+        # Create exchange
+        await rabbitmq_create_exchange_async(rabbitmq_channel, exchange_name, exchange_type)
+        print(f"Exchange '{exchange_name}' created successfully.")
+
+        # Create binding
+        await rabbitmq_create_binding_async(rabbitmq_channel, queue_name, exchange_name, routing_key)
+        print(f"Binding created successfully for queue '{queue_name}' and exchange '{exchange_name}'.")
+
+        # Create consumer
+        await rabbitmq_create_consumer_async(rabbitmq_channel, queue_name, callback)
+        print(f"Consumer created successfully for queue '{queue_name}'.")
+
     except Exception as e:
-        pass        
+        pass
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
