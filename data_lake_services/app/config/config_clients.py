@@ -273,9 +273,7 @@ async def setup_rabbitmq_pipeline_async(rabbitmq_connection: aio_pika.Connection
     Asynchronously set up the RabbitMQ pipeline.
 
     Args:
-    host (str): The hostname for RabbitMQ.
-    user (str, optional): The username for RabbitMQ.
-    password (str, optional): The password for RabbitMQ.
+    rabbitmq_connection (aio_pika.Connection): An aio_pika Connection instance.
     queue_name (str): The name of the queue to be created.
     exchange_name (str): The name of the exchange to be created.
     exchange_type (str): The type of the exchange.
@@ -286,8 +284,8 @@ async def setup_rabbitmq_pipeline_async(rabbitmq_connection: aio_pika.Connection
     Exception: If any part of the setup fails.
     """
     try:
-        # connection = await connect_to_rabbitmq_async(host, user, password)
         channel = await rabbitmq_create_channel_async(rabbitmq_connection)
+        print(f"channel: {dir(channel)}")
         await rabbitmq_create_queue_async(channel, queue_name)
         await rabbitmq_create_exchange_async(channel, exchange_name, exchange_type)
         await rabbitmq_create_binding_async(channel, queue_name, exchange_name, routing_key)
