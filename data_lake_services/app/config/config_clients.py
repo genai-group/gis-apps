@@ -1054,7 +1054,7 @@ if GIS_ENVIRONMENT == 'local':
 
     try:
         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-        rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
         print("RabbitMQ connection created successfully locally.")
         setup_rabbitmq_pipeline_async(rabbitmq_connection,
                                         queue_name, 
@@ -1070,7 +1070,7 @@ if GIS_ENVIRONMENT == 'local':
 if GIS_ENVIRONMENT == 'flask-local':
     try:
         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME'), os.environ.get('RABBITMQ_PASSWORD'))
+        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
         print("RabbitMQ connection created successfully with container.")
         setup_rabbitmq_pipeline_async(rabbitmq_connection,
                                         queue_name, 
