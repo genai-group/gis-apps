@@ -1061,6 +1061,7 @@ if GIS_ENVIRONMENT == 'local':
                                         callback)
         
     except Exception as e:
+        print(f"Error connecting to RabbitMQ locally: {e}"")
         pass
 
 if GIS_ENVIRONMENT == 'flask-local':
@@ -1075,6 +1076,7 @@ if GIS_ENVIRONMENT == 'flask-local':
                                         callback)
 
     except Exception as e:
+        print(f"Error connecting to RabbitMQ with Flask API: {e}")
         pass
 
 # Load Vault
