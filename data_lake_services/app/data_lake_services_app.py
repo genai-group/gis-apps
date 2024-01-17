@@ -117,6 +117,15 @@ def upload_document():
 ####    RabbitMQ Process Message    ####
 ########################################
 
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+# Start a new event loop in a background thread
+loop = asyncio.new_event_loop()
+t = threading.Thread(target=start_loop, args=(loop,))
+t.start()
+
 @app.route('/send', methods=['POST'])
 def send():
     data = request.json
@@ -125,9 +134,8 @@ def send():
 
 @app.route('/start_consumer', methods=['GET'])
 def start_consumer():
-    asyncio.create_task(consume_message('example_queue', process_message))
+    asyncio.run_coroutine_threadsafe(consume_message('example_queue', process_message), loop)
     return "Consumer started", 200
-
 
 # @app.route('/search', methods=['POST'])
 # def perform_search():

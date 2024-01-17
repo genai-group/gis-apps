@@ -1182,10 +1182,14 @@ run_main_async()
 ####    Consumer    ####
 ########################
 
-async def consume_message(queue_name, process_function):
+async def consume_message(queue_name: str, process_function: Callable) -> None:
     user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
     password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
-    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@rabbitmq/")
+    if GIS_ENVIRONMENT == 'local':
+        host = 'localhost'
+    if GIS_ENVIRONMENT == 'flask-local':
+        host = 'rabbitmq-container'
+    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@{host}/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue(queue_name, durable=True)
@@ -1194,7 +1198,11 @@ async def consume_message(queue_name, process_function):
 async def send_message(queue_name, message):
     user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
     password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
-    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@rabbitmq/")
+    if GIS_ENVIRONMENT == 'local':
+        host = 'localhost'
+    if GIS_ENVIRONMENT == 'flask-local':
+        host = 'rabbitmq-container'
+    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@{host}/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue(queue_name, durable=True)
