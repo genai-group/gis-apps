@@ -129,8 +129,11 @@ t.start()
 @app.route('/send', methods=['POST'])
 def send():
     data = request.json
-    asyncio.run(send_message('example_queue', data['message']))
-    return "Message sent", 200
+    if data and 'message' in data:
+        asyncio.run_coroutine_threadsafe(send_message('example_queue', data['message']), loop)
+        return jsonify({"status": "Message sent"}), 200
+    else:
+        return jsonify({"error": "Invalid request"}), 400
 
 @app.route('/start_consumer', methods=['GET'])
 def start_consumer():

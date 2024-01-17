@@ -1198,16 +1198,16 @@ async def consume_message(queue_name: str, process_function: Callable) -> None:
 async def send_message(queue_name, message):
     user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
     password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
-    if GIS_ENVIRONMENT == 'local':
-        host = 'localhost'
-    if GIS_ENVIRONMENT == 'flask-local':
-        host = 'rabbitmq-container'
+    GIS_ENVIRONMENT = os.environ.get('GIS_ENVIRONMENT', 'local')
+    host = 'localhost' if GIS_ENVIRONMENT == 'local' else 'rabbitmq-container'
+
     connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@{host}/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue(queue_name, durable=True)
         await channel.default_exchange.publish(
-            aio_pika.Message(body=message.encode()), routing_key=queue.name)
+            aio_pika.Message(body=str(message).encode()), routing_key=queue.name)
+
 
 async def process_message(message: aio_pika.IncomingMessage):
     with message.process():
