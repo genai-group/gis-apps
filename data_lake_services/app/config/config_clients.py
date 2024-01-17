@@ -1123,7 +1123,20 @@ async def main(rabbitmq_connection: aio_pika.Connection):
         print(f"Error connecting to RabbitMQ locally: {e}")
 
 # Replace this with your GIS_ENVIRONMENT check
-asyncio.run(main(rabbitmq_connection))
+# Check if an existing event loop is running
+try:
+    loop = asyncio.get_running_loop()
+except RuntimeError:  # No running event loop
+    loop = None
+
+if loop and loop.is_running():
+    print("Running inside existing event loop")
+    # Schedule main to run, the event loop is already running
+    task = loop.create_task(main(rabbitmq_connection))
+else:
+    print("Starting new event loop")
+    # There's no running event loop, use asyncio.run()
+    asyncio.run(main(rabbitmq_connection))
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
