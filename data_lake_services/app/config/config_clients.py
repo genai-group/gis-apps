@@ -1098,8 +1098,10 @@ milvus_collection.load()
 
 if GIS_ENVIRONMENT == 'local':
     rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+    print("RabbitMQ connection created successfully locally.")
 elif GIS_ENVIRONMENT == 'flask-local':
     rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+    print("RabbitMQ connection created successfully with container.")
 
 
 async def main(rabbitmq_connection: aio_pika.Connection):
