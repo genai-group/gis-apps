@@ -1140,12 +1140,19 @@ async def main(rabbitmq_connection: aio_pika.Connection):
 #         asyncio.run(main(rabbitmq_connection))
 
 def run_main_async(rabbitmq_connection: aio_pika.Connection):
-    # Schedule the coroutine for execution
-    task = asyncio.create_task(main(rabbitmq_connection))
+    try:
+        # Check if there is a running event loop
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No running event loop, create a new one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
-    # If you need to wait for the task to complete, this would be
-    # environment-specific. For example, in a Jupyter notebook, you might
-    # just call 'await task' in a cell.
+    # Now, we can be sure there's an event loop running
+    task = asyncio.create_task(main(rabbitmq_connection))
+    
+    # Run the task to completion
+    loop.run_until_complete(task)
 
 # Building RabbitMQ Objects
 run_main_async(rabbitmq_connection)
