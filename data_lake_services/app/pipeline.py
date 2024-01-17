@@ -26,7 +26,7 @@ data = process_data(data, parse_config, template)
 
 #%%
 # Load data
-load_data(data, parse_config, template)
+load(data, parse_config, template)
 
 
 #%%
@@ -51,7 +51,7 @@ del new_data
 # Process template, data, and load data
 template = process_template(parse_config)
 data = process_data(data, parse_config, template)
-load_data(data, parse_config, template)
+load(data, parse_config, template)
 
 ##################################
 ####    Flight Information    ####

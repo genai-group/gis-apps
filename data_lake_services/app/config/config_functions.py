@@ -1028,7 +1028,7 @@ def search(query_str: str, expand: bool = False, foaf: bool = False) -> List[Dic
             if str(expand).lower() == 'true':
                 # Perform Neo4j expansion
                 pass
-        
+
         # Search Neo4j for a label
         elif 'match' in query_str.lower() and 'return' in query_str.lower():
             with neo4j_client.session() as session:
@@ -2578,7 +2578,7 @@ def process_data(data: Union[List[Dict], Dict], parse_config, template: Dict) ->
 ####    Load Data    ####
 #########################
 
-def load_data(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> None:
+def load(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> None:
     """
     Load data into GIS Data Lake databases
 

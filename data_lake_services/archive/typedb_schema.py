@@ -74,7 +74,7 @@ def main():
 
         # Load data
         # Here you would implement or call your data loading function
-        # For example, load_data(client)
+        # For example, load(client)
 
 # Main script execution
 if __name__ == '__main__':
