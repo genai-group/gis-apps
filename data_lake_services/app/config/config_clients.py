@@ -1137,6 +1137,7 @@ def run_main():
         print("Starting new event loop")
         asyncio.run(main(rabbitmq_connection))
 
+# Building RabbitMQ Objects
 run_main()
 
 # Load Vault
