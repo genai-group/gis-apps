@@ -1139,20 +1139,19 @@ async def main(rabbitmq_connection: aio_pika.Connection):
 #         print("Starting new event loop")
 #         asyncio.run(main(rabbitmq_connection))
 
-def run_main_async(rabbitmq_connection: aio_pika.Connection):
-    try:
-        # Check if there is a running event loop
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        # No running event loop, create a new one
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+def start_async_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
 
-    # Now, we can be sure there's an event loop running
-    task = asyncio.create_task(main(rabbitmq_connection))
-    
-    # Run the task to completion
-    loop.run_until_complete(task)
+def run_main_async(rabbitmq_connection: aio_pika.Connection):
+    # Create a new event loop
+    new_loop = asyncio.new_event_loop()
+
+    # Start the new event loop in a separate thread
+    threading.Thread(target=start_async_loop, args=(new_loop,), daemon=True).start()
+
+    # Now, we can use this new event loop to run our coroutine
+    asyncio.run_coroutine_threadsafe(main(rabbitmq_connection), new_loop)
 
 # Building RabbitMQ Objects
 run_main_async(rabbitmq_connection)

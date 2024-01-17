@@ -15,6 +15,7 @@ import logging
 import asyncio
 import aio_pika
 import textwrap
+import threading
 import xmltodict
 import unicodedata
 import numpy as np
