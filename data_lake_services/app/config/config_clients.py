@@ -1122,23 +1122,32 @@ async def main(rabbitmq_connection: aio_pika.Connection):
     except Exception as e:
         print(f"Error connecting to RabbitMQ locally: {e}")
 
-def run_main():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:  # No running event loop
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+# def run_main():
+#     try:
+#         loop = asyncio.get_running_loop()
+#     except RuntimeError:  # No running event loop
+#         loop = asyncio.new_event_loop()
+#         asyncio.set_event_loop(loop)
 
-    if loop.is_running():
-        print("Running inside existing event loop")
-        task = asyncio.ensure_future(main(rabbitmq_connection))
-        loop.run_until_complete(task)
-    else:
-        print("Starting new event loop")
-        asyncio.run(main(rabbitmq_connection))
+#     if loop.is_running():
+#         print("Running inside existing event loop")
+#         task = asyncio.ensure_future(main(rabbitmq_connection))
+#         loop.run_until_complete(task)
+#     else:
+#         print("Starting new event loop")
+#         asyncio.run(main(rabbitmq_connection))
+
+def run_main_async(rabbitmq_connection: aio_pika.Connection):
+    # Schedule the coroutine for execution
+    task = asyncio.create_task(main(rabbitmq_connection))
+
+    # If you need to wait for the task to complete, this would be
+    # environment-specific. For example, in a Jupyter notebook, you might
+    # just call 'await task' in a cell.
 
 # Building RabbitMQ Objects
-run_main()
+run_main_async(rabbitmq_connection)
+
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
