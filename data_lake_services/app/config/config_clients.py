@@ -1096,65 +1096,87 @@ milvus_collection.load()
 ####    RabbitMQ    ####
 ########################
 
-if GIS_ENVIRONMENT == 'local':
-    rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
-    print("RabbitMQ connection created successfully locally.")
-elif GIS_ENVIRONMENT == 'flask-local':
-    rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
-    print("RabbitMQ connection created successfully with container.")
+# if GIS_ENVIRONMENT == 'local':
+#     rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+#     print("RabbitMQ connection created successfully locally.")
+# elif GIS_ENVIRONMENT == 'flask-local':
+#     rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+#     print("RabbitMQ connection created successfully with container.")
 
+async def connect_to_rabbitmq_async(host: str = 'localhost', user: str = '', password: str = '') -> aio_pika.Connection:
+    """
+    Asynchronously create and return a connection to RabbitMQ.
 
-async def main(rabbitmq_connection: aio_pika.Connection):
+    Args:
+        host (str): The hostname for RabbitMQ, e.g., 'localhost'.
+        user (str): The username for RabbitMQ.
+        password (str): The password for RabbitMQ.
+
+    Returns:
+        aio_pika.Connection: An aio_pika Connection instance.
+
+    Raises:
+        AssertionError: If the host is not provided or is empty.
+    """
+    assert host, "RabbitMQ host must be provided."
+    # Construct the URL for the connection
+    url = f'amqp://{user}:{password}@{host}/'
+
+    # Create and return the asynchronous connection
+    return await aio_pika.connect_robust(url)
+
+async def main():
+    """
+    Main function to connect to RabbitMQ and set up the pipeline.
+    
+    Raises:
+        Exception: If any part of the setup fails.
+    """
     queue_name = 'example_queue'
     exchange_name = 'example_exchange'
     exchange_type = 'direct'
-    routing_key = 'example_routing_key'
+    routing_key = 'example_routing_key'    
+    # Determine environment-specific parameters
+    if GIS_ENVIRONMENT == 'local':
+        host = 'localhost'  
+    else: 
+        host = 'rabbitmq-container'
 
     try:
-        print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-        # Assuming connect_to_rabbitmq is an async function
-        print("RabbitMQ connection created successfully locally.")
+        user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
+        password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
+
+        # Connect to RabbitMQ asynchronously
+        rabbitmq_connection = await connect_to_rabbitmq_async(host, user, password)
+        print("RabbitMQ connection created successfully.")
+
         await setup_rabbitmq_pipeline_async(rabbitmq_connection,
                                             queue_name, 
                                             exchange_name, 
                                             exchange_type, 
                                             routing_key, 
                                             sample_callback)
+        print(f"RabbitMQ pipeline setup complete.")
         
     except Exception as e:
-        print(f"Error connecting to RabbitMQ locally: {e}")
-
-# def run_main():
-#     try:
-#         loop = asyncio.get_running_loop()
-#     except RuntimeError:  # No running event loop
-#         loop = asyncio.new_event_loop()
-#         asyncio.set_event_loop(loop)
-
-#     if loop.is_running():
-#         print("Running inside existing event loop")
-#         task = asyncio.ensure_future(main(rabbitmq_connection))
-#         loop.run_until_complete(task)
-#     else:
-#         print("Starting new event loop")
-#         asyncio.run(main(rabbitmq_connection))
+        raise Exception(f"Error connecting to RabbitMQ asynchronously: {e}")
 
 def start_async_loop(loop):
     asyncio.set_event_loop(loop)
     loop.run_forever()
 
-def run_main_async(rabbitmq_connection: aio_pika.Connection):
+def run_main_async():
     # Create a new event loop
     new_loop = asyncio.new_event_loop()
 
     # Start the new event loop in a separate thread
     threading.Thread(target=start_async_loop, args=(new_loop,), daemon=True).start()
 
-    # Now, we can use this new event loop to run our coroutine
-    asyncio.run_coroutine_threadsafe(main(rabbitmq_connection), new_loop)
+    # Schedule the main coroutine on the new event loop
+    asyncio.run_coroutine_threadsafe(main(), new_loop)
 
 # Building RabbitMQ Objects
-run_main_async(rabbitmq_connection)
+run_main_async()
 
 
 # Load Vault
