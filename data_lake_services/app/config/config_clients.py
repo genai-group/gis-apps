@@ -1117,8 +1117,7 @@ async def main():
         print(f"Error connecting to RabbitMQ locally: {e}")
 
 # Replace this with your GIS_ENVIRONMENT check
-if GIS_ENVIRONMENT == 'local':
-    asyncio.run(main())
+asyncio.run(main())
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
