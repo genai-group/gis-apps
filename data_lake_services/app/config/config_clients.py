@@ -1092,40 +1092,38 @@ milvus_collection.load()
 #         print(f"Error connecting to RabbitMQ with Flask API: {e}")
 #         pass
 
+########################
+####    RabbitMQ    ####
+########################
 
-async def setup_local_rabbitmq():
-    if GIS_ENVIRONMENT == 'local':
-        queue_name = 'example_queue'
-        exchange_name = 'example_exchange'
-        exchange_type = 'direct'
-        routing_key = 'example_routing_key'
+if GIS_ENVIRONMENT == 'local':
+    rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+elif GIS_ENVIRONMENT == 'flask-local':
+    rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
 
-        try:
-            print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-            # Assuming connect_to_rabbitmq is an async function
-            if GIS_ENVIRONMENT == 'local':
-                rabbitmq_connection = await connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
-            if GIS_ENVIRONMENT == 'flask-local':
-                rabbitmq_connection = await connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
-            print("RabbitMQ connection created successfully locally.")
-            await setup_rabbitmq_pipeline_async(rabbitmq_connection,
-                                                queue_name, 
-                                                exchange_name, 
-                                                exchange_type, 
-                                                routing_key, 
-                                                sample_callback)
-            
-        except Exception as e:
-            print(f"Error connecting to RabbitMQ locally: {e}")
 
-# Get the current event loop and run the coroutine
-loop = asyncio.get_event_loop()
+async def main(rabbitmq_connection: aio_pika.Connection):
+    queue_name = 'example_queue'
+    exchange_name = 'example_exchange'
+    exchange_type = 'direct'
+    routing_key = 'example_routing_key'
 
-# If the loop is already running, use `create_task` or `ensure_future`
-if loop.is_running():
-    asyncio.create_task(setup_local_rabbitmq())
-else:
-    loop.run_until_complete(setup_local_rabbitmq())
+    try:
+        print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
+        # Assuming connect_to_rabbitmq is an async function
+        print("RabbitMQ connection created successfully locally.")
+        await setup_rabbitmq_pipeline_async(rabbitmq_connection,
+                                            queue_name, 
+                                            exchange_name, 
+                                            exchange_type, 
+                                            routing_key, 
+                                            sample_callback)
+        
+    except Exception as e:
+        print(f"Error connecting to RabbitMQ locally: {e}")
+
+# Replace this with your GIS_ENVIRONMENT check
+asyncio.run(main(rabbitmq_connection))
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
