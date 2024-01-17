@@ -1050,7 +1050,49 @@ milvus_collection.load()
 #     except Exception as e:
 #         pass        
 
-if GIS_ENVIRONMENT == 'local':
+# if GIS_ENVIRONMENT == 'local':
+#     queue_name = 'example_queue'
+#     exchange_name = 'example_exchange'
+#     exchange_type = 'direct'
+#     routing_key = 'example_routing_key'
+
+#     try:
+#         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
+#         rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+#         print("RabbitMQ connection created successfully locally.")
+#         setup_rabbitmq_pipeline_async(rabbitmq_connection,
+#                                         queue_name, 
+#                                         exchange_name, 
+#                                         exchange_type, 
+#                                         routing_key, 
+#                                         sample_callback)
+        
+#     except Exception as e:
+#         print(f"Error connecting to RabbitMQ locally: {e}")
+#         pass
+
+# if GIS_ENVIRONMENT == 'flask-local':
+#     queue_name = 'example_queue'
+#     exchange_name = 'example_exchange'
+#     exchange_type = 'direct'
+#     routing_key = 'example_routing_key'
+
+#     try:
+#         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
+#         rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+#         print("RabbitMQ connection created successfully with container.")
+#         setup_rabbitmq_pipeline_async(rabbitmq_connection,
+#                                         queue_name, 
+#                                         exchange_name, 
+#                                         exchange_type, 
+#                                         routing_key, 
+#                                         sample_callback)
+
+#     except Exception as e:
+#         print(f"Error connecting to RabbitMQ with Flask API: {e}")
+#         pass
+
+async def main():
     queue_name = 'example_queue'
     exchange_name = 'example_exchange'
     exchange_type = 'direct'
@@ -1058,39 +1100,25 @@ if GIS_ENVIRONMENT == 'local':
 
     try:
         print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-        rabbitmq_connection = connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+        # Assuming connect_to_rabbitmq is an async function
+        if GIS_ENVIRONMENT == 'local':
+            rabbitmq_connection = await connect_to_rabbitmq('localhost', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
+        elif GIS_ENVIRONMENT == 'flask-local':
+            rabbitmq_connection = await connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
         print("RabbitMQ connection created successfully locally.")
-        setup_rabbitmq_pipeline_async(rabbitmq_connection,
-                                        queue_name, 
-                                        exchange_name, 
-                                        exchange_type, 
-                                        routing_key, 
-                                        sample_callback)
+        await setup_rabbitmq_pipeline_async(rabbitmq_connection,
+                                            queue_name, 
+                                            exchange_name, 
+                                            exchange_type, 
+                                            routing_key, 
+                                            sample_callback)
         
     except Exception as e:
         print(f"Error connecting to RabbitMQ locally: {e}")
-        pass
 
-if GIS_ENVIRONMENT == 'flask-local':
-    queue_name = 'example_queue'
-    exchange_name = 'example_exchange'
-    exchange_type = 'direct'
-    routing_key = 'example_routing_key'
-
-    try:
-        print(f"os.environ.get('RABBITMQ_USERNAME'): {os.environ.get('RABBITMQ_USERNAME')}")
-        rabbitmq_connection = connect_to_rabbitmq('rabbitmq-container', os.environ.get('RABBITMQ_USERNAME', 'rabbit'), os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@'))
-        print("RabbitMQ connection created successfully with container.")
-        setup_rabbitmq_pipeline_async(rabbitmq_connection,
-                                        queue_name, 
-                                        exchange_name, 
-                                        exchange_type, 
-                                        routing_key, 
-                                        sample_callback)
-
-    except Exception as e:
-        print(f"Error connecting to RabbitMQ with Flask API: {e}")
-        pass
+# Replace this with your GIS_ENVIRONMENT check
+if GIS_ENVIRONMENT == 'local':
+    asyncio.run(main())
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':
