@@ -143,7 +143,53 @@
             }
           }
         }
-      }      
+      },
+      "/send": {
+        "post": {
+          "summary": "Send a message to RabbitMQ queue",
+          "description": "Sends a specified message to a RabbitMQ queue named 'test_queue'.",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Hello RabbitMQ"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Message successfully sent",
+              "schema": {
+                "type": "string",
+                "example": "Message sent"
+              }
+            }
+          }
+        }
+      },
+      "/start_consumer": {
+        "get": {
+          "summary": "Start a RabbitMQ message consumer",
+          "description": "Starts a RabbitMQ consumer that listens to the 'test_queue' and processes messages using a predefined callback function.",
+          "responses": {
+            "200": {
+              "description": "Consumer successfully started",
+              "schema": {
+                "type": "string",
+                "example": "Consumer started"
+              }
+            }
+          }
+        }
+      }
     },
     "components": {
       "schemas": {

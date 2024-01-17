@@ -1178,6 +1178,31 @@ def run_main_async():
 # Building RabbitMQ Objects
 run_main_async()
 
+########################
+####    Consumer    ####
+########################
+
+async def consume_message(queue_name, process_function):
+    connection = await aio_pika.connect_robust("amqp://user:password@rabbitmq/")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue(queue_name, durable=True)
+        await queue.consume(process_function)
+
+async def send_message(queue_name, message):
+    connection = await aio_pika.connect_robust("amqp://user:password@rabbitmq/")
+    async with connection:
+        channel = await connection.channel()
+        queue = await channel.declare_queue(queue_name, durable=True)
+        await channel.default_exchange.publish(
+            aio_pika.Message(body=message.encode()), routing_key=queue.name)
+
+async def process_message(message: aio_pika.IncomingMessage):
+    with message.process():
+        print("Received message:", message.body.decode())
+
+
+        # Process message here
 
 # Load Vault
 if GIS_ENVIRONMENT == 'flask-local':

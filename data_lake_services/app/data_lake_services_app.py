@@ -113,6 +113,21 @@ def upload_document():
         "file_type": file_type
     }), 200
 
+########################################
+####    RabbitMQ Process Message    ####
+########################################
+
+@app.route('/send', methods=['POST'])
+def send():
+    data = request.json
+    asyncio.run(send_message('test_queue', data['message']))
+    return "Message sent", 200
+
+@app.route('/start_consumer', methods=['GET'])
+def start_consumer():
+    asyncio.create_task(consume_message('test_queue', process_message))
+    return "Consumer started", 200
+
 
 # @app.route('/search', methods=['POST'])
 # def perform_search():
