@@ -148,6 +148,9 @@
         "post": {
           "summary": "Send a message to RabbitMQ queue",
           "description": "Sends a specified message to a RabbitMQ queue named 'test_queue'.",
+          "consumes": [
+            "application/json"
+          ],
           "parameters": [
             {
               "in": "body",
