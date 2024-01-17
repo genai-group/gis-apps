@@ -120,12 +120,12 @@ def upload_document():
 @app.route('/send', methods=['POST'])
 def send():
     data = request.json
-    asyncio.run(send_message('test_queue', data['message']))
+    asyncio.run(send_message('example_queue', data['message']))
     return "Message sent", 200
 
 @app.route('/start_consumer', methods=['GET'])
 def start_consumer():
-    asyncio.create_task(consume_message('test_queue', process_message))
+    asyncio.create_task(consume_message('example_queue', process_message))
     return "Consumer started", 200
 
 

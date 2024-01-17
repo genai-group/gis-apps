@@ -1183,14 +1183,18 @@ run_main_async()
 ########################
 
 async def consume_message(queue_name, process_function):
-    connection = await aio_pika.connect_robust("amqp://user:password@rabbitmq/")
+    user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
+    password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
+    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@rabbitmq/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue(queue_name, durable=True)
         await queue.consume(process_function)
 
 async def send_message(queue_name, message):
-    connection = await aio_pika.connect_robust("amqp://user:password@rabbitmq/")
+    user = os.environ.get('RABBITMQ_USERNAME', 'rabbit')
+    password = os.environ.get('RABBITMQ_PASSWORD', 'r@bb!tM@')
+    connection = await aio_pika.connect_robust(f"amqp://{user}:{password}@rabbitmq/")
     async with connection:
         channel = await connection.channel()
         queue = await channel.declare_queue(queue_name, durable=True)
