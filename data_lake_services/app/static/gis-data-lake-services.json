@@ -94,6 +94,22 @@
             }
         }
       },
+      "/start_consumer": {
+        "get": {
+          "tags": ["RabbitMQ Start Consumer"],
+          "summary": "Start a RabbitMQ message consumer",
+          "description": "Starts a RabbitMQ consumer that listens to the 'test_queue' and processes messages using a predefined callback function.",
+          "responses": {
+            "200": {
+              "description": "Consumer successfully started",
+              "schema": {
+                "type": "string",
+                "example": "Consumer started"
+              }
+            }
+          }
+        }
+      },      
       "/send": {
         "post": {
           "tags": ["RabbitMQ Send Message"],
@@ -124,22 +140,6 @@
               "schema": {
                 "type": "string",
                 "example": "Message sent"
-              }
-            }
-          }
-        }
-      },
-      "/start_consumer": {
-        "get": {
-          "tags": ["RabbitMQ Start Consumer"],
-          "summary": "Start a RabbitMQ message consumer",
-          "description": "Starts a RabbitMQ consumer that listens to the 'test_queue' and processes messages using a predefined callback function.",
-          "responses": {
-            "200": {
-              "description": "Consumer successfully started",
-              "schema": {
-                "type": "string",
-                "example": "Consumer started"
               }
             }
           }
