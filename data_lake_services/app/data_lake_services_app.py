@@ -96,6 +96,7 @@ def perform_search():
     logger.info("Received search request")
 
     query_str = request.json.get('query') if request.json else None
+    logger.info(f"Received search query: {query_str}")
 
     if query_str is None:
         logger.warning("No query provided in search request")
@@ -104,7 +105,7 @@ def perform_search():
     # Here you would typically perform a search query against a database
     try:
         results = search(query_str)
-        logger.info(f"Search performed successfully for query: {query_str}")
+        logger.info(f"Search performed successfully for query: {query_str}. Results: {results}")
         return jsonify({
             "status": "success",
             "data": results
