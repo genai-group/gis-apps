@@ -44,27 +44,6 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 def home():
     return "<h1>Welcome to GIS Data Lake Services!</h1>"
 
-@app.route('/items', methods=['GET'])
-def get_items():
-    # Example data - you can modify this with real data or database queries
-    items = [
-        {"id": 1, "name": "Item 1"},
-        {"id": 2, "name": "Item 2"},
-        {"id": 3, "name": "Item 3"}
-    ]
-    return jsonify(items)
-
-@app.route('/item', methods=['POST'])
-def create_item():
-    # Assuming JSON input with 'name' and 'description'
-    data = request.json
-    # Here you would typically process the data and save it to a database
-    # For the sake of example, we'll just return it
-    return jsonify({
-        "status": "success",
-        "data": data
-    }), 201
-
 @app.route('/search', methods=['POST'])
 def perform_search():
     query_str = request.json.get('query') if request.json else None

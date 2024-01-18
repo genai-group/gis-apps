@@ -94,56 +94,6 @@
             }
         }
       },
-      "/items": {
-        "get": {
-          "summary": "List all items",
-          "tags": ["Items"],
-          "responses": {
-            "200": {
-              "description": "A list of items",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Item"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/item": {
-        "post": {
-          "summary": "Create a new item",
-          "tags": ["Item"],
-          "requestBody": {
-            "description": "Item to add",
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Item"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Item created",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Item"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "/send": {
         "post": {
           "tags": ["RabbitMQ Send Message"],
@@ -198,18 +148,6 @@
     },
     "components": {
       "schemas": {
-        "Item": {
-          "type": "object",
-          "required": ["name", "description"],
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            }
-          }
-        },
         "SearchRequest": {
           "type": "object",
           "properties": {
