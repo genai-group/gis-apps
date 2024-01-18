@@ -1024,7 +1024,8 @@ def search(query_str: str, expand: bool = False, foaf: bool = False) -> List[Dic
     try:
         # Search for a GUID
         if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)):
-            results = list(mongo_collection.find({'_guid':query_str}))
+            # results = list(mongo_collection.find({'_guid':query_str}))
+            results = list(mongo_collection.find({}))
             logging.info(f"_guid search results: {results}")
 
         # Search Neo4j for a label
