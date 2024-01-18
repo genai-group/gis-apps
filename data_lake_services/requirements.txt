@@ -9,7 +9,7 @@ click==8.1.6
 click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
-confluent-kafka==2.3.0
+# confluent-kafka==2.3.0
 cryptography==41.0.3
 Flask==2.2.5
 Flask-Cors==3.0.10
@@ -22,13 +22,13 @@ geopy==2.4.1
 hvac==2.1.0
 kombu==5.3.4
 lxml==4.9.3
-minio==7.2.0
+# minio==7.2.0
 motor==3.3.2
 neo4j==5.7.0
 pandas==1.4.1
 pika==1.3.2
 phonenumbers==8.13.27
-plotly==5.18.0
+# plotly==5.18.0
 pymilvus==2.3.4
 pymongo==4.6.1
 PyMuPDF==1.22.5

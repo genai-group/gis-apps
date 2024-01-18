@@ -55,13 +55,11 @@ import pika
 from pika import URLParameters
 from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
 
-
 # Multiprcessing
 import ray
 
 # Celery
 from celery import Celery
-
 
 # Spacy
 import spacy
@@ -76,8 +74,8 @@ import yaml
 # from typedb.common.exception import TypeDBClientException, TypeDBClientError
 
 # MinIO
-from minio import Minio
-from minio.error import S3Error
+# from minio import Minio
+# from minio.error import S3Error
 
 # Phone numbers
 import phonenumbers
@@ -97,8 +95,8 @@ import psycopg2
 from psycopg2 import pool, sql
 
 # Kafka & Zookeeper
-from confluent_kafka import Producer, Consumer, KafkaException
-from confluent_kafka.admin import AdminClient, NewTopic
+# from confluent_kafka import Producer, Consumer, KafkaException
+# from confluent_kafka.admin import AdminClient, NewTopic
 
 # Swagger
 from flask_swagger_ui import get_swaggerui_blueprint

@@ -37,34 +37,34 @@ def s3_connect():
 # start the minio server
 # minio server ~/data/minio
 
-def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
-    """
-    Connect to a MinIO client.
+# def minio_connect(endpoint_url: str, access_key: str, secret_key: str):
+#     """
+#     Connect to a MinIO client.
 
-    Args:
-        endpoint_url (str): The endpoint URL of the MinIO server.
-        access_key (str): The access key for MinIO.
-        secret_key (str): The secret key for MinIO.
+#     Args:
+#         endpoint_url (str): The endpoint URL of the MinIO server.
+#         access_key (str): The access key for MinIO.
+#         secret_key (str): The secret key for MinIO.
 
-    Returns:
-        boto3.client: A boto3 client object if the connection is successful, None otherwise.
-    """
-    try:
-        # Asserting that necessary parameters are provided
-        assert endpoint_url, "Endpoint URL must be provided"
-        assert access_key, "Access key must be provided"
-        assert secret_key, "Secret key must be provided"
+#     Returns:
+#         boto3.client: A boto3 client object if the connection is successful, None otherwise.
+#     """
+#     try:
+#         # Asserting that necessary parameters are provided
+#         assert endpoint_url, "Endpoint URL must be provided"
+#         assert access_key, "Access key must be provided"
+#         assert secret_key, "Secret key must be provided"
 
-        # Creating a boto3 client for MinIO
-        minio_client = boto3.client('s3', endpoint_url=endpoint_url,
-                                    aws_access_key_id=access_key,
-                                    aws_secret_access_key=secret_key,
-                                    use_ssl=False)  # Set to True if your MinIO server uses SSL
-        print("MinIO Client Connected")
-        return minio_client
-    except Exception as e:
-        print(f"MinIO Client Connection Error: {e}")
-        return None
+#         # Creating a boto3 client for MinIO
+#         minio_client = boto3.client('s3', endpoint_url=endpoint_url,
+#                                     aws_access_key_id=access_key,
+#                                     aws_secret_access_key=secret_key,
+#                                     use_ssl=False)  # Set to True if your MinIO server uses SSL
+#         print("MinIO Client Connected")
+#         return minio_client
+#     except Exception as e:
+#         print(f"MinIO Client Connection Error: {e}")
+#         return None
 
 ########################
 ####    RabbitMQ    ####
@@ -569,38 +569,38 @@ def connect_to_mongodb(host: str = 'localhost', port: int = 27017,
 #################################
 
 
-def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",   # def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
-                              client_id: Optional[str] = None) -> AdminClient:
-    """
-    Create a Kafka AdminClient with specified parameters.
+# def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",   # def create_kafka_admin_client(bootstrap_servers: str = "localhost:9092",
+#                               client_id: Optional[str] = None) -> AdminClient:
+#     """
+#     Create a Kafka AdminClient with specified parameters.
 
-    Parameters:
-    bootstrap_servers (str): Comma-separated list of broker addresses (default: "localhost:9092").
-    client_id (Optional[str]): An optional identifier for the client.
+#     Parameters:
+#     bootstrap_servers (str): Comma-separated list of broker addresses (default: "localhost:9092").
+#     client_id (Optional[str]): An optional identifier for the client.
 
-    Returns:
-    AdminClient: A Kafka AdminClient instance.
+#     Returns:
+#     AdminClient: A Kafka AdminClient instance.
 
-    Raises:
-    AssertionError: If any of the input parameters are not in expected format.
-    Exception: If there is an error in creating the Kafka AdminClient.
-    """
+#     Raises:
+#     AssertionError: If any of the input parameters are not in expected format.
+#     Exception: If there is an error in creating the Kafka AdminClient.
+#     """
 
-    # Validate input parameters
-    assert isinstance(bootstrap_servers, str), "bootstrap_servers must be a string"
-    if client_id is not None:
-        assert isinstance(client_id, str), "client_id must be a string"
+#     # Validate input parameters
+#     assert isinstance(bootstrap_servers, str), "bootstrap_servers must be a string"
+#     if client_id is not None:
+#         assert isinstance(client_id, str), "client_id must be a string"
 
-    # Prepare configuration
-    config = {"bootstrap.servers": bootstrap_servers}
-    if client_id is not None:
-        config["client.id"] = client_id
+#     # Prepare configuration
+#     config = {"bootstrap.servers": bootstrap_servers}
+#     if client_id is not None:
+#         config["client.id"] = client_id
 
-    # Attempt to create a Kafka AdminClient
-    try:
-        return AdminClient(config)
-    except Exception as e:
-        raise Exception(f"Error in creating Kafka AdminClient: {e}")
+#     # Attempt to create a Kafka AdminClient
+#     try:
+#         return AdminClient(config)
+#     except Exception as e:
+#         raise Exception(f"Error in creating Kafka AdminClient: {e}")
 
 ############################
 ####    Neo4j Client    ####

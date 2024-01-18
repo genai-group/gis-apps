@@ -11,7 +11,7 @@ services:
       - "5672:5672"     # AMQP protocol port
       - "15672:15672"   # RabbitMQ Management console
     networks:
-      - gis-dl-local-network      
+      - gis-dl-local-network
 
   python-app:
     build: .
@@ -21,28 +21,6 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     depends_on:
       - rabbitmq
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - gis-dl-local-network
-
-  kafka-container:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    networks:
-      - gis-dl-local-network
 
   postgres:
     image: postgres:latest
@@ -55,17 +33,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
-  typedb:
-    image: vaticle/typedb:latest
-    container_name: typedb
-    networks:
-      - gis-dl-local-network
-    ports:
-      - "1729:1729"
-    volumes:
-      - typedb-data:/opt/
-    platform: linux/amd64
 
   neo4j:
     image: neo4j:latest
@@ -83,6 +50,9 @@ services:
     environment:
       NEO4J_AUTH: ${NEO4J_USER}/${NEO4J_PASSWORD}
       NEO4J_dbms_default__listen__address: "0.0.0.0"
+      NEO4J_dbms_connector_https_advertised__address: "neo4j-container:7473"
+      NEO4J_dbms_connector_http_advertised__address: "neo4j-container:7474"
+      NEO4J_dbms_connector_bolt_advertised__address: "neo4j-container:7687"
 
   redis:
     image: redis:latest
@@ -121,51 +91,13 @@ services:
     container_name: mongodb-container
     image: mongo:4.4
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MONGODB_USERNAME=${MONGODB_USER}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - MONGODB_DATABASE=mydatabase
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=mydatabase
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/bitnami/mongodb
-    networks:
-      - gis-dl-local-network
-
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.5
-    environment:
-      - ETCD_AUTO_COMPACTION_MODE=revision
-      - ETCD_AUTO_COMPACTION_RETENTION=1000
-      - ETCD_QUOTA_BACKEND_BYTES=4294967296
-      - ETCD_SNAPSHOT_COUNT=50000
-    volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
-    healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-    networks:
-      - gis-dl-local-network
-
-  minio:
-    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
-    environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-    ports:
-      - "9001:9001"
-      - "9000:9000"
-    volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
-    command: minio server /minio_data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      - mongodb_data:/data/db
     networks:
       - gis-dl-local-network
 
@@ -195,14 +127,115 @@ services:
     networks:
       - gis-dl-local-network
 
-
 volumes:
   postgres-data:
-  typedb-data:
   ollama:
   mongodb_data:
+  # typedb-data:  
 
 networks:
   gis-dl-local-network:
     driver: bridge
     external: true
+
+  # etcd:
+  #   image: quay.io/coreos/etcd:v3.5.5
+  #   environment:
+  #     - ETCD_AUTO_COMPACTION_MODE=revision
+  #     - ETCD_AUTO_COMPACTION_RETENTION=1000
+  #     - ETCD_QUOTA_BACKEND_BYTES=4294967296
+  #     - ETCD_SNAPSHOT_COUNT=50000
+  #   volumes:
+  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+  #   command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+  #   healthcheck:
+  #     test: ["CMD", "etcdctl", "endpoint", "health"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+  #   networks:
+  #     - gis-dl-local-network
+
+  # minio:
+  #   image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+  #   environment:
+  #     MINIO_ACCESS_KEY: minioadmin
+  #     MINIO_SECRET_KEY: minioadmin
+  #   ports:
+  #     - "9001:9001"
+  #     - "9000:9000"
+  #   volumes:
+  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
+  #   command: minio server /minio_data --console-address ":9001"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+  #     interval: 30s
+  #     timeout: 20s
+  #     retries: 3
+  #   networks:
+  #     - gis-dl-local-network
+
+  # mongodb:
+  #   container_name: mongodb-container
+  #   image: mongo:4.4
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #     - MONGODB_USERNAME=${MONGODB_USER}
+  #     - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+  #     - MONGODB_DATABASE=mydatabase
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongodb_data:/bitnami/mongodb
+  #   networks:
+  #     - gis-dl-local-network
+
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:latest
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   networks:
+  #     - gis-dl-local-network
+
+  # kafka-container:
+  #   image: confluentinc/cp-kafka:latest
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #   networks:
+  #     - gis-dl-local-network
+
+# typedb:
+  #   image: vaticle/typedb:latest
+  #   container_name: typedb
+  #   networks:
+  #     - gis-dl-local-network
+  #   ports:
+  #     - "1729:1729"
+  #   volumes:
+  #     - typedb-data:/opt/
+  #   platform: linux/amd64
+
+  # neo4j:
+  #   image: neo4j:latest
+  #   container_name: neo4j-container
+  #   networks:
+  #     - gis-dl-local-network
+  #   ports:
+  #     - "7474:7474"
+  #     - "7687:7687"
+  #   volumes:
+  #     - $HOME/neo4j/data:/data
+  #     - $HOME/neo4j/logs:/logs
+  #     - $HOME/neo4j/import:/var/lib/neo4j/import
+  #     - $HOME/neo4j/plugins:/plugins
+  #   environment:
+  #     NEO4J_AUTH: ${NEO4J_USER}/${NEO4J_PASSWORD}
+  #     NEO4J_dbms_default__listen__address: "0.0.0.0"
