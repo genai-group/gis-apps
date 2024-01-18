@@ -164,7 +164,6 @@ services:
     networks:
       - gis-dl-local-network
 
-
 volumes:
   postgres-data:
   ollama:
