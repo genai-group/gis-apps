@@ -194,6 +194,18 @@ services:
     networks:
       - gis-dl-local-network
 
+  gis_data_lake:
+    build:
+      context: .
+      dockerfile: Dockerfile # Replace with your Dockerfile name if different
+    image: gis-apps
+    networks:
+      gis-dl-local-network:
+        aliases:
+          - gis-apps
+    ports:
+      - "5002:5000"
+
 volumes:
   postgres-data:
   typedb-data:
