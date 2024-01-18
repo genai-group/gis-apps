@@ -104,7 +104,7 @@ def perform_search():
 
     # Here you would typically perform a search query against a database
     try:
-        results = search(query_str, neo4j_client)
+        results = search(query_str, neo4j_client, mongodb_client)
         logger.info(f"Search performed successfully for query: {query_str}. Results: {results}")
         return jsonify({
             "status": "success",

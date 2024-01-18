@@ -1009,7 +1009,7 @@ query = "flight_manifest___e4268fb2489004f749ff"
 
 """
 
-def search(query_str: str, neo4j_client: Any, expand: bool = False, foaf: bool = False) -> List[Dict]:
+def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_client, mongodb_client: pymongo.database.Database = mongodb_client, expand: bool = False, foaf: bool = False) -> List[Dict]:
     """
     Search GIS Data Lake for a given query.
 
