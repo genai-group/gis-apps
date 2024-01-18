@@ -200,9 +200,7 @@ services:
       dockerfile: Dockerfile # Replace with your Dockerfile name if different
     image: gis-apps
     networks:
-      gis-dl-local-network:
-        aliases:
-          - gis-apps
+      - gis-dl-local-network
     ports:
       - "5002:5000"
 
