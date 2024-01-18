@@ -31,7 +31,7 @@ phonenumbers==8.13.27
 # plotly==5.18.0
 pymilvus==2.3.4
 pymongo==4.6.1
-PyMuPDF==1.22.5
+# PyMuPDF==1.22.5
 # psycopg2==2.9.9
 protobuf==3.20.0
 psycopg2-binary==2.9.9

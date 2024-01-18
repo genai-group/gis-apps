@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Download NLP models
 RUN python -m spacy download en_core_web_lg
-RUN python -m pip install --upgrade pymupdf
+# RUN python -m pip install --upgrade pymupdf
 
 # Define environment variable
 ENV FLASK_APP=app/data_lake_services_app.py
