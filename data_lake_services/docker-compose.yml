@@ -127,17 +127,6 @@ services:
     networks:
       - gis-dl-local-network
 
-volumes:
-  postgres-data:
-  ollama:
-  mongodb_data:
-  # typedb-data:  
-
-networks:
-  gis-dl-local-network:
-    driver: bridge
-    external: true
-
   etcd:
     image: quay.io/coreos/etcd:v3.5.5
     environment:
@@ -174,6 +163,18 @@ networks:
       retries: 3
     networks:
       - gis-dl-local-network
+
+
+volumes:
+  postgres-data:
+  ollama:
+  mongodb_data:
+  # typedb-data:  
+
+networks:
+  gis-dl-local-network:
+    driver: bridge
+    external: true
 
   # mongodb:
   #   container_name: mongodb-container
