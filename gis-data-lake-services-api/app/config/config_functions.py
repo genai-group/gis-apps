@@ -1023,7 +1023,7 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
 
     try:
         # Search for a GUID
-        if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)):
+        if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)) and 'match' not in query_str.lower() and 'return' not in query_str.lower():
             # results = list(mongo_collection.find({'_guid':query_str}))
             results = list(mongo_collection.find({}))
             results = json.loads(json_util.dumps(results))
