@@ -6,7 +6,7 @@
 ####    Docker Prune    ####
 ############################
 
-docker system prune -a
+docker system prune -a --force
 docker system df
 
 ##############################
