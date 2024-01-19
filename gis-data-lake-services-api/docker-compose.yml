@@ -99,15 +99,10 @@ services:
   mongodb:
     container_name: mongodb-container
     image: mongo:4.4
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MONGODB_USERNAME=${MONGODB_USER}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - MONGODB_DATABASE=mydatabase
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data://data/db
+      - mongodb_data:/data/db
     networks:
       - gis-dl-local-network
 
