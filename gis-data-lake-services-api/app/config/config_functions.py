@@ -1028,6 +1028,11 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
             results = json.loads(json_util.dumps(results))
             logging.info(f"MongoDB _guid search results: {results}")
 
+        elif 'find' in query_str.lower():
+            results = list(query_str)
+            results = json.loads(json_util.dumps(results))
+            logging.info(f"Full MongoDB _guid search results: {results}")
+
         # Search Neo4j for a label
         elif 'match' in query_str.lower() and 'return' in query_str.lower():
             with neo4j_client.session() as session:
