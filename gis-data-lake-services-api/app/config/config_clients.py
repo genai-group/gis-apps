@@ -544,22 +544,27 @@ def connect_to_mongodb(host: str = 'localhost', port: int = 27017,
 
     try:
         # Form the connection string
-        if username and password:
-            username = quote_plus(username)
-            password = quote_plus(password)
-            client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/{db_name}')
-        else:
-            client = MongoClient(f'mongodb://{host}:{port}/{db_name}')
+        # if username and password:
+        #     username = quote_plus(username)
+        #     password = quote_plus(password)
+        #     client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/{db_name}')
+        # else:
+        #     client = MongoClient(f'mongodb://{host}:{port}/{db_name}')
+        client = MongoClient(f'mongodb://{host}:{port}/{db_name}')
 
         # Access the specified database
         db = client[db_name]
 
         # Attempt a simple operation to verify the connection
         db.command('ping')
+        logging.info(f"Connected to MongoDB Ping: {db.command('ping')}")
+
+        logging.info(f"Connected to MongoDB: {db._Database__client}")
 
         print(f"Connected to MongoDB: {db_name}")
 
         return db
+    
     except ConnectionFailure as e:
         raise ConnectionFailure(f"Failed to connect to MongoDB: {e}")
     except PyMongoError as e:

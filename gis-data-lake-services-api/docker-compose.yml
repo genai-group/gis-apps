@@ -235,7 +235,6 @@ networks:
   #     NEO4J_AUTH: ${NEO4J_USER}/${NEO4J_PASSWORD}
   #     NEO4J_dbms_default__listen__address: "0.0.0.0"
 
-
     # mongodb:
   #   container_name: mongodb-container
   #   image: mongo:4.4
