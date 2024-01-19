@@ -165,12 +165,12 @@ services:
     networks:
       - gis-dl-local-network
 
-  gis-app-container:
+  gis-dls-container:
     build:
       context: .
       dockerfile: Dockerfile # Ensure this points to your Dockerfile
     image: gis-apps
-    container_name: gis-app-container
+    container_name: gis-dls-container
     networks:
       gis-dl-local-network:
         aliases:
