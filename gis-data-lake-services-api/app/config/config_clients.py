@@ -545,6 +545,8 @@ def connect_to_mongodb(host: str = 'localhost', port: int = 27017,
     try:
         # Form the connection string
         if username and password:
+            username = quote_plus(username)
+            password = quote_plus(password)
             client = MongoClient(f'mongodb://{username}:{password}@{host}:{port}/{db_name}')
         else:
             client = MongoClient(f'mongodb://{host}:{port}/{db_name}')

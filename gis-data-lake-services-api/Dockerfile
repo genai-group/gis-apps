@@ -1,5 +1,5 @@
 # Python 3.11 docker
-FROM python:3.9
+FROM python:3.9-slim
 
 # Set the working directory in the container to /app
 WORKDIR /app
