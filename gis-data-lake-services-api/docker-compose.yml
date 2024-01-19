@@ -96,6 +96,16 @@ services:
     volumes:
       - ollama:/root/.ollama
 
+mongodb:
+  container_name: mongodb-container
+  image: mongo:4.4
+  ports:
+    - "27017:27017"
+  volumes:
+    - mongodb_data:/data/db
+  networks:
+    - gis-dl-local-network
+
   mongodb:
     container_name: mongodb-container
     image: mongo:4.4
