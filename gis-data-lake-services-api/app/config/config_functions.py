@@ -2759,7 +2759,7 @@ def declare_queue(channel: BlockingChannel, queue_name: str):
         print(f"Declared queue: {queue_name}")
     except Exception as e:
         raise Exception(f"Error declaring queue: {e}")
-    
+
 def set_consumer_callback(channel: BlockingChannel, queue_name: str, callback: Callable):
     """
     Set a callback function for consuming messages from a queue.
@@ -2803,7 +2803,7 @@ def publish_message(channel: BlockingChannel, queue_name: str, message: str):
         print(f"Published message to queue: {queue_name}")
     except Exception as e:
         raise Exception(f"Error publishing message to queue: {e}")
-    
+
 def start_consuming(channel: BlockingChannel):
     """
     Start consuming messages from the queue.

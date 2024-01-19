@@ -108,45 +108,45 @@ def connect_to_rabbitmq(host: str = 'localhost', user: Optional[str] = '', passw
     # Create and return the connection
     return pika.BlockingConnection(parameters)
 
-async def connect_to_rabbitmq_async(host: str = 'localhost', 
-                                    user: Optional[str] = None, 
-                                    password: Optional[str] = None, 
-                                    connection_parameters: Optional[URLParameters] = None) -> aio_pika.Connection:
-    """
-    Asynchronously create and return a connection to RabbitMQ.
+# async def connect_to_rabbitmq_async(host: str = 'localhost', 
+#                                     user: Optional[str] = None, 
+#                                     password: Optional[str] = None, 
+#                                     connection_parameters: Optional[URLParameters] = None) -> aio_pika.Connection:
+#     """
+#     Asynchronously create and return a connection to RabbitMQ.
 
-    Args:
-        host (str): The hostname for RabbitMQ, e.g., 'localhost'.
-        user (Optional[str]): The username for RabbitMQ. Defaults to environment variable RABBITMQ_USERNAME or 'guest'.
-        password (Optional[str]): The password for RabbitMQ. Defaults to environment variable RABBITMQ_PASSWORD or 'guest'.
-        connection_parameters (Optional[URLParameters]): Additional connection parameters. Default is None.
+#     Args:
+#         host (str): The hostname for RabbitMQ, e.g., 'localhost'.
+#         user (Optional[str]): The username for RabbitMQ. Defaults to environment variable RABBITMQ_USERNAME or 'guest'.
+#         password (Optional[str]): The password for RabbitMQ. Defaults to environment variable RABBITMQ_PASSWORD or 'guest'.
+#         connection_parameters (Optional[URLParameters]): Additional connection parameters. Default is None.
 
-    Returns:
-        aio_pika.Connection: An aio_pika Connection instance.
+#     Returns:
+#         aio_pika.Connection: An aio_pika Connection instance.
 
-    Raises:
-        AssertionError: If the host is not provided or is empty.
-        aio_pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
-        Exception: For any other unexpected errors.
-    """
-    assert host, "RabbitMQ host must be provided."
+#     Raises:
+#         AssertionError: If the host is not provided or is empty.
+#         aio_pika.exceptions.AMQPConnectionError: If the connection to RabbitMQ fails.
+#         Exception: For any other unexpected errors.
+#     """
+#     assert host, "RabbitMQ host must be provided."
 
-    user = user or os.environ.get('RABBITMQ_USERNAME', 'guest')
-    password = password or os.environ.get('RABBITMQ_PASSWORD', 'guest')
+#     user = user or os.environ.get('RABBITMQ_USERNAME', 'guest')
+#     password = password or os.environ.get('RABBITMQ_PASSWORD', 'guest')
 
-    url = f'amqp://{user}:{password}@{host}/'
+#     url = f'amqp://{user}:{password}@{host}/'
 
-    if connection_parameters:
-        parameters = connection_parameters
-    else:
-        parameters = URLParameters(url)
+#     if connection_parameters:
+#         parameters = connection_parameters
+#     else:
+#         parameters = URLParameters(url)
 
-    try:
-        return await aio_pika.connect_robust(parameters)
-    except aio_pika.exceptions.AMQPConnectionError as e:
-        raise ConnectionError(f"Failed to connect to RabbitMQ: {e}")
-    except Exception as e:
-        raise Exception(f"Unexpected error while connecting to RabbitMQ: {e}")
+#     try:
+#         return await aio_pika.connect_robust(parameters)
+#     except aio_pika.exceptions.AMQPConnectionError as e:
+#         raise ConnectionError(f"Failed to connect to RabbitMQ: {e}")
+#     except Exception as e:
+#         raise Exception(f"Unexpected error while connecting to RabbitMQ: {e}")
 
 async def rabbitmq_create_channel_async(connection: aio_pika.Connection) -> aio_pika.Channel:
     """
@@ -1033,9 +1033,12 @@ if GIS_ENVIRONMENT == 'local':
         pass    
 
 # Creating Milvus collection
-milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
-milvus_create_index("gis_main", "vector")
-milvus_collection.load()
+try:
+    milvus_collection = milvus_create_collection("gis_main", "gis_main holds vectors for GIS Data Lake.")
+    milvus_create_index("gis_main", "vector")
+    milvus_collection.load()
+except Exception as e:
+    print(f"Errors building Milvus Collection: {e}")
 
 # Load RabbitMQ
 # if GIS_ENVIRONMENT == 'flask-local':

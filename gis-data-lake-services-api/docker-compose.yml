@@ -31,15 +31,6 @@ services:
     networks:
       - gis-dl-local-network
 
-  python-app:
-    build: .
-    environment:
-      RABBITMQ_HOST: 'rabbitmq-container'
-      RABBITMQ_USER: ${RABBITMQ_USERNAME}
-      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-    depends_on:
-      - rabbitmq
-
   postgres:
     image: postgres:latest
     container_name: postgres-container
@@ -263,3 +254,12 @@ networks:
   #     - mongodb_data:/data/db
   #   networks:
   #     - gis-dl-local-network
+
+  # gis-data-lake-services-api:
+  #   build: .
+  #   environment:
+  #     RABBITMQ_HOST: 'rabbitmq-container'
+  #     RABBITMQ_USER: ${RABBITMQ_USERNAME}
+  #     RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+  #   depends_on:
+  #     - rabbitmq
