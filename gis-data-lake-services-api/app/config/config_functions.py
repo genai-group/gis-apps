@@ -1024,12 +1024,14 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
     try:
         # Search for a GUID
         if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)) and 'match' not in query_str.lower() and 'return' not in query_str.lower():
+            logging.info(f"Query String: {query_str}")
             results = list(mongo_collection.find({'_guid':query_str}))
             results = json.loads(json_util.dumps(results))
             logging.info(f"MongoDB _guid search results: {results}")
 
-        elif 'find' in query_str.lower():
-            results = list(query_str)
+        elif 'find' in query_str.lower() and 'mongo_collection' in query_str.lower() and 'drop' not in query_str.lower() and 'dump' not in query_str.lower() and 'destroy' not in query_str.lower() and 'delete' not in query_str.lower() and 'remove' not in query_str.lower():
+            logging.info(f"Query String: {query_str}")
+            results = list(eval(query_str))
             results = json.loads(json_util.dumps(results))
             logging.info(f"Full MongoDB _guid search results: {results}")
 
@@ -1041,6 +1043,7 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
                 logging.info(f"Neo4j search results: {results}")
 
         else:
+            results = {'error': 'Search query not recognized.'}
             logging.info(f"Search query not recognized: {query_str}")
 
         return {'results': results}
