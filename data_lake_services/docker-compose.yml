@@ -178,14 +178,14 @@ services:
     ports:
       - "5002:5000"
     depends_on:
-      - postgres-container
-      - neo4j-container
-      - redis-container
-      - vault-container
-      - mongodb-container
-      - milvus-container
-      - etcd-container
-      - minio-container
+      - postgres
+      - neo4j
+      - redis
+      - vault
+      - mongodb
+      - standalone
+      - etcd
+      - minio
 
 volumes:
   postgres-data:
