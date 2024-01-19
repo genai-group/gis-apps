@@ -20,4 +20,4 @@ Dockerfile
 .idea
 *.swp
 *.swo
-*volumes*
+*/volumes*
