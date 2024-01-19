@@ -167,7 +167,7 @@ services:
 
   gis_data_lake:
     build:
-      context: '.'
+      context: .
       dockerfile: Dockerfile # Ensure this points to your Dockerfile
     image: gis-apps
     container_name: gis_data_lake
