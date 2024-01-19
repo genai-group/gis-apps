@@ -151,12 +151,12 @@ services:
     networks:
       - gis-dl-local-network
 
-  gis-dls-container:
+  python-data-lake-container:
     build:
       context: .
       dockerfile: Dockerfile # Ensure this points to your Dockerfile
     image: gis-apps
-    container_name: gis-dls-container
+    container_name: python-data-lake-container
     networks:
       gis-dl-local-network:
         aliases:
