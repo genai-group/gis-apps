@@ -1039,7 +1039,7 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
         return {'results': results}
 
     except Exception as e:
-        print(f"Errors in GIS Data Lake Search: {e}")
+        logging.error(f"An error occurred in search: {e}", exc_info=True)
         return {}
 
 
