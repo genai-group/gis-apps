@@ -1026,12 +1026,14 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
         if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)):
             # results = list(mongo_collection.find({'_guid':query_str}))
             results = list(mongo_collection.find({}))
+            results = json.loads(json.dumps(results))
             logging.info(f"_guid search results: {results}")
 
         # Search Neo4j for a label
         elif 'match' in query_str.lower() and 'return' in query_str.lower():
             with neo4j_client.session() as session:
                 results = list(session.run(query_str).data())
+                results = json.loads(json.dumps(results))
                 logging.info(f"Neo4j search results: {results}")
 
         return {'results': results}
