@@ -606,13 +606,17 @@ def connect_to_mongodb(host: str = 'localhost', port: int = 27017,
 ####    Neo4j Client    ####
 ############################
 
-def connect_to_neo4j(host: str = 'bolt://localhost:7687'):
+def connect_to_neo4j(host: str = 'bolt://localhost:7687', user: str = '', password: str = '') -> GraphDatabase.driver:
     try:
+        if user == '':
+            user = os.environ.get("NEO4J_USER")
+        if password == '':
+            password = os.environ.get("NEO4J_PASSWORD")
         client = GraphDatabase.driver(
             host,
             # "bolt://neo4j-container:7687",
             # os.environ.get("NEO4J_URI"),
-            auth=(os.environ.get("NEO4J_USER"), os.environ.get("NEO4J_PASSWORD")),
+            auth=(user, password),
             max_connection_lifetime=3600*24*30,
             keep_alive=True
         )
@@ -938,7 +942,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        mongodb_client = connect_to_mongodb('mongodb-container')
+        mongodb_client = connect_to_mongodb('mongodb-container', username='mongo', password='asdf89HYRgFSJ!@')
         print("MongoDB client connected to container.")
     except Exception as e:
         print(f"Error connecting to MongoDB with Flask API: {e}")
@@ -946,7 +950,7 @@ if GIS_ENVIRONMENT == 'flask-local':
 
 if GIS_ENVIRONMENT == 'local':
     try:
-        mongodb_client = connect_to_mongodb('localhost')
+        mongodb_client = connect_to_mongodb('localhost', username='mongo', password='asdf89HYRgFSJ!@')
         print("MongoDB client connected locally.")
     except Exception as e:
         pass    
@@ -982,14 +986,14 @@ nlp = connect_to_spacy()
 # Neo4j
 if GIS_ENVIRONMENT == 'flask-local':    
     try:
-        neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687')
+        neo4j_client = connect_to_neo4j('bolt://neo4j-container:7687', 'neo4j', 'RjMgReqQjjHfgdhvWex4')
         print("Neo4j client connected to container.")
     except Exception as e:
         pass
 
 if GIS_ENVIRONMENT == 'local':
     try:
-        neo4j_client = connect_to_neo4j('bolt://localhost:7687')
+        neo4j_client = connect_to_neo4j('bolt://localhost:7687', 'neo4j', 'RjMgReqQjjHfgdhvWex4')
         print("Neo4j client connected locally.")
     except Exception as e:
         pass

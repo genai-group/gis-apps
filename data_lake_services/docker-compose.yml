@@ -165,6 +165,28 @@ services:
     networks:
       - gis-dl-local-network
 
+  gis_data_lake:
+    build:
+      context: '.'
+      dockerfile: Dockerfile # Ensure this points to your Dockerfile
+    image: gis-apps
+    container_name: gis_data_lake
+    networks:
+      gis-dl-local-network:
+        aliases:
+          - gis-apps
+    ports:
+      - "5002:5000"
+    depends_on:
+      - postgres
+      - neo4j
+      - redis
+      - vault
+      - mongodb
+      - standalone
+      - etcd
+      - minio
+
 volumes:
   postgres-data:
   ollama:
