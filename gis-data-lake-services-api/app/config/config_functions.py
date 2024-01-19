@@ -1024,10 +1024,9 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
     try:
         # Search for a GUID
         if bool(re.match(r".*___.*[A-Za-z0-9]{20}.*", query_str)) and 'match' not in query_str.lower() and 'return' not in query_str.lower():
-            # results = list(mongo_collection.find({'_guid':query_str}))
-            results = list(mongo_collection.find({}))
+            results = list(mongo_collection.find({'_guid':query_str}))
             results = json.loads(json_util.dumps(results))
-            logging.info(f"_guid search results: {results}")
+            logging.info(f"MongoDB _guid search results: {results}")
 
         # Search Neo4j for a label
         elif 'match' in query_str.lower() and 'return' in query_str.lower():
@@ -1036,8 +1035,11 @@ def search(query_str: str, neo4j_client: neo4j._sync.driver.BoltDriver = neo4j_c
                 results = json.loads(json.dumps(results))
                 logging.info(f"Neo4j search results: {results}")
 
-        return {'results': results}
+        else:
+            logging.info(f"Search query not recognized: {query_str}")
 
+        return {'results': results}
+        
     except Exception as e:
         logging.error(f"An error occurred in search: {e}", exc_info=True)
         return {}
