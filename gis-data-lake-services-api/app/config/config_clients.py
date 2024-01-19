@@ -942,7 +942,7 @@ if GIS_ENVIRONMENT == 'local':
 
 if GIS_ENVIRONMENT == 'flask-local':
     try:
-        mongodb_client = connect_to_mongodb('mongodb-container', username='mongo', password='asdf89HYRgFSJ!@')
+        mongodb_client = connect_to_mongodb('mongodb-container')
         print("MongoDB client connected to container.")
     except Exception as e:
         print(f"Error connecting to MongoDB with Flask API: {e}")
@@ -950,7 +950,7 @@ if GIS_ENVIRONMENT == 'flask-local':
 
 if GIS_ENVIRONMENT == 'local':
     try:
-        mongodb_client = connect_to_mongodb('localhost', username='mongo', password='asdf89HYRgFSJ!@')
+        mongodb_client = connect_to_mongodb('localhost')
         print("MongoDB client connected locally.")
     except Exception as e:
         pass    
