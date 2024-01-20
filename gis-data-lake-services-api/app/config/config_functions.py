@@ -5,6 +5,8 @@ from config.config_variables import *
 from config.config_modules import *
 from config.config_clients import *
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+
 ###############################
 ####    Basic Functions    ####
 ###############################
