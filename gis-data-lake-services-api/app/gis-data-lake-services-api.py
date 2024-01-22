@@ -132,7 +132,7 @@ def load_document():
             metadata = list(data.keys()) 
             fingerprint = generate_fingerprint(metadata)
             logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")             
-        
+
     return jsonify({
         "status": "success",
         "message": f"File '{document_name}' uploaded successfully",
@@ -140,7 +140,6 @@ def load_document():
         "file_type": file_type,
         "fingerprint": fingerprint
     }), 200
-
 
 @app.route('/search', methods=['POST'])
 def perform_search():
