@@ -119,11 +119,19 @@ def load_document():
         logger.info(f"File '{filename}' uploaded successfully as '{document_name}'")
         logger.info(f"Saved at '{file_path}' with file type '{file_type}'")
 
+        # Based on the file type, build a "fingerprint of the file" and store it in redis
+        if file_type == "text/csv":
+            data = pd.read_csv(file_path)
+            metadata = data.columns.tolist()
+            fingerprint = generate_fingerprint(metadata)
+            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")  
+        
     return jsonify({
         "status": "success",
         "message": f"File '{document_name}' uploaded successfully",
         "file_path": file_path,
-        "file_type": file_type
+        "file_type": file_type,
+        "fingerprint": fingerprint
     }), 200
 
 

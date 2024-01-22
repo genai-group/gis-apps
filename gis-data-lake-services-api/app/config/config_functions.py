@@ -194,7 +194,23 @@ temp_data
 ####   File Fingerprint    ####
 ###############################    
 
-def generate_fingerprint(json_data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
+def generate_fingerprint(data: Any, data_type) -> str:
+    """
+    Generate a fingerprint for the data by creating a sorted string of unique keys.
+
+    Args:
+    data (Any): The data for which the fingerprint is to be generated.
+
+    Returns:
+        str: A SHA256 hash representing the fingerprint of the data.    
+    """
+    try:
+        fingerprint = hashlib.sha256(data.encode()).hexdigest()
+        return fingerprint
+    except Exception as e:
+        raise RuntimeError(f"Error in generating fingerprint: {e}")
+
+def fingerprint_json(json_data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> str:
     """
     Generate a fingerprint for the JSON data by creating a sorted string of unique keys.
     This function handles both dictionaries and arrays of dictionaries by considering the keys
