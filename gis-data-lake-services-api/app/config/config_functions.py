@@ -194,7 +194,7 @@ temp_data
 ####   File Fingerprint    ####
 ###############################    
 
-def generate_fingerprint(data: Any, data_type) -> str:
+def generate_fingerprint(data: Any) -> str:
     """
     Generate a fingerprint for the data by creating a sorted string of unique keys.
 

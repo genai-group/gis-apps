@@ -121,10 +121,17 @@ def load_document():
 
         # Based on the file type, build a "fingerprint of the file" and store it in redis
         if file_type == "text/csv":
-            data = pd.read_csv(file_path)
+            data = open_file(file_path)
+            data = pd.DataFrame(data)
             metadata = data.columns.tolist()
             fingerprint = generate_fingerprint(metadata)
-            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")  
+            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}") 
+
+        elif file_type == "application/json":
+            data = open_file(file_path)
+            metadata = list(data.keys()) 
+            fingerprint = generate_fingerprint(metadata)
+            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")             
         
     return jsonify({
         "status": "success",
