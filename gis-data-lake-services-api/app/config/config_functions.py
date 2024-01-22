@@ -367,7 +367,6 @@ def from_unix(unix_timestamp: int, tz_str: Optional[str] = None) -> datetime:
     except Exception as e:
         raise ValueError(f"Failed to convert UNIX timestamp '{unix_timestamp}' to datetime. Error: {e}")
 
-
 # def from_unix(unix_timestamp: int, tz_str: Optional[str] = None) -> datetime:
 #     """
 #     Convert a UNIX timestamp to a timezone aware datetime object.

@@ -39,10 +39,10 @@
           }
         }
       },
-      "/upload": {
+      "/load": {
         "post": {
-            "summary": "Upload a document",
-            "tags": ["Upload"],
+            "summary": "Load a document",
+            "tags": ["Load"],
             "requestBody": {
                 "required": true,
                 "content": {
@@ -53,7 +53,7 @@
                                 "document": {
                                     "type": "string",
                                     "format": "binary",
-                                    "description": "The document to upload"
+                                    "description": "The document to load"
                                 },
                                 "name": {
                                     "type": "string",
@@ -67,7 +67,7 @@
             },
             "responses": {
                 "201": {
-                    "description": "Document uploaded successfully",
+                    "description": "Document loaded successfully",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -75,11 +75,11 @@
                                 "properties": {
                                     "status": {
                                         "type": "string",
-                                        "description": "Status of the upload operation"
+                                        "description": "Status of the load operation"
                                     },
                                     "message": {
                                         "type": "string",
-                                        "description": "Additional information about the upload"
+                                        "description": "Additional information about the load"
                                     }
                                 },
                                 "required": ["status"]

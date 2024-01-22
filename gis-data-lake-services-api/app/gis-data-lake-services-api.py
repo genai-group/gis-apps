@@ -91,31 +91,9 @@ def home():
     </html>
     """
 
-@app.route('/search', methods=['POST'])
-def perform_search():
-    logger.info("Received search request")
 
-    query_str = request.json.get('query') if request.json else None
-    logger.info(f"Received search query: {query_str}")
-
-    if query_str is None:
-        logger.warning("No query provided in search request")
-        return jsonify({"status": "error", "message": "No query provided"}), 400
-
-    # Here you would typically perform a search query against a database
-    try:
-        results = search(query_str, neo4j_client, mongodb_client)
-        logger.info(f"Search performed successfully for query: {query_str}. Results: {results}")
-        return jsonify({
-            "status": "success",
-            "data": results
-        }), 200
-    except Exception as e:
-        logger.error(f"Error during search operation: {e}")
-        return jsonify({"status": "error", "message": "Search operation failed"}), 500
-
-@app.route('/upload', methods=['POST'])
-def upload_document():
+@app.route('/load', methods=['POST'])
+def load_document():
     # Check if the post request has the file part
     if 'document' not in request.files:
         logger.error("No file part in the request")
@@ -147,6 +125,30 @@ def upload_document():
         "file_path": file_path,
         "file_type": file_type
     }), 200
+
+
+@app.route('/search', methods=['POST'])
+def perform_search():
+    logger.info("Received search request")
+
+    query_str = request.json.get('query') if request.json else None
+    logger.info(f"Received search query: {query_str}")
+
+    if query_str is None:
+        logger.warning("No query provided in search request")
+        return jsonify({"status": "error", "message": "No query provided"}), 400
+
+    # Here you would typically perform a search query against a database
+    try:
+        results = search(query_str, neo4j_client, mongodb_client)
+        logger.info(f"Search performed successfully for query: {query_str}. Results: {results}")
+        return jsonify({
+            "status": "success",
+            "data": results
+        }), 200
+    except Exception as e:
+        logger.error(f"Error during search operation: {e}")
+        return jsonify({"status": "error", "message": "Search operation failed"}), 500
 
 ########################################
 ####    RabbitMQ Process Message    ####
