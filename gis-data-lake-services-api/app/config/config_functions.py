@@ -205,7 +205,7 @@ def generate_fingerprint(data: Any) -> str:
         str: A SHA256 hash representing the fingerprint of the data.    
     """
     try:
-        fingerprint = hashlib.sha256(data.encode()).hexdigest()
+        fingerprint = hashlib.sha256(str(data)).hexdigest()
         return fingerprint
     except Exception as e:
         raise RuntimeError(f"Error in generating fingerprint: {e}")
