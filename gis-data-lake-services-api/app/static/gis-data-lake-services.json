@@ -39,10 +39,10 @@
           }
         }
       },
-      "/load": {
+      "/register": {
         "post": {
-            "summary": "Load a document",
-            "tags": ["Load"],
+            "summary": "Register data (e.g. JSON document, XML, CSV, SQL, PDF, etc.) into the GIS Data Lake",
+            "tags": ["Register"],
             "requestBody": {
                 "required": true,
                 "content": {
@@ -53,11 +53,11 @@
                                 "document": {
                                     "type": "string",
                                     "format": "binary",
-                                    "description": "The document to load"
+                                    "description": "Data to register"
                                 },
                                 "name": {
                                     "type": "string",
-                                    "description": "Name for the document"
+                                    "description": "Name for the data"
                                 }
                             },
                             "required": ["document"]
@@ -67,7 +67,7 @@
             },
             "responses": {
                 "201": {
-                    "description": "Document loaded successfully",
+                    "description": "Data registered successfully",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -75,11 +75,11 @@
                                 "properties": {
                                     "status": {
                                         "type": "string",
-                                        "description": "Status of the load operation"
+                                        "description": "Status of the data registration"
                                     },
                                     "message": {
                                         "type": "string",
-                                        "description": "Additional information about the load"
+                                        "description": "Additional information about the data registration"
                                     }
                                 },
                                 "required": ["status"]

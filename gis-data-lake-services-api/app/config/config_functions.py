@@ -965,7 +965,7 @@ def standardize_objects(objects: List[Dict], parse_config: Dict, _created_at: st
     except Exception as e:
         raise RuntimeError(f"Error during processing: {e}")
 
-def prepare_entities_for_load(objects, _namespace: str, template: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
+def prepare_entities_for_registration(objects, _namespace: str, template: Dict, _created_at: str = '', include_created_at: bool = True) -> List[Dict]:
     """
     Prepare objects for hashing and loading into the database.
 
@@ -2606,12 +2606,12 @@ def process_data(data: Union[List[Dict], Dict], parse_config, template: Dict) ->
 ####    Load Data    ####
 #########################
 
-def load(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> None:
+def register(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> None:
     """
-    Load data into GIS Data Lake databases
+    Register data into GIS Data Lake databases
 
     Args:
-        data (Union[List[Dict], Dict]): data to load
+        data (Union[List[Dict], Dict]): data to register
         template (Dict): template_output dictionary which contains the parsed configuration
 
     Returns:
@@ -2664,7 +2664,7 @@ def load(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) -> N
                 # Loading an array of entities into Neo4j
                 neo4j_objects = map_func(lambda x: {k:v for k,v in x.items() if k in ['_guid', entity]}, data)
                 neo4j_objects = standardize_objects(neo4j_objects, parse_config, template)
-                neo4j_objects = prepare_entities_for_load(neo4j_objects, entity, template, include_created_at=False)
+                neo4j_objects = prepare_entities_for_registration(neo4j_objects, entity, template, include_created_at=False)
                 pp(neo4j_objects)
                 if len(neo4j_objects) > 0:
                     # buiding the load statements

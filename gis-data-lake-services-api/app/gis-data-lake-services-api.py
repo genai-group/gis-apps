@@ -92,52 +92,55 @@ def home():
     """
 
 
-@app.route('/load', methods=['POST'])
-def load_document():
+@app.route('/register', methods=['POST'])
+def register_data():
     # Check if the post request has the file part
     if 'document' not in request.files:
         logger.error("No file part in the request")
         return jsonify({"status": "error", "message": "No file part"}), 400
 
-    file = request.files['document']
+    data = request.files['document']
 
-    # If the user does not select a file, the browser submits an empty file without a filename.
-    if file.filename == '':
-        logger.error("No file selected for upload")
+    # If the user does not select a data source, the browser submits an empty file without a filename.
+    if data.filename == '':
+        logger.error("No data selected for upload")
         return jsonify({"status": "error", "message": "No selected file"}), 400
 
-    if file:
-        filename = secure_filename(file.filename)
+    if data:
+        filename = secure_filename(data.filename)
         document_name = request.form.get('name', filename)  # Default to original filename if name not provided
 
         # Save the file to the specified UPLOAD_FOLDER
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(file_path)
+        data_path = os.path.join(UPLOAD_FOLDER, filename)
+        data.save(data_path)
 
         # Output the file type
-        file_type = file.content_type
+        data_type = data.content_type
         logger.info(f"File '{filename}' uploaded successfully as '{document_name}'")
-        logger.info(f"Saved at '{file_path}' with file type '{file_type}'")
+        logger.info(f"Saved at '{data_path}' with file type '{data_type}'")
 
         # Based on the file type, build a "fingerprint of the file" and store it in redis
-        if file_type == "text/csv":
-            data = open_file(file_path)
+        if data_type == "text/csv":
+            data = open_file(data_path)
             data = pd.DataFrame(data)
             metadata = data.columns.tolist()
             fingerprint = generate_fingerprint(metadata)
             logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}") 
 
-        elif file_type == "application/json":
-            data = open_file(file_path)
-            metadata = list(data.keys()) 
+        elif data_type == "application/json":
+            data = open_file(data_path)
+            if isinstance(data, list):
+                metadata = list(data[0].keys())
+            else:
+                metadata = list(data.keys()) 
             fingerprint = generate_fingerprint(metadata)
             logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")             
 
     return jsonify({
         "status": "success",
         "message": f"File '{document_name}' uploaded successfully",
-        "file_path": file_path,
-        "file_type": file_type,
+        "data_path": data_path,
+        "data_type": data_type,
         "fingerprint": fingerprint
     }), 200
 
