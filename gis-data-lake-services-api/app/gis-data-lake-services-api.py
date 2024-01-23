@@ -108,7 +108,7 @@ def register_data():
 
     if data:
         filename = secure_filename(data.filename)
-        document_name = request.form.get('name', filename)  # Default to original filename if name not provided
+        data_name = request.form.get('name', filename)  # Default to original filename if name not provided
 
         # Save the file to the specified UPLOAD_FOLDER
         data_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -116,7 +116,7 @@ def register_data():
 
         # Output the file type
         data_type = data.content_type
-        logger.info(f"File '{filename}' uploaded successfully as '{document_name}'")
+        logger.info(f"File '{filename}' uploaded successfully as '{data_name}'")
         logger.info(f"Saved at '{data_path}' with file type '{data_type}'")
 
         # Based on the file type, build a "fingerprint of the file" and store it in redis
@@ -125,7 +125,7 @@ def register_data():
             data = pd.DataFrame(data)
             metadata = data.columns.tolist()
             fingerprint = generate_fingerprint(metadata)
-            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}") 
+            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")
 
         elif data_type == "application/json":
             data = open_file(data_path)
@@ -134,11 +134,24 @@ def register_data():
             else:
                 metadata = list(data.keys()) 
             fingerprint = generate_fingerprint(metadata)
-            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")             
+            logger.info(f"Fingerprint of file '{filename}' is: {fingerprint}")  
+
+        else:
+            logger.warning(f"File type '{data_type}' not supported")
+            return jsonify({"status": "error", "message": "File type not supported"}), 400           
+
+        # Check to see if the file already exists in redis cache
+        if redis_client.exists(fingerprint):
+            logger.warning(f"File '{data_name}' already exists in the data lake")
+            return jsonify({"status": "error", "message": "File already exists"}), 400
+        else:
+            # Store the file in redis cache
+            redis_client.set(fingerprint, data_path)
+            logger.info(f"File '{data_name}' stored successfully in the data lake")
 
     return jsonify({
         "status": "success",
-        "message": f"File '{document_name}' uploaded successfully",
+        "message": f"File '{data_name}' uploaded successfully",
         "data_path": data_path,
         "data_type": data_type,
         "fingerprint": fingerprint

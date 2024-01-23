@@ -2628,7 +2628,7 @@ def register(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) 
     ###########
     # MongoDB #
     ###########
-    
+
     try:
         mongo_collection.insert_many(data)
     except Exception as e:
@@ -2760,7 +2760,7 @@ def register(data: Union[List[Dict], Dict], parse_config: Dict, template: Dict) 
                 calculated_entity_title = list(calculated_entity.keys())[0]
                 calculated_entity_fields = calculated_entity[calculated_entity_title]
     except Exception as e:
-        print(f"Errors loading Neo4j Database: {e}")
+        logging.error(f"Error in loading data into Neo4j: {e}")
 
 
 #############################################
