@@ -1,0 +1,12 @@
+calculated_entities: []
+edges: []
+fields: []
+name:
+- rank
+- country
+- score
+- category
+- change
+namespace: What is the namespace
+primary_key: ''
+status: setup

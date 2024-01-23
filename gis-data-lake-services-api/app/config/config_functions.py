@@ -159,77 +159,87 @@ def is_json_nested(json_obj: Union[Dict[str, Any], List[Any]]) -> bool:
 
     return _is_nested(json_obj)
 
-def process_data_file(file_path: str) -> None:
+def process_data_file(file_path: str) -> List[str]:
     """
-    Reads a data file of various formats (JSON, CSV, XML, XSD, PDF, etc.), extracts the data fields,
-    and generates a template file for data processing.
+    Reads a data file of various formats (JSON, CSV, XML, XSD, PDF, etc.), and extracts the data fields.
 
     Args:
     file_path (str): The path to the data file.
 
     Returns:
-    None: Writes the output to a file.
+    List[str]: A list of field names extracted from the data file.
     """
     assert isinstance(file_path, str), "File path must be a string."
 
     try:
         file_extension = Path(file_path).suffix.lower()
 
-        # Determine the file type and read data
-        if file_extension == '.json':
-            with open(file_path, 'r') as file:
-                data = json.load(file)
-                fields = list(data.keys())
-        elif file_extension == '.csv':
-            df = pd.read_csv(file_path)
-            fields = list(df.columns)
-        elif file_extension == '.xml' or file_extension == '.xsd':
-            tree = ET.parse(file_path)
-            root = tree.getroot()
-            fields = [elem.tag for elem in root.iter()]
-        elif file_extension == '.pdf':
-            # PDF processing can be complex and might need a library like PyPDF2 or pdfplumber
-            raise NotImplementedError("PDF file processing is not implemented.")
+        if file_extension in ['.json', '.csv', '.xml', '.xsd']:
+            # Process file based on its extension
+            if file_extension == '.json':
+                with open(file_path, 'r') as file:
+                    data = json.load(file)
+                    return list(data.keys()) if isinstance(data, dict) else list(data[0].keys())
+            
+            elif file_extension == '.csv':
+                df = pd.read_csv(file_path)
+                return list(df.columns)
+            
+            elif file_extension in ['.xml', '.xsd']:
+                tree = ET.parse(file_path)
+                root = tree.getroot()
+                return [elem.tag for elem in root.iter()]
         else:
-            raise ValueError(f"Unsupported file extension: {file_extension}")
-
-        generate_template(fields)
+            raise ValueError("Unsupported file extension: {}".format(file_extension))
     except Exception as e:
-        raise RuntimeError(f"Error processing file: {e}")
-
-def generate_template(name: str = 'template_name', primary_key: str = '', namespace: str = 'What is the namespace', fields: List[str] = []) -> None:
+        raise RuntimeError("Error processing file: {}".format(e))
+    
+def generate_template(file_path: str, name: str = 'fake_airline_manifest_flight', primary_key: str = 'flight_information', namespace: str = 'flight_manifest') -> None:
     """
     Generates a template file based on the fields extracted from the data file.
 
     Args:
     fields (List[str]): List of fields extracted from the data file.
+    name (str): Template name.
+    primary_key (str): Primary key for the template.
+    namespace (str): Namespace for the template.
 
     Returns:
     None: Writes the output to a file.
     """
+    # Define specific attributes for each field based on your requirements
+    field_attributes = {
+        "flight_manifest_id": {"is_entity": True, "standardize": "standardize_name", "alias": ""},
+        # Add similar entries for other fields as per your requirements
+    }
+
     template = {
         "name": name,
         "primary_key": primary_key,
         "namespace": namespace,
         "fields": [],
-        "calculated_entities": [],
-        "edges": [],
-        "status": "setup"
+        "calculated_entities": [
+            {"calculated_entities_name_1": [], "alias": "alias_name"}
+        ],
+        "edges": [
+            {"parents": [], "children": [], "properties": [], "direction": "out", "type": "one_to_one"},
+            {"parents": [], "children": [], "properties": [], "direction": "out", "type": "one_to_one"},
+        ]
     }
 
     for field in fields:
+        attributes = field_attributes.get(field, {"is_entity": False, "standardize": "standardize_name", "alias": ""})
         field_template = {
             "field": field,
-            "alias": "",
-            "standardize": "standardize_name",
-            "is_entity": False,
+            "alias": attributes["alias"],
+            "standardize": attributes["standardize"],
+            "is_entity": attributes["is_entity"],
             "is_embedding": False,
             "is_datetime": False,
             "drop": False
         }
         template["fields"].append(field_template)
 
-    # Writing the template to a file
     with open('output_template.yaml', 'w') as file:
         yaml.dump(template, file, default_flow_style=False)
 
