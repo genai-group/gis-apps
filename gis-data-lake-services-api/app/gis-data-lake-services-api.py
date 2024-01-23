@@ -142,12 +142,12 @@ def register_data():
 
         # Check to see if the file already exists in redis cache
         if redis_client.exists(fingerprint):
-            logger.warning(f"File '{data_name}' already exists in the data lake")
-            return jsonify({"status": "error", "message": "File already exists"}), 400
+            fingerprint = redis_client.get(fingerprint)
+            logger.info(f"File '{data_name}' already exists in redis cache. Fingerpring: {fingerprint}")
         else:
             # Store the file in redis cache
             redis_client.set(fingerprint, data_path)
-            logger.info(f"File '{data_name}' stored successfully in the data lake")
+            logger.info(f"File '{data_name}' stored successfully in redis cache")
 
     return jsonify({
         "status": "success",
