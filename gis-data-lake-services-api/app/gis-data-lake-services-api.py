@@ -144,8 +144,11 @@ def register_data():
         # Check and handle the fingerprint/template in Redis
         if redis_client.exists(fingerprint):
             template_bytes = redis_client.get(fingerprint)
-            template_str = template_bytes.decode('utf-8')  # Convert bytes to string
-            template = json.loads(template_str)
+            try:
+                template_str = template_bytes.decode('utf-8')  # Convert bytes to string
+                template = json.loads(template_str)
+            except Exception as e:
+                logger.info(f"Template is not a valid JSON string: {e}")
             logger.info(f"File '{data_name}' already exists in redis cache under fingerprint {fingerprint}. Template: {template}")
         else:
             # Store the file in redis cache
