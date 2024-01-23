@@ -123,6 +123,21 @@ def open_file(filename: str):
         print(f"An error occurred: {e}")
         return None
 
+def bytes_to_base64(data: bytes) -> str:
+    """Convert bytes data to a Base64 encoded string.
+
+    Args:
+    data (bytes): The bytes object to be encoded.
+
+    Returns:
+    str: A Base64 encoded string.
+    """
+    assert isinstance(data, bytes), "Data must be of type bytes"
+
+    try:
+        return base64.b64encode(data).decode('utf-8')
+    except Exception as e:
+        logging.error(f"An error occurred in bytes_to_base64: {e}", exc_info=True)
 
 def is_json_nested(json_obj: Union[Dict[str, Any], List[Any]]) -> bool:
     """

@@ -10,6 +10,7 @@ import pytz
 import copy
 import random
 import sspipe
+import base64
 import hashlib
 import logging
 import asyncio

@@ -143,6 +143,7 @@ def register_data():
         # Check to see if the file already exists in redis cache
         if redis_client.exists(fingerprint):
             fingerprint = redis_client.get(fingerprint)
+            fingerprint = bytes_to_base64(fingerprint)
             logger.info(f"File '{data_name}' already exists in redis cache. Fingerpring: {fingerprint}")
         else:
             # Store the file in redis cache
