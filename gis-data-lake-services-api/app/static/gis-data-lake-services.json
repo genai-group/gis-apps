@@ -60,8 +60,10 @@
                                     "description": "Name for the data"
                                 },
                                 "type": {
-                                    "type": "string",
-                                    "description": "Type of the registration (e.g. data, template, user, model, etc.)"}
+                                  "type": "string",
+                                  "description": "Type of the registration",
+                                  "enum": ["data", "template", "user", "model"]
+                                }
                             },
                             "required": ["document", "name", "type"]
                         }

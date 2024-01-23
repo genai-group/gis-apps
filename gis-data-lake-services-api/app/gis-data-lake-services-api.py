@@ -141,11 +141,12 @@ def register_data():
             return jsonify({"status": "error", "message": "File type not supported"}), 400           
 
         # Check to see if the fingerprint/template already exists in redis cache
+        # Check and handle the fingerprint/template in Redis
         if redis_client.exists(fingerprint):
-            template = redis_client.get(fingerprint)
-            # fingerprint = bytes_to_base64(fingerprint)
-            template = json.loads(json.dumps(template))
-            logger.info(f"File '{data_name}' already exists in redis cache under fingerprint {fingerprint}. template: {template}")
+            template_bytes = redis_client.get(fingerprint)
+            template_str = template_bytes.decode('utf-8')  # Convert bytes to string
+            template = json.loads(template_str)
+            logger.info(f"File '{data_name}' already exists in redis cache under fingerprint {fingerprint}. Template: {template}")
         else:
             # Store the file in redis cache
             redis_client.set(fingerprint, data_path)
