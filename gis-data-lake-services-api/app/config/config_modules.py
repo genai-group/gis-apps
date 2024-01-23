@@ -23,11 +23,13 @@ import numpy as np
 import pandas as pd
 import logging.config
 import logging.handlers
+from pathlib import Path
 from bson import json_util
 from pandas.api import types
 from titlecase import titlecase
 from pprint import pprint as pp
 from dateutil.parser import parse
+import xml.etree.ElementTree as ET
 from urllib.parse import quote_plus
 from datetime import datetime, timedelta, timezone, date
 from cryptography.fernet import Fernet, InvalidToken

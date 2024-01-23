@@ -159,6 +159,82 @@ def is_json_nested(json_obj: Union[Dict[str, Any], List[Any]]) -> bool:
 
     return _is_nested(json_obj)
 
+def process_data_file(file_path: str) -> None:
+    """
+    Reads a data file of various formats (JSON, CSV, XML, XSD, PDF, etc.), extracts the data fields,
+    and generates a template file for data processing.
+
+    Args:
+    file_path (str): The path to the data file.
+
+    Returns:
+    None: Writes the output to a file.
+    """
+    assert isinstance(file_path, str), "File path must be a string."
+
+    try:
+        file_extension = Path(file_path).suffix.lower()
+
+        # Determine the file type and read data
+        if file_extension == '.json':
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+                fields = list(data.keys())
+        elif file_extension == '.csv':
+            df = pd.read_csv(file_path)
+            fields = list(df.columns)
+        elif file_extension == '.xml' or file_extension == '.xsd':
+            tree = ET.parse(file_path)
+            root = tree.getroot()
+            fields = [elem.tag for elem in root.iter()]
+        elif file_extension == '.pdf':
+            # PDF processing can be complex and might need a library like PyPDF2 or pdfplumber
+            raise NotImplementedError("PDF file processing is not implemented.")
+        else:
+            raise ValueError(f"Unsupported file extension: {file_extension}")
+
+        generate_template(fields)
+    except Exception as e:
+        raise RuntimeError(f"Error processing file: {e}")
+
+def generate_template(name: str = 'template_name', primary_key: str = '', namespace: str = 'What is the namespace', fields: List[str] = []) -> None:
+    """
+    Generates a template file based on the fields extracted from the data file.
+
+    Args:
+    fields (List[str]): List of fields extracted from the data file.
+
+    Returns:
+    None: Writes the output to a file.
+    """
+    template = {
+        "name": name,
+        "primary_key": primary_key,
+        "namespace": namespace,
+        "fields": [],
+        "calculated_entities": [],
+        "edges": [],
+        "status": "setup"
+    }
+
+    for field in fields:
+        field_template = {
+            "field": field,
+            "alias": "",
+            "standardize": "standardize_name",
+            "is_entity": False,
+            "is_embedding": False,
+            "is_datetime": False,
+            "drop": False
+        }
+        template["fields"].append(field_template)
+
+    # Writing the template to a file
+    with open('output_template.yaml', 'w') as file:
+        yaml.dump(template, file, default_flow_style=False)
+
+    logging.info("Template generated and saved as output_template.yaml")
+
 def flatten_json(json_obj: Union[Dict[str, Any], List[Any]]) -> Dict[str, Any]:
     """
     Flattens a nested JSON object into a single-level object with dot-separated keys.

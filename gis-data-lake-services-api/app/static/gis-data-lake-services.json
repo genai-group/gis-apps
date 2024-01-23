@@ -58,9 +58,12 @@
                                 "name": {
                                     "type": "string",
                                     "description": "Name for the data"
-                                }
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "description": "Type of the registration (e.g. data, template, user, model, etc.)"}
                             },
-                            "required": ["document"]
+                            "required": ["document", "name", "type"]
                         }
                     }
                 }
