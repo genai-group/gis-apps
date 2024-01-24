@@ -4,6 +4,8 @@ template:
   name: "fake_airline_manifest_flight"
   primary_key: "flight_information"
   namespace: "flight_manifest"
+  status: "accepted"
+  ttl: 360000
 
 fields:
   - field: "flight_manifest_id"

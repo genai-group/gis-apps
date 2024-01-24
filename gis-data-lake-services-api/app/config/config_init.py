@@ -92,6 +92,14 @@ except Exception as e:
     print(f"Error loading ISO data: {e}")
     raise
 
+# languages
+try:
+    language_list = open_file(f"{data_dir}/languages.json")
+    print(f"Successfully loaded data for the Languages list: {language_list}")
+except Exception as e:
+    print(f"Errors loading language list: {e}")
+    raise
+
 # Reading in the International Government IDs - Sheet1.csv
 try:
     government_ids = open_file(f"{data_dir}/International Government IDs - Sheet1.csv")
