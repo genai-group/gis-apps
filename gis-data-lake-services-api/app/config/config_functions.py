@@ -2949,5 +2949,554 @@ def start_consuming(channel: BlockingChannel):
     except KeyboardInterrupt:
         channel.stop_consuming()
 
+# async def search_consolidated_screening_list(subscription_key: str,
+#                                              name: Optional[str] = None,
+#                                              fuzzy_name: Optional[str] = None,
+#                                              sources: Optional[str] = None,
+#                                              types: Optional[str] = None,
+#                                              countries: Optional[str] = None,
+#                                              address: Optional[str] = None,
+#                                              city: Optional[str] = None,
+#                                              state: Optional[str] = None,
+#                                              postal_code: Optional[str] = None,
+#                                              full_address: Optional[str] = None,
+#                                              offset: Optional[int] = None,
+#                                              size: Optional[int] = None) -> Dict[str, Any]:
+#     """
+#     Asynchronously search the consolidated screening list from the Trade.gov API.
 
+#     Args:
+#         subscription_key (str): API subscription key.
+#         name (Optional[str]): Name filter.
+#         fuzzy_name (Optional[str]): Fuzzy name filter.
+#         sources (Optional[str]): Sources filter.
+#         types (Optional[str]): Types filter.
+#         countries (Optional[str]): Countries filter.
+#         address (Optional[str]): Address filter.
+#         city (Optional[str]): City filter.
+#         state (Optional[str]): State filter.
+#         postal_code (Optional[str]): Postal code filter.
+#         full_address (Optional[str]): Full address filter.
+#         offset (Optional[int]): Offset for pagination.
+#         size (Optional[int]): Size of the result set.
+
+#     Returns:
+#         Dict[str, Any]: The JSON response from the API.
+#     """
+#     url = 'https://data.trade.gov/consolidated_screening_list/v1/search'
+#     headers = {'Subscription-Key': subscription_key}
+#     params = {
+#         'name': name,
+#         'fuzzy_name': fuzzy_name,
+#         'sources': sources,
+#         'types': types,
+#         'countries': countries,
+#         'address': address,
+#         'city': city,
+#         'state': state,
+#         'postal_code': postal_code,
+#         'full_address': full_address,
+#         'offset': offset,
+#         'size': size
+#     }
+
+#     async with aiohttp.ClientSession() as session:
+#         async with session.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None}) as response:
+#             response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+#             return await response.json()
+
+# # Example usage
+# async def trade_main():
+#     result = await search_consolidated_screening_list(
+#         subscription_key='your_subscription_key',
+#         name='John Doe',
+#         size=10
+#     )
+#     print(result)
+
+# if __name__ == '__main__':
+#     asyncio.run(trade_main())
     
+# async def search_consolidated_screening_list(subscription_key: str,
+#                                              name: Optional[str] = None,
+#                                              fuzzy_name: Optional[str] = None,
+#                                              sources: Optional[str] = None,
+#                                              types: Optional[str] = None,
+#                                              countries: Optional[str] = None,
+#                                              address: Optional[str] = None,
+#                                              city: Optional[str] = None,
+#                                              state: Optional[str] = None,
+#                                              postal_code: Optional[str] = None,
+#                                              full_address: Optional[str] = None,
+#                                              offset: Optional[int] = None,
+#                                              size: Optional[int] = None) -> Dict[str, Any]:
+#     """
+#     Asynchronously search the consolidated screening list from the Trade.gov API.
+
+#     Args:
+#         subscription_key (str): API subscription key.
+#         name (Optional[str]): Name filter.
+#         fuzzy_name (Optional[str]): Fuzzy name filter.
+#         sources (Optional[str]): Sources filter.
+#         types (Optional[str]): Types filter.
+#         countries (Optional[str]): Countries filter.
+#         address (Optional[str]): Address filter.
+#         city (Optional[str]): City filter.
+#         state (Optional[str]): State filter.
+#         postal_code (Optional[str]): Postal code filter.
+#         full_address (Optional[str]): Full address filter.
+#         offset (Optional[int]): Offset for pagination.
+#         size (Optional[int]): Size of the result set.
+
+#     Returns:
+#         Dict[str, Any]: The JSON response from the API.
+#     """
+#     url = 'https://data.trade.gov/consolidated_screening_list/v1/search'
+#     headers = {'Subscription-Key': subscription_key}
+#     params = {
+#         'name': name,
+#         'fuzzy_name': fuzzy_name,
+#         'sources': sources,
+#         'types': types,
+#         'countries': countries,
+#         'address': address,
+#         'city': city,
+#         'state': state,
+#         'postal_code': postal_code,
+#         'full_address': full_address,
+#         'offset': offset,
+#         'size': size
+#     }
+
+#     async with aiohttp.ClientSession() as session:
+#         async with session.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None}) as response:
+#             response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+#             return await response.json()
+
+# # Example usage
+# async def trade_main():
+#     result = await search_consolidated_screening_list(
+#         subscription_key=os.environ.get('TRADE_GOV_1'),
+#         name='John Doe',
+#         size=10
+#     )
+#     print(result)
+
+# if __name__ == '__main__':
+#     asyncio.run(trade_main())
+
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(trade_main())
+
+def search_consolidated_screening_list(subscription_key: str,
+                                       name: Optional[str] = None,
+                                       fuzzy_name: Optional[str] = None,
+                                       sources: Optional[str] = None,
+                                       types: Optional[str] = None,
+                                       countries: Optional[str] = None,
+                                       address: Optional[str] = None,
+                                       city: Optional[str] = None,
+                                       state: Optional[str] = None,
+                                       postal_code: Optional[str] = None,
+                                       full_address: Optional[str] = None,
+                                       offset: Optional[int] = None,
+                                       size: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Search the consolidated screening list from the Trade.gov API synchronously.
+
+    Args:
+        subscription_key (str): API subscription key.
+        name (Optional[str]): Name filter.
+        fuzzy_name (Optional[str]): Fuzzy name filter.
+        sources (Optional[str]): Sources filter.
+        types (Optional[str]): Types filter.
+        countries (Optional[str]): Countries filter.
+        address (Optional[str]): Address filter.
+        city (Optional[str]): City filter.
+        state (Optional[str]): State filter.
+        postal_code (Optional[str]): Postal code filter.
+        full_address (Optional[str]): Full address filter.
+        offset (Optional[int]): Offset for pagination.
+        size (Optional[int]): Size of the result set.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+    """
+    url = 'https://data.trade.gov/consolidated_screening_list/v1/search'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'name': name,
+        'fuzzy_name': fuzzy_name,
+        'sources': sources,
+        'types': types,
+        'countries': countries,
+        'address': address,
+        'city': city,
+        'state': state,
+        'postal_code': postal_code,
+        'full_address': full_address,
+        'offset': offset,
+        'size': size
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")   
+
+result = search_consolidated_screening_list(
+    subscription_key=os.environ.get('TRADE_GOV_1'),
+    name='Steve',
+    size=10
+)
+print(result)
+
+def get_consolidated_screening_list_sources(subscription_key: str) -> Dict[str, Any]:
+    """
+    Retrieve the sources from the consolidated screening list provided by Trade.gov API.
+
+    Args:
+        subscription_key (str): The API subscription key.
+
+    Returns:
+        Dict[str, Any]: The JSON response containing the list of sources.
+    """
+    url = 'https://data.trade.gov/consolidated_screening_list/v1/sources'
+    headers = {'Subscription-Key': subscription_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+
+def get_de_minimis_list(subscription_key: str, size: Optional[int] = 10, offset: Optional[int] = 0) -> Dict[str, Any]:
+    """
+    Retrieves the de minimis list from the Trade.gov API with provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+        size (Optional[int]): The size of the result set.
+        offset (Optional[int]): The offset for pagination.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/de_minimis/v1/list'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'size': size,
+        'offset': offset
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")    
+
+def search_de_minimis(subscription_key: str, country_codes: Optional[str] = None, size: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Searches the de minimis list from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+        country_codes (Optional[str]): Country codes to filter the search.
+        size (Optional[int]): The size of the result set.
+        offset (Optional[int]): The offset for pagination.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/de_minimis/v1/search'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'country_codes': country_codes,
+        'size': size,
+        'offset': offset
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+    
+def get_ita_office_count(subscription_key: str) -> Dict[str, Any]:
+    """
+    Retrieves the count of ITA office locations from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/ita_office_locations/v1/count'
+    headers = {'Subscription-Key': subscription_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")    
+
+def search_ita_office_locations(subscription_key: str, q: Optional[str] = None, country_codes: Optional[str] = None, states: Optional[str] = None, assigned_zip_codes: Optional[str] = None, offset: Optional[int] = None, size: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Searches ITA office locations from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+        q (Optional[str]): Search query.
+        country_codes (Optional[str]): Country codes to filter the search.
+        states (Optional[str]): States to filter the search.
+        assigned_zip_codes (Optional[str]): Assigned zip codes to filter the search.
+        offset (Optional[int]): The offset for pagination.
+        size (Optional[int]): The size of the result set.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/ita_office_locations/v1/search'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'q': q,
+        'country_codes': country_codes,
+        'states': states,
+        'assigned_zip_codes': assigned_zip_codes,
+        'offset': offset,
+        'size': size
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+    
+def get_trade_events_count(subscription_key: str) -> Dict[str, Any]:
+    """
+    Retrieves the count of trade events from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/trade_events/v1/count'
+    headers = {'Subscription-Key': subscription_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")  
+
+def search_trade_events(subscription_key: str, 
+                        sources: Optional[str] = None, 
+                        countries: Optional[str] = None, 
+                        event_types: Optional[str] = None, 
+                        industries: Optional[str] = None, 
+                        states: Optional[str] = None, 
+                        q: Optional[str] = None, 
+                        start_date_from: Optional[str] = None, 
+                        start_date_to: Optional[str] = None, 
+                        size: Optional[int] = None, 
+                        offset: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Searches trade events from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+        sources (Optional[str]): Source filter.
+        countries (Optional[str]): Country filter.
+        event_types (Optional[str]): Event type filter.
+        industries (Optional[str]): Industry filter.
+        states (Optional[str]): State filter.
+        q (Optional[str]): Search query.
+        start_date_from (Optional[str]): Start date range from.
+        start_date_to (Optional[str]): Start date range to.
+        size (Optional[int]): The size of the result set.
+        offset (Optional[int]): The offset for pagination.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+    """
+    url = 'https://data.trade.gov/trade_events/v1/search'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'sources': sources,
+        'countries': countries,
+        'event_types': event_types,
+        'industries': industries,
+        'states': states,
+        'q': q,
+        'start_date_range[from]': start_date_from,
+        'start_date_range[to]': start_date_to,
+        'size': size,
+        'offset': offset
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+
+def get_trade_leads_count(subscription_key: str) -> Dict[str, Any]:
+    """
+    Retrieves the count of trade leads from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/trade_leads/v1/count'
+    headers = {'Subscription-Key': subscription_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")  
+    
+def search_trade_leads(subscription_key: str, 
+                       q: Optional[str] = None, 
+                       country_codes: Optional[str] = None, 
+                       tender_start_date_from: Optional[str] = None, 
+                       tender_start_date_to: Optional[str] = None, 
+                       contract_start_date_from: Optional[str] = None, 
+                       contract_start_date_to: Optional[str] = None, 
+                       size: Optional[int] = None, 
+                       offset: Optional[int] = None) -> Dict[str, Any]:
+    """
+    Searches trade leads from the Trade.gov API using the provided subscription key.
+
+    Args:
+        subscription_key (str): The subscription key for API access.
+        q (Optional[str]): Search query.
+        country_codes (Optional[str]): Country codes to filter the search.
+        tender_start_date_from (Optional[str]): Start date range (from) for tender.
+        tender_start_date_to (Optional[str]): Start date range (to) for tender.
+        contract_start_date_from (Optional[str]): Start date range (from) for contract.
+        contract_start_date_to (Optional[str]): Start date range (to) for contract.
+        size (Optional[int]): The size of the result set.
+        offset (Optional[int]): The offset for pagination.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+
+    Raises:
+        SystemExit: If the request fails.
+    """
+    url = 'https://data.trade.gov/trade_leads/v1/search'
+    headers = {'Subscription-Key': subscription_key}
+    params = {
+        'q': q,
+        'country_codes': country_codes,
+        'tender_start_date_range[from]': tender_start_date_from,
+        'tender_start_date_range[to]': tender_start_date_to,
+        'contract_start_date_range[from]': contract_start_date_from,
+        'contract_start_date_range[to]': contract_start_date_to,
+        'size': size,
+        'offset': offset
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params={k: v for k, v in params.items() if v is not None})
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+
+
+###########################
+####    Translation    ####
+###########################
+    
+# Initialize Ray
+ray.init(ignore_reinit_error=True)
+
+@ray.remote
+def translate_text(target_language: str, text: str) -> str:
+    """
+    Translate the given text into the specified target language using Google Translator.
+
+    Args:
+        target_language (str): Target language code (e.g., 'de' for German).
+        text (str): Text to be translated.
+
+    Returns:
+        str: Translated text.
+
+    Raises:
+        ValueError: If the target language code or text is invalid.
+    """
+    assert isinstance(target_language, str), "Target language code must be a string."
+    assert isinstance(text, str), "Text must be a string."
+    try:
+        translator = GoogleTranslator(source='auto', target=target_language)
+        return translator.translate(text)
+    except Exception as e:
+        raise ValueError(f"Error in translating text to '{target_language}': {e}")
+
+# Default
+languages = list(set(map_func(lambda x: x['language'].lower(), language_list)).intersection(GoogleTranslator().get_supported_languages()))
+
+def translate(text: str, languages: List[str] = languages) -> List[str]:
+    """
+    Translate text into multiple languages simultaneously using Ray for parallel processing.
+
+    Args:
+        languages (List[str]): A list of target language codes.
+        text (str): Text to be translated.
+
+    Returns:
+        List[str]: List of translated texts in the target languages.
+
+    Raises:
+        AssertionError: If languages is not a list or text is not a string.
+    """
+    assert isinstance(languages, list), "Languages must be a list."
+    assert all(isinstance(lang, str) for lang in languages), "All language codes must be strings."
+    assert isinstance(text, str), "Text must be a string."
+
+    translation_tasks = [translate_text.remote(lang, text) for lang in languages]
+    translations = ray.get(translation_tasks)
+
+    return translations
+
+# Shutdown Ray
+# ray.shutdown()
+

@@ -14,6 +14,8 @@ import base64
 import hashlib
 import logging
 import asyncio
+import aiohttp
+import requests
 import aio_pika
 import textwrap
 import threading
@@ -50,6 +52,10 @@ from pymilvus import (
 
 # PyXB => .xsd files
 # import pyxb.utils.domutils as domutils
+
+# Deep Translators
+from deep_translator import GoogleTranslator
+
 
 # Neo4j
 import neo4j

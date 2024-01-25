@@ -1,7 +1,7 @@
 {
     "language_list": [
         {"language": "English", "percent_spoken": 20},
-        {"language": "Mandarin Chinese", "percent_spoken": 16},
+        {"language": "Chinese (Simplified)", "percent_spoken": 16},
         {"language": "Hindi", "percent_spoken": 8},
         {"language": "Spanish", "percent_spoken": 7},
         {"language": "French", "percent_spoken": 3},
@@ -12,8 +12,10 @@
         {"language": "Indonesian", "percent_spoken": 3},
         {"language": "Urdu", "percent_spoken": 2.5},
         {"language": "Pashto", "percent_spoken": 1.5},
-        {"language": "Persian (Farsi)", "percent_spoken": 1.2},
+        {"language": "Persian", "percent_spoken": 1.2},
         {"language": "Somali", "percent_spoken": 0.5},
-        {"language": "Hausa", "percent_spoken": 0.5}
+        {"language": "Hausa", "percent_spoken": 0.5},
+        {"language": "Swahili", "percent_spoken": 1.0}, 
+        {"language": "filipino", "percent_spoken": 1.0}  
     ]
 }

@@ -94,10 +94,11 @@ except Exception as e:
 
 # languages
 try:
-    language_list = open_file(f"{data_dir}/languages.json")
-    print(f"Successfully loaded data for the Languages list: {language_list}")
+    spoken_languages = open_file(f"{data_dir}/languages.json")
+    language_list = spoken_languages['language_list']
+    print(f"Successfully loaded data for the Languages list: {spoken_languages}")
 except Exception as e:
-    print(f"Errors loading language list: {e}")
+    print(f"Errors loading spoken languages: {e}")
     raise
 
 # Reading in the International Government IDs - Sheet1.csv
@@ -190,3 +191,75 @@ try:
 except Exception as e:
     print(f"Error loading RAW PNRGOV KXUGJF.txt: {e}")
     pass
+
+#########################
+####    Trade.gov    ####
+#########################
+
+def get_bsp_count(subscription_key):
+    """
+    This function returns the count of business service providers from trade.gov
+    
+    Parameters:
+    subscription_key (str): The subscription key for the trade.gov API
+    
+    Returns:
+    dict: The count of business service providers
+    """
+    assert isinstance(subscription_key, str), f"subscription_key must be a string"
+    url = "https://data.trade.gov/business_service_providers/v1/count"
+    headers = {
+        'Accept': 'application/json',
+        'subscription-key': subscription_key
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return f"Error: {response.status_code}"
+    except Exception as e:
+        return f"Error with Trade.gov call: {e}"
+
+def search_business_service_providers(q: Optional[str] = None, 
+                                      categories: Optional[str] = None, 
+                                      ita_offices: Optional[str] = None, 
+                                      offset: Optional[int] = None, 
+                                      size: Optional[int] = None,
+                                      subscription_key: str = '') -> Dict[str, Any]:
+    """
+    Search business service providers from the Trade.gov API.
+
+    Args:
+        q (Optional[str]): Search query.
+        categories (Optional[str]): Categories filter.
+        ita_offices (Optional[str]): ITA offices filter.
+        offset (Optional[int]): Offset for pagination.
+        size (Optional[int]): Size of the result set.
+
+    Returns:
+        Dict[str, Any]: The JSON response from the API.
+    """
+    headers = {
+        'Accept': 'application/json',
+        'subscription-key': subscription_key
+    }
+
+    url = 'https://data.trade.gov/business_service_providers/v1/search'
+    params = {
+        'q': q,
+        'categories': categories,
+        'ita_offices': ita_offices,
+        'offset': offset,
+        'size': size
+    }
+
+    try:
+        response = requests.get(url, params={k: v for k, v in params.items() if v is not None}, headers=headers)
+        response.raise_for_status()  # Raises HTTPError for bad requests (4XX, 5XX)
+        return response.json()
+    except requests.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+
