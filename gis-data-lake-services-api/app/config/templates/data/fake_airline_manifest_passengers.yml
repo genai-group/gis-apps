@@ -63,8 +63,8 @@ edges:
     properties: [""]
     direction: "out"
     type: "one_to_one"
-  - parents: ["full_name"]
-    children: ["government_id_type", "passport_information"]
+  - parents: ["full_name", "identity"]
+    children: ["passport_information"]
     properties: [""]
     direction: "out"
     type: "one_to_one"

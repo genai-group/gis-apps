@@ -1,3 +1,4 @@
 
 .terraform/
 volumes/
+.DS_Store
